@@ -41,14 +41,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app.js" />
-    <Content Include="node.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="app.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="x32\node.exe" />
-    <Content Include="x32\openssl-cli.exe" />
-    <Content Include="x64\node.exe" />
-    <Content Include="x64\openssl-cli.exe" />
+    <Content Include="tool\node\x32\node.exe" />
+    <Content Include="tool\node\x32\openssl-cli.exe" />
+    <Content Include="tool\node\x64\node.exe" />
+    <Content Include="tool\node\x64\openssl-cli.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tool\Redis-x64-4.0.14.2.zip" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

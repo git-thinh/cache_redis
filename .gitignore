@@ -1,2 +1,3 @@
 /build/*.nlp
 /build/*.pdb
+/cache_redis/obj

@@ -12,26 +12,36 @@ namespace cache_redis
         static void Main(string[] args)
         {
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string platform = "64";
 
-            string file_node = Path.Combine(path, "x" + platform + @"\node.exe");
-
+            string file_node = Path.Combine(path, "node.exe");
             if (File.Exists(file_node))
             {
-                Process p = new Process();
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.RedirectStandardError = true;
-                p.StartInfo.RedirectStandardInput = true;
-                p.StartInfo.FileName = file_node;
+                Process node = new Process();
+                node.StartInfo.UseShellExecute = false;
+                node.StartInfo.RedirectStandardOutput = true;
+                node.StartInfo.RedirectStandardError = true;
+                node.StartInfo.RedirectStandardInput = true;
+                node.StartInfo.FileName = file_node;
                 string argument = @" --max-old-space-size=4096 app.js";
-                p.StartInfo.Arguments = argument;
-                p.Start();
-                //p.WaitForExit();
-                Console.ReadLine();
+                node.StartInfo.Arguments = argument;
+                node.Start();
             }
 
+            string file_redis = Path.Combine(path, "redis-server.exe");
+            if (File.Exists(file_redis))
+            {
+                Process redis = new Process();
+                redis.StartInfo.UseShellExecute = false;
+                redis.StartInfo.RedirectStandardOutput = true;
+                redis.StartInfo.RedirectStandardError = true;
+                redis.StartInfo.RedirectStandardInput = true;
+                redis.StartInfo.FileName = file_redis;
+                string argument = @" redis.windows.conf --port 5500";
+                redis.StartInfo.Arguments = argument;
+                redis.Start();
+            }
 
+            Console.ReadLine();
 
         }
     }
