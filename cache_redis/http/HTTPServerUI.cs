@@ -164,7 +164,8 @@ namespace cache_redis
                 try
                 {
                     HttpListenerContext context = _listener.GetContext();
-                    Process(context);
+                    //Process(context);
+                    FuncProcess(context);
                 }
                 catch (Exception ex)
                 {

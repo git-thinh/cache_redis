@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Login</title>
+
+    <script src="_lib/classie.js"></script>
+    <script src="_lib/head.load.min.js"></script>
+    <script src="_lib/lodash.min.js"></script>
+    <script src="_lib/jquery.min.3.3.1.js"></script>
+
+    <link href="_lib/fomantic-ui/semantic.min.css" rel="stylesheet" />
+    <script src="_lib/fomantic-ui/semantic.min.js"></script>
+
+    <script src="_lib/vue/vue.min.js"></script>
+
+    <script src="_lib/pouchdb/pouchdb-7.1.1.min.js"></script>
+    <script src="_lib/pouchdb/db-store.js"></script>
+
+    <script src="init.js"></script>
+
+</head>
+<body>
+    <div id="app">
+        <div v-show="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background-color:#fff;z-index:9999999;">
+            <div class="ui">
+                <div class="ui active slow green double loader"></div>
+            </div>
+        </div>
+
+
+        <div class="page-login">
+            <div class="ui centered grid container">
+                <div class="nine wide column">
+
+                    <h2 class="ui teal image header" style="width:100%">
+                        <div class="content" style="width: 100%;text-align: center;">
+                            HỆ THỐNG BÁN HÀNG F88
+                        </div>
+                    </h2>
+                   
+                    <div class="ui icon warning message" v-show="messages.length > 0">
+                        <i class="lock icon"></i>
+                        <div class="content">
+                            <div class="header">
+                                Đăng nhập không thành công!
+                            </div>
+                            <p><span v-for="(msg,index) in messages">{{msg}}<br /></span></p>
+                        </div>
+                    </div>
+                    <div class="ui fluid card">
+                        <div class="content">
+                            <form class="ui form">
+                                <div class="field" style="width: 100%;font-size: 17px;font-weight: bold;color: red;">
+                                  * Đăng nhập bằng tài khoản POS
+                                </div>
+
+                                <div class="field">
+                                    <div class="ui left icon input">
+                                        <i class="user icon"></i>
+                                        <input type="text" name="str_user_name" v-model="login.str_user_name" placeholder="Tài khoản">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui left icon input">
+                                        <i class="lock icon"></i>
+                                        <input type="password" name="str_pass_word" v-model="login.str_pass_word" placeholder="Mật khẩu">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <button class="ui primary labeled icon button" type="submit">
+                                        <i class="unlock alternate icon"></i>
+                                        Đăng nhập
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

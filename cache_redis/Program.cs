@@ -14,6 +14,10 @@ namespace cache_redis
 {
     class Program
     {
+        static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        static readonly string ROOT_PATH_UI = Path.Combine(ROOT_PATH, "ui");
+
+        static oConfig m_config;
         static Program()
         {
             AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
@@ -42,8 +46,21 @@ namespace cache_redis
             };
         }
 
-        static string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        static oConfig m_config;
+        static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
+        {
+            if (Directory.Exists(path) == false) return new string[] { };
+
+            if (string.IsNullOrEmpty(searchPattern) || searchPattern == "*.*")
+                return Directory.GetFiles(path, "*.*", searchOption).Select(x => x.ToLower()).ToArray();
+
+            string[] searchPatterns = searchPattern.Split('|');
+            List<string> files = new List<string>();
+            foreach (string sp in searchPatterns)
+                files.AddRange(Directory.GetFiles(path, sp, searchOption).Select(x => x.ToLower()));
+            files.Sort();
+            return files.ToArray();
+        }
+
 
         static Stream api___stream_string(string s)
         {
@@ -55,11 +72,12 @@ namespace cache_redis
             return stream;
         }
 
-        static void api___response(string _extension, string data, HttpListenerContext context) {
+        static void api___response(string _extension, Stream input, HttpListenerContext context)
+        {
             try
             {
                 //Stream input = new FileStream(filename, FileMode.Open);
-                Stream input = api___stream_string(data);
+                //Stream input = api___stream_string(data);
 
                 //Adding permanent http response headers
                 string contentType = HTTPServerUI.GetContentType(_extension);
@@ -82,12 +100,79 @@ namespace cache_redis
                 context.Response.StatusDescription = ex.Message;
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
+
+            context.Response.OutputStream.Close();
         }
 
-        static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) => {
-            string method = context.Request.HttpMethod;
-            string path = context.Request.Url.AbsolutePath;
+        static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) =>
+        {
+            string method = context.Request.HttpMethod,
+                path = context.Request.Url.AbsolutePath,
+                text = string.Empty;
+            string[] files, dirs;
 
+            switch (method)
+            {
+                #region [ GET ]
+                case "GET":
+                    string filename = path.Substring(1);
+                    Stream input = api___stream_string("Cannot found the file: " + path);
+
+                    if (filename == "list.html" || filename == "list")
+                    {
+                        dirs = Directory.GetDirectories(ROOT_PATH_UI);
+                        files = GetFiles(ROOT_PATH_UI, "*.*", SearchOption.TopDirectoryOnly);
+
+                        files = files.Select(x => string.Format(@"<a href=""{0}"">{0}</a></br>", Path.GetFileName(x))).ToArray();
+                        dirs = dirs.Select(x => string.Format(@"<a href=""{0}"">{0}</a></br>", Path.GetFileName(x))).ToArray();
+
+                        string s = string.Join(string.Empty, dirs) + string.Join(string.Empty, files);
+                        input = api___stream_string(s);
+                        filename = "list.html";
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(filename))
+                        {
+                            files = GetFiles(ROOT_PATH_UI, "*.*", SearchOption.TopDirectoryOnly);
+                            string fileIndex = files.Where(x => x.EndsWith("index.htm") || x.EndsWith("index.html")).SingleOrDefault();
+                            if (fileIndex != null) filename = Path.GetFileName(fileIndex);
+                        }
+
+                        filename = Path.Combine(ROOT_PATH_UI, filename);
+                        if (File.Exists(filename))
+                            input = new FileStream(filename, FileMode.Open);
+                        else
+                        {
+                            if (Directory.Exists(filename))
+                            {
+                                dirs = Directory.GetDirectories(filename);
+                                files = GetFiles(filename, "*.*", SearchOption.TopDirectoryOnly);
+
+                                files = files.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
+                                dirs = dirs.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
+
+                                string s = string.Join(string.Empty, dirs) + string.Join(string.Empty, files);
+                                input = api___stream_string(s);
+                                filename = "*.html";
+                            }
+                            else
+                            {
+                                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                                context.Response.OutputStream.Close();
+                                return false;
+                            }
+                        }
+                    }
+
+                    Console.WriteLine(path);
+                    api___response(Path.GetExtension(filename), input, context);
+
+                    break;
+                #endregion
+                case "POST":
+                    break;
+            }
             return false;
         };
 
@@ -96,7 +181,8 @@ namespace cache_redis
             #region [ READ CONFIG.JSON ]
 
             string file_config = Path.Combine(ROOT_PATH, "config.json");
-            if (!File.Exists(file_config)) {
+            if (!File.Exists(file_config))
+            {
                 Console.WriteLine("Cannot find config.json");
                 return;
             }
@@ -106,19 +192,17 @@ namespace cache_redis
                 string sconfig = File.ReadAllText(file_config);
                 m_config = JsonConvert.DeserializeObject<oConfig>(sconfig);
             }
-            catch (Exception e1) {
+            catch (Exception e1)
+            {
                 Console.WriteLine("Error format JSON file config.json = ", e1.Message);
                 return;
             }
 
             #endregion
 
+            if (!Directory.Exists(ROOT_PATH_UI)) Directory.CreateDirectory(ROOT_PATH_UI);
+            HTTPServerUI http_api = new HTTPServerUI(ROOT_PATH_UI, m_config.port_api, HTTP_API_PROCESS);
 
-            if (string.IsNullOrEmpty(m_config.dir_ui)) m_config.dir_ui = "ui";
-            string path_ui = Path.Combine(ROOT_PATH, m_config.dir_ui);
-            if (!Directory.Exists(path_ui)) Directory.CreateDirectory(path_ui);
-            HTTPServerUI http_api = new HTTPServerUI(path_ui, m_config.port_api, HTTP_API_PROCESS);
-            
 
 
             Console.WriteLine("Enter to exit ...");

@@ -1,9 +1,9 @@
 {
   "name": "POL_CACHE_ENGIN",
   "description": "",
-  "dir_ui": "ui",
   "port_api": 5500,
   "port_ws": 5510,
+  "port_tcp": 5511,
   "caches": [
     {
       "id": 10,
