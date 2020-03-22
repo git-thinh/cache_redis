@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Fleck2;
+using Fleck2.Interfaces;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 
@@ -9,39 +14,192 @@ namespace cache_redis
 {
     class Program
     {
+        static Program()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
+            {
+                Assembly asm = null;
+                string comName = ev.Name.Split(',')[0];
+                string resourceName = @"DLL\" + comName + ".dll";
+                var assembly = Assembly.GetExecutingAssembly();
+                resourceName = typeof(Program).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream != null)
+                    {
+                        byte[] buffer = new byte[stream.Length];
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                ms.Write(buffer, 0, read);
+                            buffer = ms.ToArray();
+                        }
+                        asm = Assembly.Load(buffer);
+                    }
+                }
+                return asm;
+            };
+        }
+
+        static string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        static oConfig m_config;
+
+        static Stream api___stream_string(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+
+        static void api___response(string _extension, string data, HttpListenerContext context) {
+            try
+            {
+                //Stream input = new FileStream(filename, FileMode.Open);
+                Stream input = api___stream_string(data);
+
+                //Adding permanent http response headers
+                string contentType = HTTPServerUI.GetContentType(_extension);
+                context.Response.ContentType = contentType;
+                context.Response.ContentLength64 = input.Length;
+                //context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
+                //context.Response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filename).ToString("r"));
+
+                byte[] buffer = new byte[1024 * 16];
+                int nbytes;
+                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                    context.Response.OutputStream.Write(buffer, 0, nbytes);
+                input.Close();
+
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                context.Response.OutputStream.Flush();
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusDescription = ex.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+        }
+
+        static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) => {
+            string method = context.Request.HttpMethod;
+            string path = context.Request.Url.AbsolutePath;
+
+            return false;
+        };
+
         static void Main(string[] args)
         {
-            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            #region [ READ CONFIG.JSON ]
 
-            string file_node = Path.Combine(path, "node.exe");
-            if (File.Exists(file_node))
-            {
-                Process node = new Process();
-                node.StartInfo.UseShellExecute = false;
-                node.StartInfo.RedirectStandardOutput = true;
-                node.StartInfo.RedirectStandardError = true;
-                node.StartInfo.RedirectStandardInput = true;
-                node.StartInfo.FileName = file_node;
-                string argument = @" --max-old-space-size=4096 app.js";
-                node.StartInfo.Arguments = argument;
-                node.Start();
+            string file_config = Path.Combine(ROOT_PATH, "config.json");
+            if (!File.Exists(file_config)) {
+                Console.WriteLine("Cannot find config.json");
+                return;
             }
 
-            string file_redis = Path.Combine(path, "redis-server.exe");
-            if (File.Exists(file_redis))
+            try
             {
-                Process redis = new Process();
-                redis.StartInfo.UseShellExecute = false;
-                redis.StartInfo.RedirectStandardOutput = true;
-                redis.StartInfo.RedirectStandardError = true;
-                redis.StartInfo.RedirectStandardInput = true;
-                redis.StartInfo.FileName = file_redis;
-                string argument = @" redis.windows.conf --port 5500";
-                redis.StartInfo.Arguments = argument;
-                redis.Start();
+                string sconfig = File.ReadAllText(file_config);
+                m_config = JsonConvert.DeserializeObject<oConfig>(sconfig);
+            }
+            catch (Exception e1) {
+                Console.WriteLine("Error format JSON file config.json = ", e1.Message);
+                return;
             }
 
-            Console.ReadLine();
+            #endregion
+
+
+            if (string.IsNullOrEmpty(m_config.dir_ui)) m_config.dir_ui = "ui";
+            string path_ui = Path.Combine(ROOT_PATH, m_config.dir_ui);
+            if (!Directory.Exists(path_ui)) Directory.CreateDirectory(path_ui);
+            HTTPServerUI http_api = new HTTPServerUI(path_ui, m_config.port_api, HTTP_API_PROCESS);
+            
+
+
+            Console.WriteLine("Enter to exit ...");
+            Console.ReadKey();
+
+            // Exit program
+            http_api.Stop();
+
+
+
+
+
+
+
+
+
+
+            //string file_node = Path.Combine(ROOT_PATH, "node.exe");
+            //if (File.Exists(file_node))
+            //{
+            //    Process node = new Process();
+            //    node.StartInfo.UseShellExecute = false;
+            //    node.StartInfo.RedirectStandardOutput = true;
+            //    node.StartInfo.RedirectStandardError = true;
+            //    node.StartInfo.RedirectStandardInput = true;
+            //    node.StartInfo.FileName = file_node;
+            //    string argument = @" --max-old-space-size=4096 app.js";
+            //    node.StartInfo.Arguments = argument;
+            //    node.Start();
+            //}
+
+            //string file_redis = Path.Combine(ROOT_PATH, "redis-server.exe");
+            //if (File.Exists(file_redis))
+            //{
+            //    Process redis = new Process();
+            //    redis.StartInfo.UseShellExecute = false;
+            //    redis.StartInfo.RedirectStandardOutput = true;
+            //    redis.StartInfo.RedirectStandardError = true;
+            //    redis.StartInfo.RedirectStandardInput = true;
+            //    redis.StartInfo.FileName = file_redis;
+            //    string argument = @" redis.windows.conf --port 5500";
+            //    redis.StartInfo.Arguments = argument;
+            //    redis.Start();
+            //}
+
+            //////Console.ReadLine();
+
+            //////FleckLog.Level = LogLevel.Debug;
+            //////var allSockets = new List<IWebSocketConnection>();
+            //////var server = new WebSocketServer("ws://localhost:8181");
+            //////server.Start(socket =>
+            //////{
+            //////    socket.OnOpen = () =>
+            //////    {
+            //////        Console.WriteLine("Open!");
+            //////        allSockets.Add(socket);
+            //////    };
+            //////    socket.OnClose = () =>
+            //////    {
+            //////        Console.WriteLine("Close!");
+            //////        allSockets.Remove(socket);
+            //////    };
+            //////    socket.OnMessage = message =>
+            //////    {
+            //////        Console.WriteLine(message);
+            //////        allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
+            //////    };
+            //////});
+
+            //////Process.Start("client.html");
+
+            //////var input = Console.ReadLine();
+            //////while (input != "exit")
+            //////{
+            //////    foreach (var socket in allSockets.ToList())
+            //////    {
+            //////        socket.Send(input);
+            //////    }
+            //////    input = Console.ReadLine();
+            //////}
+            ///
 
         }
     }
