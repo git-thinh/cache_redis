@@ -1,0 +1,6 @@
+D:\cache_redis\build\node.exe
+D:\cache_redis\build\cache.exe
+D:\cache_redis\build\cache.pdb
+D:\cache_redis\cache_redis\obj\Debug\cache_redis.csproj.CopyComplete
+D:\cache_redis\cache_redis\obj\Debug\cache.exe
+D:\cache_redis\cache_redis\obj\Debug\cache.pdb
