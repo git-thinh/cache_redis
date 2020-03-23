@@ -184,6 +184,7 @@ namespace TeamDevRedis
         #endregion
 
         #region connection methods
+
         public override Socket Connect()
         {
             var tid = Thread.CurrentThread.ManagedThreadId;
@@ -378,6 +379,7 @@ namespace TeamDevRedis
             if (_bstreams.ContainsKey(threadid))
                 _bstreams.Remove(threadid);
         }
+
         #endregion
 
         #region communication methods

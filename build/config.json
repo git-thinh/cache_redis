@@ -2,141 +2,201 @@
   "name": "POL_CACHE_ENGIN",
   "description": "",
   "port_api": 5500,
-  "port_ws": 5510,
+  "port_ws": 64798,
   "port_tcp": 5511,
+  "enable": false,
+  "ready": false,
+  "busy": false,
   "list_cache": [
     {
       "id": 10,
       "scope": "sys",
       "name": "LOG",
-      "port": 10000,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64760
     },
     {
       "id": 11,
       "scope": "pos",
       "name": "USER",
-      "port": 10001,
-      "enable": true
+      "description": null,
+      "enable": true,
+      "ready": true,
+      "busy": false,
+      "port": 64762
     },
     {
       "id": 12,
       "scope": "pos",
       "name": "SHOP",
-      "port": 10002,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64764
     },
     {
       "id": 13,
       "scope": "pos",
       "name": "GROUP",
-      "port": 10003,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64766
     },
     {
       "id": 14,
       "scope": "pol",
       "name": "SYS_SMS",
-      "port": 10004,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64768
     },
     {
       "id": 15,
       "scope": "pol",
       "name": "SYS_EMAIL",
-      "port": 10005,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64770
     },
     {
       "id": 16,
       "scope": "pol",
       "name": "SUPPORT_SCHEDULE",
-      "port": 10006,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64772
     },
     {
       "id": 17,
       "scope": "pol",
       "name": "STEP",
-      "port": 10007,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64774
     },
     {
       "id": 18,
       "scope": "pol",
       "name": "REASON_FAIL",
-      "port": 10008,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64776
     },
     {
       "id": 19,
       "scope": "pol",
       "name": "PROCESS",
-      "port": 10009,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64778
     },
     {
       "id": 20,
       "scope": "pol",
       "name": "PRIORITY",
-      "port": 10010,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64780
     },
     {
       "id": 21,
       "scope": "pol",
       "name": "PAWN_DETAIL",
-      "port": 10012,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64782
     },
     {
       "id": 22,
       "scope": "pol",
       "name": "NOTIFY",
-      "port": 10014,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64784
     },
     {
       "id": 23,
       "scope": "pol",
       "name": "CUSTOMER",
-      "port": 10015,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64786
     },
     {
       "id": 24,
       "scope": "pol",
       "name": "CHANNEL",
-      "port": 10016,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64788
     },
     {
       "id": 25,
       "scope": "pol",
       "name": "ASSET_TYPE",
-      "port": 10017,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64790
     },
     {
       "id": 26,
       "scope": "pol",
       "name": "AREA",
-      "port": 10018,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64792
     },
     {
       "id": 27,
       "scope": "pol",
       "name": "PAWN",
-      "port": 10013,
-      "enable": false
+      "description": null,
+      "enable": false,
+      "ready": true,
+      "busy": false,
+      "port": 64794
     },
     {
       "id": 28,
       "scope": "pos",
       "name": "SYS_CONFIG",
-      "port": 10019,
-      "enable": true
+      "description": null,
+      "enable": true,
+      "ready": true,
+      "busy": false,
+      "port": 64796
     }
   ]
 }
