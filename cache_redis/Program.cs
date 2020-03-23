@@ -72,7 +72,7 @@ namespace cache_redis
             return stream;
         }
 
-        static void api___response(string _extension, Stream input, HttpListenerContext context)
+        static void api___response_stream(string _extension, Stream input, HttpListenerContext context)
         {
             try
             {
@@ -104,19 +104,60 @@ namespace cache_redis
             context.Response.OutputStream.Close();
         }
 
+        static void api___response_json_error(string message, HttpListenerContext context)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(new oResponseJson().Error(message));
+                string _extension = "*.json";
+                //Stream input = new FileStream(filename, FileMode.Open);
+                Stream input = api___stream_string(json);
+
+                //Adding permanent http response headers
+                string contentType = HTTPServerUI.GetContentType(_extension);
+                context.Response.ContentType = contentType;
+                context.Response.ContentLength64 = input.Length;
+                //context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
+                //context.Response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filename).ToString("r"));
+
+                byte[] buffer = new byte[1024 * 16];
+                int nbytes;
+                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                    context.Response.OutputStream.Write(buffer, 0, nbytes);
+                input.Close();
+
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                context.Response.OutputStream.Flush();
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusDescription = ex.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+
+            context.Response.OutputStream.Close();
+        }
+
+        static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
+        {
+
+             return false;
+        };
+
         static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) =>
         {
             string method = context.Request.HttpMethod,
                 path = context.Request.Url.AbsolutePath,
-                text = string.Empty;
+                text = string.Empty, filename = path.Substring(1);
             string[] files, dirs;
+            Stream input;
 
             switch (method)
             {
                 #region [ GET ]
                 case "GET":
-                    string filename = path.Substring(1);
-                    Stream input = api___stream_string("Cannot found the file: " + path);
+                    filename = path.Substring(1);
+                    input = api___stream_string("Cannot found the file: " + path);
 
                     if (filename == "list.html" || filename == "list")
                     {
@@ -165,13 +206,40 @@ namespace cache_redis
                         }
                     }
 
-                    Console.WriteLine(path);
-                    api___response(Path.GetExtension(filename), input, context);
+                    //Console.WriteLine(path);
+                    api___response_stream(Path.GetExtension(filename), input, context);
 
                     break;
                 #endregion
+
+                #region [ POST ]
                 case "POST":
+                    input = context.Request.InputStream;
+                    if (input != null && input.Length > 0)
+                    {
+                        input.Position = 0;
+                        using (StreamReader reader = new StreamReader(input, Encoding.UTF8))
+                            text = reader.ReadToEnd();
+                        oRedisCmd[] cmds = null;
+                        try
+                        {
+                            cmds = JsonConvert.DeserializeObject<oRedisCmd[]>(text);
+                            HTTP_API_PROCESS_CMD(context, cmds);
+                        }
+                        catch (Exception ex) { 
+                        
+                        }                        
+                    }
+                    else
+                    {
+                        input = api___stream_string(s);
+                        api___response_stream(Path.GetExtension(filename), input, context);
+                        //context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                        context.Response.OutputStream.Close();
+                        return false;
+                    }
                     break;
+                    #endregion
             }
             return false;
         };
