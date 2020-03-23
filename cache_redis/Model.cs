@@ -31,6 +31,7 @@ namespace cache_redis
     {
         public string name { set; get; }
         public string description { set; get; }
+        public Dictionary<string,string> db_connect { set; get; }
 
         public int port_api { set; get; }
         public int port_ws { set; get; }
