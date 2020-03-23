@@ -158,8 +158,12 @@ namespace cache_redis
         /// </summary>
         public void Stop()
         {
-            _serverThread.Abort();
-            _listener.Stop();
+            try
+            {
+                _serverThread.Abort();
+                _listener.Stop();
+            }
+            catch (Exception e) { }
         }
 
         private void Listen()

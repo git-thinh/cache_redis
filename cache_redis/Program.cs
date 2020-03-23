@@ -2,6 +2,7 @@
 using Fleck2.Interfaces;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using TeamDevRedis;
 
 namespace cache_redis
 {
@@ -47,7 +49,7 @@ namespace cache_redis
             };
         }
 
-        #region [ API RESPONSE ]
+        #region [ API BASE ]
 
         static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
         {
@@ -127,7 +129,7 @@ namespace cache_redis
             try
             {
                 string json;
-                
+
                 if (obj == null)
                     json = JsonConvert.SerializeObject(new oResponseJson().Ok());
                 else
@@ -143,6 +145,10 @@ namespace cache_redis
             }
             context.Response.OutputStream.Close();
         }
+
+        #endregion
+
+        #region [ API PROCESS ]
 
         static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
         {
@@ -183,7 +189,7 @@ namespace cache_redis
                             input = api___stream_string(text);
                             filename = "list.html";
                             break;
-                            #endregion
+                        #endregion
                         case "config":
                         case "config.html":
                             #region
@@ -191,7 +197,7 @@ namespace cache_redis
                             input = api___stream_string(text);
                             api___response_stream(".json", input, context);
                             break;
-                            #endregion
+                        #endregion
                         default:
                             #region
                             if (string.IsNullOrEmpty(filename))
@@ -268,9 +274,44 @@ namespace cache_redis
 
         #endregion
 
+        #region [ FREE RESOURCE ]
+
+        static int tcp___get_free_port() {
+            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
+        
+        static HTTPServerUI http_api;
+        static WebSocketServer server_ws;
+        static List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
+        static ConcurrentDictionary<string, IRedisDataAccessProvider> m_redis
+            = new ConcurrentDictionary<string, IRedisDataAccessProvider>() { };
+        static void app___free_resouce() {
+            try
+            {
+                http_api.Stop();
+
+                m_config.list_cache.ForEach(cf =>
+                {
+                    try { m_redis[cf.name].Close(); } catch (Exception e1) { }
+                    try { cf.process.Kill(); } catch (Exception e2) { }
+                });
+                m_redis.Clear();
+
+                allSockets.Clear();
+                server_ws.Dispose();
+            }
+            catch (Exception err) { }
+        }
+
+        #endregion
+
         static void Main(string[] args)
         {
-            #region [ READ CONFIG.JSON ]
+            #region [ CONFIG.JSON ]
 
             string file_config = Path.Combine(ROOT_PATH, "config.json");
             if (!File.Exists(file_config))
@@ -292,42 +333,66 @@ namespace cache_redis
 
             #endregion
 
-            #region [ START REDIS CACHE ]
+            #region [ REDIS CACHE ]
 
-            if (m_config != null && m_config.list_cache != null) {
+            if (m_config != null && m_config.list_cache != null)
+            {
+                string file_conf_template = Path.Combine(ROOT_PATH, "redis.conf");
+                if (File.Exists(file_conf_template) == false)
+                {
+                    Console.WriteLine("Cannot found the file: " + file_conf_template);
+                    return;
+                }
+                string temp_conf = File.ReadAllText(file_conf_template);
 
-                string dir_conf = Path.Combine(ROOT_PATH, "config");
-                if (Directory.Exists(dir_conf) == false) Directory.CreateDirectory(dir_conf);
+                string path_conf = Path.Combine(ROOT_PATH, "config");
+                if (Directory.Exists(path_conf) == false) Directory.CreateDirectory(path_conf);
 
-                string dir_data = Path.Combine(ROOT_PATH, "data");
-                if (Directory.Exists(dir_data) == false) Directory.CreateDirectory(dir_data);
+                string PATH_DATA = Path.Combine(ROOT_PATH, "data");
+                if (Directory.Exists(PATH_DATA) == false) Directory.CreateDirectory(PATH_DATA);
 
                 m_config.busy = true;
                 m_config.list_cache.ForEach(cf =>
                 {
-                    TcpListener l = new TcpListener(IPAddress.Loopback, 0);
-                    l.Start();
-                    int port = ((IPEndPoint)l.LocalEndpoint).Port;
-                    l.Stop();
-
-                    string file_conf = Path.Combine(dir_conf, cf.name + ".conf");
-
+                    int port = tcp___get_free_port();
                     string file_redis = Path.Combine(ROOT_PATH, "redis-server.exe");
                     if (File.Exists(file_redis))
                     {
+                        string file_conf = Path.Combine(path_conf, cf.name + ".conf");
+                        if (File.Exists(file_conf)) File.Delete(file_conf);
+
+                        string conf = temp_conf
+                            .Replace("[IP]", "127.0.0.1")
+                            .Replace("[PORT]", port.ToString())
+                            .Replace("[DATA_FILE]", cf.name)
+                            .Replace("[DATA_PATH]", PATH_DATA.Replace('\\', '/'));
+                        File.WriteAllText(file_conf, conf);
+
                         Process p = new Process();
                         p.StartInfo.UseShellExecute = false;
                         p.StartInfo.RedirectStandardOutput = true;
                         p.StartInfo.RedirectStandardError = true;
                         p.StartInfo.RedirectStandardInput = true;
                         p.StartInfo.FileName = file_redis;
-                        string argument = @" redis.windows.conf --port " + port.ToString();
+                        //string argument = @" """ + file_conf + @""" --port " + port.ToString();
+                        string argument = @" """ + file_conf + @"""";
                         p.StartInfo.Arguments = argument;
                         p.Start();
 
                         cf.process = p;
                         cf.port = port;
                         cf.ready = true;
+
+                        RedisDataAccessProvider redis = new RedisDataAccessProvider();
+                        redis.Configuration = new TeamDevRedis.LanguageItems.Configuration() { Host = "127.0.0.1", Port = port };
+                        redis.Connect();
+
+                        if (m_redis.ContainsKey(cf.name))
+                            m_redis.TryAdd(cf.name, redis);
+                        else
+                            m_redis[cf.name] = redis;
+
+                        Console.WriteLine(" -> " + cf.name + " " + cf.port.ToString());
                     }
                 });
                 m_config.busy = false;
@@ -335,25 +400,65 @@ namespace cache_redis
 
             #endregion
 
+            #region [ WEB_SOCKET ]
+
+            int port_ws = tcp___get_free_port();
+            FleckLog.Level = LogLevel.Error;
+            server_ws = new WebSocketServer("ws://127.0.0.1:" + port_ws);
+            server_ws.Start(socket =>
+            {
+                socket.OnOpen = () =>
+                {
+                    Console.WriteLine("Open!");
+                    allSockets.Add(socket);
+                };
+                socket.OnClose = () =>
+                {
+                    Console.WriteLine("Close!");
+                    allSockets.Remove(socket);
+                };
+                socket.OnMessage = message =>
+                {
+                    Console.WriteLine(message);
+                    allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                };
+            });
+            m_config.port_ws = port_ws;
+
+            #endregion
+
+            #region [ TCP_PUSH ]
+
+
+            #endregion
+
+            #region [ HTTP_API ]
+            
             if (!Directory.Exists(ROOT_PATH_UI)) Directory.CreateDirectory(ROOT_PATH_UI);
-            HTTPServerUI http_api = new HTTPServerUI(ROOT_PATH_UI, m_config.port_api, HTTP_API_PROCESS);
+            http_api = new HTTPServerUI(ROOT_PATH_UI, m_config.port_api, HTTP_API_PROCESS);
 
+            #endregion
 
+            File.WriteAllText(file_config, JsonConvert.SerializeObject(m_config, Formatting.Indented));
+            
+            #region [ READ LINE ]
 
-            Console.WriteLine("Enter to exit ...");
-            Console.ReadKey();
+            string line = Console.ReadLine();
+            while (line != "exit")
+            {
+                //foreach (var socket in allSockets.ToList()) socket.Send(line);
+                switch (line) {
+                    case "cls":
+                    case "clean":
+                    case "clear":
+                        Console.Clear();
+                        break;
+                }
+                line = Console.ReadLine();
+            }
 
-            // Exit program
-            http_api.Stop();
-
-
-
-
-
-
-
-
-
+            Console.WriteLine("Program is closing... ");
+            app___free_resouce();
 
             //string file_node = Path.Combine(ROOT_PATH, "node.exe");
             //if (File.Exists(file_node))
@@ -369,57 +474,7 @@ namespace cache_redis
             //    node.Start();
             //}
 
-            //string file_redis = Path.Combine(ROOT_PATH, "redis-server.exe");
-            //if (File.Exists(file_redis))
-            //{
-            //    Process redis = new Process();
-            //    redis.StartInfo.UseShellExecute = false;
-            //    redis.StartInfo.RedirectStandardOutput = true;
-            //    redis.StartInfo.RedirectStandardError = true;
-            //    redis.StartInfo.RedirectStandardInput = true;
-            //    redis.StartInfo.FileName = file_redis;
-            //    string argument = @" redis.windows.conf --port 5500";
-            //    redis.StartInfo.Arguments = argument;
-            //    redis.Start();
-            //}
-
-            //////Console.ReadLine();
-
-            //////FleckLog.Level = LogLevel.Debug;
-            //////var allSockets = new List<IWebSocketConnection>();
-            //////var server = new WebSocketServer("ws://localhost:8181");
-            //////server.Start(socket =>
-            //////{
-            //////    socket.OnOpen = () =>
-            //////    {
-            //////        Console.WriteLine("Open!");
-            //////        allSockets.Add(socket);
-            //////    };
-            //////    socket.OnClose = () =>
-            //////    {
-            //////        Console.WriteLine("Close!");
-            //////        allSockets.Remove(socket);
-            //////    };
-            //////    socket.OnMessage = message =>
-            //////    {
-            //////        Console.WriteLine(message);
-            //////        allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
-            //////    };
-            //////});
-
-            //////Process.Start("client.html");
-
-            //////var input = Console.ReadLine();
-            //////while (input != "exit")
-            //////{
-            //////    foreach (var socket in allSockets.ToList())
-            //////    {
-            //////        socket.Send(input);
-            //////    }
-            //////    input = Console.ReadLine();
-            //////}
-            ///
-
+            #endregion
         }
     }
 }

@@ -5,3 +5,4 @@
 /.vs
 /studio-redis/bin
 /studio-redis/obj
+/build/config
