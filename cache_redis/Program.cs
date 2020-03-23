@@ -109,39 +109,21 @@ namespace cache_redis
             try
             {
                 string json = JsonConvert.SerializeObject(new oResponseJson().Error(message));
-                string _extension = "*.json";
-                //Stream input = new FileStream(filename, FileMode.Open);
                 Stream input = api___stream_string(json);
-
-                //Adding permanent http response headers
-                string contentType = HTTPServerUI.GetContentType(_extension);
-                context.Response.ContentType = contentType;
-                context.Response.ContentLength64 = input.Length;
-                //context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
-                //context.Response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filename).ToString("r"));
-
-                byte[] buffer = new byte[1024 * 16];
-                int nbytes;
-                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0)
-                    context.Response.OutputStream.Write(buffer, 0, nbytes);
-                input.Close();
-
-                context.Response.StatusCode = (int)HttpStatusCode.OK;
-                context.Response.OutputStream.Flush();
+                api___response_stream("*.json", input, context);
             }
             catch (Exception ex)
             {
                 context.Response.StatusDescription = ex.Message;
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
-
             context.Response.OutputStream.Close();
         }
 
         static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
         {
 
-             return false;
+            return false;
         };
 
         static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) =>
@@ -226,16 +208,15 @@ namespace cache_redis
                             cmds = JsonConvert.DeserializeObject<oRedisCmd[]>(text);
                             HTTP_API_PROCESS_CMD(context, cmds);
                         }
-                        catch (Exception ex) { 
-                        
-                        }                        
+                        catch (Exception ex)
+                        {
+                            api___response_json_error("Error convert json input: " + ex.Message, context);
+                            return false;
+                        }
                     }
                     else
                     {
-                        input = api___stream_string(s);
-                        api___response_stream(Path.GetExtension(filename), input, context);
-                        //context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                        context.Response.OutputStream.Close();
+                        api___response_json_error("Body input is null", context);
                         return false;
                     }
                     break;
