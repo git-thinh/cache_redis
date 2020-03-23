@@ -1,0 +1,1 @@
+﻿SELECT * FROM mobile.pol_notify order by int_date,int_time desc

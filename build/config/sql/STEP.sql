@@ -1,0 +1,1 @@
+﻿select * from mobile.pol_step
