@@ -98,11 +98,19 @@ namespace cache_redis
             {".xml", "text/xml"},
             {".xpi", "application/x-xpinstall"},
             {".zip", "application/zip"},
+            {".json", "application/json"},
 
             #endregion
         };
 
-        public static string GetContentType(string _extension) {
+        public static string GetContentType(string _extension)
+        {
+            if (string.IsNullOrEmpty(_extension) || _extension.Length == 0 || _mimeTypeMappings.ContainsKey(_extension) == false)  
+                return "application/octet-stream";
+
+            if (_extension[0] == '*') 
+                _extension = _extension.Substring(1);
+
             string mime;
             return _mimeTypeMappings.TryGetValue(_extension, out mime) ? mime : "application/octet-stream";
         }

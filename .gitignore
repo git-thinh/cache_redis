@@ -1,3 +1,7 @@
 /build/*.nlp
 /build/*.pdb
 /cache_redis/obj
+/cache_redis/.vs
+/.vs
+/studio-redis/bin
+/studio-redis/obj

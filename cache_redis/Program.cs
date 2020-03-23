@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 
@@ -46,6 +47,8 @@ namespace cache_redis
             };
         }
 
+        #region [ API RESPONSE ]
+
         static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
         {
             if (Directory.Exists(path) == false) return new string[] { };
@@ -60,7 +63,6 @@ namespace cache_redis
             files.Sort();
             return files.ToArray();
         }
-
 
         static Stream api___stream_string(string s)
         {
@@ -110,7 +112,29 @@ namespace cache_redis
             {
                 string json = JsonConvert.SerializeObject(new oResponseJson().Error(message));
                 Stream input = api___stream_string(json);
-                api___response_stream("*.json", input, context);
+                api___response_stream(".json", input, context);
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusDescription = ex.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            context.Response.OutputStream.Close();
+        }
+
+        static void api___response_json_ok(object obj, HttpListenerContext context)
+        {
+            try
+            {
+                string json;
+                
+                if (obj == null)
+                    json = JsonConvert.SerializeObject(new oResponseJson().Ok());
+                else
+                    json = JsonConvert.SerializeObject(new oResponseJson().Ok());
+
+                Stream input = api___stream_string(json);
+                api___response_stream(".json", input, context);
             }
             catch (Exception ex)
             {
@@ -141,51 +165,68 @@ namespace cache_redis
                     filename = path.Substring(1);
                     input = api___stream_string("Cannot found the file: " + path);
 
-                    if (filename == "list.html" || filename == "list")
+                    switch (filename)
                     {
-                        dirs = Directory.GetDirectories(ROOT_PATH_UI);
-                        files = GetFiles(ROOT_PATH_UI, "*.*", SearchOption.TopDirectoryOnly);
-
-                        files = files.Select(x => string.Format(@"<a href=""{0}"">{0}</a></br>", Path.GetFileName(x))).ToArray();
-                        dirs = dirs.Select(x => string.Format(@"<a href=""{0}"">{0}</a></br>", Path.GetFileName(x))).ToArray();
-
-                        string s = string.Join(string.Empty, dirs) + string.Join(string.Empty, files);
-                        input = api___stream_string(s);
-                        filename = "list.html";
-                    }
-                    else
-                    {
-                        if (string.IsNullOrEmpty(filename))
-                        {
+                        case "list.html":
+                        case "list":
+                            #region
+                            dirs = Directory.GetDirectories(ROOT_PATH_UI);
                             files = GetFiles(ROOT_PATH_UI, "*.*", SearchOption.TopDirectoryOnly);
-                            string fileIndex = files.Where(x => x.EndsWith("index.htm") || x.EndsWith("index.html")).SingleOrDefault();
-                            if (fileIndex != null) filename = Path.GetFileName(fileIndex);
-                        }
 
-                        filename = Path.Combine(ROOT_PATH_UI, filename);
-                        if (File.Exists(filename))
-                            input = new FileStream(filename, FileMode.Open);
-                        else
-                        {
-                            if (Directory.Exists(filename))
+                            files = files.Select(x => string.Format(@"<a href=""{0}"" target=_blank>{0}</a></br>", Path.GetFileName(x))).ToArray();
+                            dirs = dirs.Select(x => string.Format(@"<a href=""{0}"" target=_blank>{0}</a></br>", Path.GetFileName(x))).ToArray();
+
+                            text = string.Join(string.Empty, dirs) + string.Join(string.Empty, files) +
+                                //@"<a href=""/config"">config</a></br>" +
+                                @"<a href=""/config"" target=_blank>config</a></br>";
+
+                            input = api___stream_string(text);
+                            filename = "list.html";
+                            break;
+                            #endregion
+                        case "config":
+                        case "config.html":
+                            #region
+                            text = JsonConvert.SerializeObject(m_config);
+                            input = api___stream_string(text);
+                            api___response_stream(".json", input, context);
+                            break;
+                            #endregion
+                        default:
+                            #region
+                            if (string.IsNullOrEmpty(filename))
                             {
-                                dirs = Directory.GetDirectories(filename);
-                                files = GetFiles(filename, "*.*", SearchOption.TopDirectoryOnly);
-
-                                files = files.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
-                                dirs = dirs.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
-
-                                string s = string.Join(string.Empty, dirs) + string.Join(string.Empty, files);
-                                input = api___stream_string(s);
-                                filename = "*.html";
+                                files = GetFiles(ROOT_PATH_UI, "*.*", SearchOption.TopDirectoryOnly);
+                                string fileIndex = files.Where(x => x.EndsWith("index.htm") || x.EndsWith("index.html")).SingleOrDefault();
+                                if (fileIndex != null) filename = Path.GetFileName(fileIndex);
                             }
+
+                            filename = Path.Combine(ROOT_PATH_UI, filename);
+                            if (File.Exists(filename))
+                                input = new FileStream(filename, FileMode.Open);
                             else
                             {
-                                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                                context.Response.OutputStream.Close();
-                                return false;
+                                if (Directory.Exists(filename))
+                                {
+                                    dirs = Directory.GetDirectories(filename);
+                                    files = GetFiles(filename, "*.*", SearchOption.TopDirectoryOnly);
+
+                                    files = files.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
+                                    dirs = dirs.Select(x => string.Format(@"<a href=""{0}/{1}"">{1}</a></br>", path, Path.GetFileName(x))).ToArray();
+
+                                    text = string.Join(string.Empty, dirs) + string.Join(string.Empty, files);
+                                    input = api___stream_string(text);
+                                    filename = ".html";
+                                }
+                                else
+                                {
+                                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                                    context.Response.OutputStream.Close();
+                                    return false;
+                                }
                             }
-                        }
+                            #endregion
+                            break;
                     }
 
                     //Console.WriteLine(path);
@@ -225,6 +266,8 @@ namespace cache_redis
             return false;
         };
 
+        #endregion
+
         static void Main(string[] args)
         {
             #region [ READ CONFIG.JSON ]
@@ -245,6 +288,49 @@ namespace cache_redis
             {
                 Console.WriteLine("Error format JSON file config.json = ", e1.Message);
                 return;
+            }
+
+            #endregion
+
+            #region [ START REDIS CACHE ]
+
+            if (m_config != null && m_config.list_cache != null) {
+
+                string dir_conf = Path.Combine(ROOT_PATH, "config");
+                if (Directory.Exists(dir_conf) == false) Directory.CreateDirectory(dir_conf);
+
+                string dir_data = Path.Combine(ROOT_PATH, "data");
+                if (Directory.Exists(dir_data) == false) Directory.CreateDirectory(dir_data);
+
+                m_config.busy = true;
+                m_config.list_cache.ForEach(cf =>
+                {
+                    TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+                    l.Start();
+                    int port = ((IPEndPoint)l.LocalEndpoint).Port;
+                    l.Stop();
+
+                    string file_conf = Path.Combine(dir_conf, cf.name + ".conf");
+
+                    string file_redis = Path.Combine(ROOT_PATH, "redis-server.exe");
+                    if (File.Exists(file_redis))
+                    {
+                        Process p = new Process();
+                        p.StartInfo.UseShellExecute = false;
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.StartInfo.RedirectStandardError = true;
+                        p.StartInfo.RedirectStandardInput = true;
+                        p.StartInfo.FileName = file_redis;
+                        string argument = @" redis.windows.conf --port " + port.ToString();
+                        p.StartInfo.Arguments = argument;
+                        p.Start();
+
+                        cf.process = p;
+                        cf.port = port;
+                        cf.ready = true;
+                    }
+                });
+                m_config.busy = false;
             }
 
             #endregion

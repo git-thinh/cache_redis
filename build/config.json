@@ -4,7 +4,7 @@
   "port_api": 5500,
   "port_ws": 5510,
   "port_tcp": 5511,
-  "caches": [
+  "list_cache": [
     {
       "id": 10,
       "scope": "sys",
