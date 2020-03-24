@@ -51,10 +51,14 @@ function ___convert_unicode_to_ascii(str) {
     return str;
 }
 
-function ___index(o) {
+function ___index(cache_name, o) {
     if (o == null) o = {};
 
     try {
+        if (cache_name == 'USER') {
+            o.int_don = 0;
+            //o.str_token = '';
+        }
 
         var ids = [], utf8 = [];
 
@@ -63,9 +67,11 @@ function ___index(o) {
             var val = o[col];
             if (col == 'id' && val != null) o[col] = Number(val);
 
-            if (val != null && val != -1) {
-                if (isNumber) ids.push(val);
-                else utf8.push(val);
+            if (col != 'str_call_out_tooken') {
+                if (val != null && val != -1) {
+                    if (isNumber) ids.push(val);
+                    else utf8.push(val);
+                }
             }
         }
 

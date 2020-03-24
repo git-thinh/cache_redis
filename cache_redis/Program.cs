@@ -52,6 +52,106 @@ namespace cache_redis
 
         #region [ MEMORY CACHE ]
 
+        static bool b_01 = false;
+        static bool b_02 = false;
+        static bool b_03 = false;
+        static bool b_04 = false;
+        static bool b_05 = false;
+        static bool b_06 = false;
+        static bool b_07 = false;
+        static bool b_08 = false;
+        static bool b_09 = false;
+        static bool b_10 = false;
+        static bool b_11 = false;
+        static bool b_12 = false;
+        static bool b_13 = false;
+        static bool b_14 = false;
+        static bool b_15 = false;
+        static bool b_16 = false;
+        static bool b_17 = false;
+        static bool b_18 = false;
+        static bool b_19 = false;
+        static bool b_20 = false;
+        static bool b_21 = false;
+        static bool b_22 = false;
+        static bool b_23 = false;
+        static bool b_24 = false;
+        static bool b_25 = false;
+        static bool b_26 = false;
+        static bool b_27 = false;
+        static bool b_28 = false;
+        static bool b_29 = false;
+        static bool b_30 = false;
+        static bool b_31 = false;
+        static bool b_32 = false;
+        static bool b_33 = false;
+        static bool b_34 = false;
+        static bool b_35 = false;
+        static bool b_36 = false;
+        static bool b_37 = false;
+        static bool b_38 = false;
+        static bool b_39 = false;
+        static bool b_40 = false;
+        static bool b_41 = false;
+        static bool b_42 = false;
+        static bool b_43 = false;
+        static bool b_44 = false;
+        static bool b_45 = false;
+        static bool b_46 = false;
+        static bool b_47 = false;
+        static bool b_48 = false;
+        static bool b_49 = false;
+        static bool b_50 = false;
+        static bool b_51 = false;
+        static bool b_52 = false;
+        static bool b_53 = false;
+        static bool b_54 = false;
+        static bool b_55 = false;
+        static bool b_56 = false;
+        static bool b_57 = false;
+        static bool b_58 = false;
+        static bool b_59 = false;
+        static bool b_60 = false;
+        static bool b_61 = false;
+        static bool b_62 = false;
+        static bool b_63 = false;
+        static bool b_64 = false;
+        static bool b_65 = false;
+        static bool b_66 = false;
+        static bool b_67 = false;
+        static bool b_68 = false;
+        static bool b_69 = false;
+        static bool b_70 = false;
+        static bool b_71 = false;
+        static bool b_72 = false;
+        static bool b_73 = false;
+        static bool b_74 = false;
+        static bool b_75 = false;
+        static bool b_76 = false;
+        static bool b_77 = false;
+        static bool b_78 = false;
+        static bool b_79 = false;
+        static bool b_80 = false;
+        static bool b_81 = false;
+        static bool b_82 = false;
+        static bool b_83 = false;
+        static bool b_84 = false;
+        static bool b_85 = false;
+        static bool b_86 = false;
+        static bool b_87 = false;
+        static bool b_88 = false;
+        static bool b_89 = false;
+        static bool b_90 = false;
+        static bool b_91 = false;
+        static bool b_92 = false;
+        static bool b_93 = false;
+        static bool b_94 = false;
+        static bool b_95 = false;
+        static bool b_96 = false;
+        static bool b_97 = false;
+        static bool b_98 = false;
+        static bool b_99 = false;
+
         static ConcurrentDictionary<string, string> m_01 = new ConcurrentDictionary<string, string>();
         static ConcurrentDictionary<string, string> m_02 = new ConcurrentDictionary<string, string>();
         static ConcurrentDictionary<string, string> m_03 = new ConcurrentDictionary<string, string>();
@@ -267,7 +367,8 @@ namespace cache_redis
             return null;
         }
 
-        static void m___free_memory() {
+        static void m___free_memory()
+        {
             m_01.Clear();
             m_02.Clear();
             m_03.Clear();
@@ -369,6 +470,232 @@ namespace cache_redis
             m_99.Clear();
         }
 
+        static bool busy___get(string cache_name)
+        {
+            int index = -1;
+            if (string.IsNullOrEmpty(cache_name)) return true;
+
+            for (int i = 0; i < 100; i++) if (m_names[i] == cache_name) { index = i; break; }
+            if (index == -1) return true;
+
+            switch (index)
+            {
+                case 1: return b_01;
+                case 2: return b_02;
+                case 3: return b_03;
+                case 4: return b_04;
+                case 5: return b_05;
+                case 6: return b_06;
+                case 7: return b_07;
+                case 8: return b_08;
+                case 9: return b_09;
+                case 10: return b_10;
+                case 11: return b_11;
+                case 12: return b_12;
+                case 13: return b_13;
+                case 14: return b_14;
+                case 15: return b_15;
+                case 16: return b_16;
+                case 17: return b_17;
+                case 18: return b_18;
+                case 19: return b_19;
+                case 20: return b_20;
+                case 21: return b_21;
+                case 22: return b_22;
+                case 23: return b_23;
+                case 24: return b_24;
+                case 25: return b_25;
+                case 26: return b_26;
+                case 27: return b_27;
+                case 28: return b_28;
+                case 29: return b_29;
+                case 30: return b_30;
+                case 31: return b_31;
+                case 32: return b_32;
+                case 33: return b_33;
+                case 34: return b_34;
+                case 35: return b_35;
+                case 36: return b_36;
+                case 37: return b_37;
+                case 38: return b_38;
+                case 39: return b_39;
+                case 40: return b_40;
+                case 41: return b_41;
+                case 42: return b_42;
+                case 43: return b_43;
+                case 44: return b_44;
+                case 45: return b_45;
+                case 46: return b_46;
+                case 47: return b_47;
+                case 48: return b_48;
+                case 49: return b_49;
+                case 50: return b_50;
+                case 51: return b_51;
+                case 52: return b_52;
+                case 53: return b_53;
+                case 54: return b_54;
+                case 55: return b_55;
+                case 56: return b_56;
+                case 57: return b_57;
+                case 58: return b_58;
+                case 59: return b_59;
+                case 60: return b_60;
+                case 61: return b_61;
+                case 62: return b_62;
+                case 63: return b_63;
+                case 64: return b_64;
+                case 65: return b_65;
+                case 66: return b_66;
+                case 67: return b_67;
+                case 68: return b_68;
+                case 69: return b_69;
+                case 70: return b_70;
+                case 71: return b_71;
+                case 72: return b_72;
+                case 73: return b_73;
+                case 74: return b_74;
+                case 75: return b_75;
+                case 76: return b_76;
+                case 77: return b_77;
+                case 78: return b_78;
+                case 79: return b_79;
+                case 80: return b_80;
+                case 81: return b_81;
+                case 82: return b_82;
+                case 83: return b_83;
+                case 84: return b_84;
+                case 85: return b_85;
+                case 86: return b_86;
+                case 87: return b_87;
+                case 88: return b_88;
+                case 89: return b_89;
+                case 90: return b_90;
+                case 91: return b_91;
+                case 92: return b_92;
+                case 93: return b_93;
+                case 94: return b_94;
+                case 95: return b_95;
+                case 96: return b_96;
+                case 97: return b_97;
+                case 98: return b_98;
+                case 99: return b_99;
+            }
+
+            return true;
+        }
+
+        static void busy___set(string cache_name, bool busy_ = true)
+        {
+            int index = -1;
+            if (string.IsNullOrEmpty(cache_name)) return;
+
+            for (int i = 0; i < 100; i++) if (m_names[i] == cache_name) { index = i; break; }
+            if (index == -1) return;
+
+            switch (index)
+            {
+                case 1: b_01 = busy_; break;
+                case 2: b_02 = busy_; break;
+                case 3: b_03 = busy_; break;
+                case 4: b_04 = busy_; break;
+                case 5: b_05 = busy_; break;
+                case 6: b_06 = busy_; break;
+                case 7: b_07 = busy_; break;
+                case 8: b_08 = busy_; break;
+                case 9: b_09 = busy_; break;
+                case 10: b_10 = busy_; break;
+                case 11: b_11 = busy_; break;
+                case 12: b_12 = busy_; break;
+                case 13: b_13 = busy_; break;
+                case 14: b_14 = busy_; break;
+                case 15: b_15 = busy_; break;
+                case 16: b_16 = busy_; break;
+                case 17: b_17 = busy_; break;
+                case 18: b_18 = busy_; break;
+                case 19: b_19 = busy_; break;
+                case 20: b_20 = busy_; break;
+                case 21: b_21 = busy_; break;
+                case 22: b_22 = busy_; break;
+                case 23: b_23 = busy_; break;
+                case 24: b_24 = busy_; break;
+                case 25: b_25 = busy_; break;
+                case 26: b_26 = busy_; break;
+                case 27: b_27 = busy_; break;
+                case 28: b_28 = busy_; break;
+                case 29: b_29 = busy_; break;
+                case 30: b_30 = busy_; break;
+                case 31: b_31 = busy_; break;
+                case 32: b_32 = busy_; break;
+                case 33: b_33 = busy_; break;
+                case 34: b_34 = busy_; break;
+                case 35: b_35 = busy_; break;
+                case 36: b_36 = busy_; break;
+                case 37: b_37 = busy_; break;
+                case 38: b_38 = busy_; break;
+                case 39: b_39 = busy_; break;
+                case 40: b_40 = busy_; break;
+                case 41: b_41 = busy_; break;
+                case 42: b_42 = busy_; break;
+                case 43: b_43 = busy_; break;
+                case 44: b_44 = busy_; break;
+                case 45: b_45 = busy_; break;
+                case 46: b_46 = busy_; break;
+                case 47: b_47 = busy_; break;
+                case 48: b_48 = busy_; break;
+                case 49: b_49 = busy_; break;
+                case 50: b_50 = busy_; break;
+                case 51: b_51 = busy_; break;
+                case 52: b_52 = busy_; break;
+                case 53: b_53 = busy_; break;
+                case 54: b_54 = busy_; break;
+                case 55: b_55 = busy_; break;
+                case 56: b_56 = busy_; break;
+                case 57: b_57 = busy_; break;
+                case 58: b_58 = busy_; break;
+                case 59: b_59 = busy_; break;
+                case 60: b_60 = busy_; break;
+                case 61: b_61 = busy_; break;
+                case 62: b_62 = busy_; break;
+                case 63: b_63 = busy_; break;
+                case 64: b_64 = busy_; break;
+                case 65: b_65 = busy_; break;
+                case 66: b_66 = busy_; break;
+                case 67: b_67 = busy_; break;
+                case 68: b_68 = busy_; break;
+                case 69: b_69 = busy_; break;
+                case 70: b_70 = busy_; break;
+                case 71: b_71 = busy_; break;
+                case 72: b_72 = busy_; break;
+                case 73: b_73 = busy_; break;
+                case 74: b_74 = busy_; break;
+                case 75: b_75 = busy_; break;
+                case 76: b_76 = busy_; break;
+                case 77: b_77 = busy_; break;
+                case 78: b_78 = busy_; break;
+                case 79: b_79 = busy_; break;
+                case 80: b_80 = busy_; break;
+                case 81: b_81 = busy_; break;
+                case 82: b_82 = busy_; break;
+                case 83: b_83 = busy_; break;
+                case 84: b_84 = busy_; break;
+                case 85: b_85 = busy_; break;
+                case 86: b_86 = busy_; break;
+                case 87: b_87 = busy_; break;
+                case 88: b_88 = busy_; break;
+                case 89: b_89 = busy_; break;
+                case 90: b_90 = busy_; break;
+                case 91: b_91 = busy_; break;
+                case 92: b_92 = busy_; break;
+                case 93: b_93 = busy_; break;
+                case 94: b_94 = busy_; break;
+                case 95: b_95 = busy_; break;
+                case 96: b_96 = busy_; break;
+                case 97: b_97 = busy_; break;
+                case 98: b_98 = busy_; break;
+                case 99: b_99 = busy_; break;
+            }
+        }
+
         #endregion
 
         #region [ ENGINE CHAKRA ]
@@ -392,7 +719,7 @@ namespace cache_redis
                 Native.JsRunScript(js___libs_text, currentSourceContext++, "", out JavaScriptValue r1);
         }
 
-        static string js___index(string json)
+        static string js___index(string cache_name, string json)
         {
             if (!js___connected) js___init();
 
@@ -401,7 +728,7 @@ namespace cache_redis
                 try
                 {
                     JavaScriptValue result;
-                    result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(o); })()", currentSourceContext++, "");
+                    result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(\'" + cache_name + "\', o); })()", currentSourceContext++, "");
                     string v = result.ConvertToString().ToString();
                     return v;
                 }
@@ -631,6 +958,12 @@ namespace cache_redis
                 return false;
             }
 
+            if (busy___get(cf.name))
+            {
+                api___response_json_error("Cache Engine " + cf.name + " is busy", context);
+                return false;
+            }
+
             return true;
         }
 
@@ -684,7 +1017,7 @@ namespace cache_redis
             string[] keys = redis.Keys;
             int max = keys.Length < 10 ? keys.Length : 10;
             string[] rs = new string[max];
-            
+
             for (var i = 0; i < max; i++)
                 //rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
                 if (m_cache.ContainsKey(keys[i])) rs[i] = m_cache[keys[i]];
@@ -740,27 +1073,29 @@ namespace cache_redis
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
 
-            string file_sql = Path.Combine(ROOT_PATH, "config\\sql\\" + cf.name + ".sql");
-            if (File.Exists(file_sql) == false)
+            try
             {
-                api___response_json_error("File " + file_sql + " not exist", context);
-                return false;
-            }
-            string sql_select = File.ReadAllText(file_sql);
-
-            redis.FlushDb();
-
-            string json;
-            bool existID = false;
-            
-            Dictionary<string, string> rows = new Dictionary<string, string>() { };
-            var m_cache = m___get(cf.name);
-
-            using (var cn = new SqlConnection(m_config.db_connect[cf.scope]))
-            {
-                cn.Open();
-                try
+                string file_sql = Path.Combine(ROOT_PATH, "config\\sql\\" + cf.name + ".sql");
+                if (File.Exists(file_sql) == false)
                 {
+                    api___response_json_error("File " + file_sql + " not exist", context);
+                    return false;
+                }
+                string sql_select = File.ReadAllText(file_sql);
+
+                redis.FlushDb();
+
+                string json;
+                bool existID = false;
+
+                Dictionary<string, string> rows = new Dictionary<string, string>() { };
+                var m_cache = m___get(cf.name);
+                m_cache.Clear();
+                busy___set(cf.name, true);
+
+                using (var cn = new SqlConnection(m_config.db_connect[cf.scope]))
+                {
+                    cn.Open();
                     var cm = cn.CreateCommand();
                     cm.CommandText = sql_select;
 
@@ -786,8 +1121,8 @@ namespace cache_redis
                                 id = k;
                                 if (existID) long.TryParse(dic["id"].ToString(), out id);
                                 json = JsonConvert.SerializeObject(dic);
-                                
-                                string ix = js___index(json);
+
+                                string ix = js___index(cf.name, json);
                                 if (!string.IsNullOrEmpty(ix)) json = ix;
 
                                 rows.Add(id.ToString(), json);
@@ -797,19 +1132,21 @@ namespace cache_redis
                             }
                         }
                     }
+                    cn.Close();
                 }
-                catch (Exception e111)
-                {
 
-                }
-                cn.Close();
+                redis.Set(rows);
+                rows.Clear();
+                busy___set(cf.name, false);
+
+                api___response_json_ok(null, context);
+                return true;
             }
-
-            redis.Set(rows);
-            rows.Clear();
-
-            api___response_json_ok(null, context);
-            return true;
+            catch (Exception e111)
+            {
+                api___response_json_error(e111.Message, context);
+            }
+            return false;
         }
 
         static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
