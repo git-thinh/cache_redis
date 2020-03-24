@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace cache_redis
 {
@@ -985,6 +986,7 @@ namespace cache_redis
             return true;
         }
 
+        static int ___id = 100;
         static bool api___get_uuid(HttpListenerContext context)
         {
             string[] a = context.Request.Url.Segments;
@@ -995,7 +997,21 @@ namespace cache_redis
                 api___response_json_error(context, "Url must be /uuid/[1..]");
             else
             {
-                api___response_json_text_body(context, true);
+                if (k > 999) k = 999;
+                List<long> ids = new List<long>() { };
+                string time = DateTime.Now.ToString("yyMMddHHmmss");
+                for (int i = 0; i < k; i++)
+                {
+                    if (___id > 999)
+                    {
+                        ___id = 100;
+                        time = DateTime.Now.ToString("yyMMddHHmmss");
+                    }
+                    ids.Add(long.Parse(time + ___id));
+                    //___id++;
+                    Interlocked.Increment(ref ___id);
+                }
+                api___response_json_text_body(context, true, JsonConvert.SerializeObject(ids), ids.Count, ids.Count);
             }
             api___close(context);
             return true;
