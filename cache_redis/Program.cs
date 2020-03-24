@@ -698,7 +698,7 @@ namespace cache_redis
 
         #endregion
 
-        #region [ ENGINE CHAKRA ]
+        #region [ JS SEARCH - INDEX ]
 
         static JavaScriptRuntime runtime;
         static JavaScriptContext context;
@@ -742,7 +742,7 @@ namespace cache_redis
             return null;
         }
 
-        static void js___search(string[] a)
+        static oSearchResult js___search(string cache_name, string fn_conditions)
         {
             List<long> ls = new List<long>() { };
             List<string> errs = new List<string>() { };
@@ -750,32 +750,47 @@ namespace cache_redis
             {
                 if (!js___connected) js___init();
 
-                if (a.Length > 0)
+                var m_cache = m___get(cache_name);
+                var redis = m_redis[cache_name];
+
+                if (m_cache.Count > 0)
                 {
+                    string[] a = redis.Keys;
+
+                    if (string.IsNullOrEmpty(fn_conditions)) fn_conditions = " return true; ";
+                    else fn_conditions = " return " + fn_conditions;
+
                     string fn, filter;
 
                     using (new JavaScriptContext.Scope(context))
                     {
                         fn = "___" + Guid.NewGuid().ToString().Replace('-', '_');
-                        //filter = " ___fn." + fn + " = function(o){ try { return o.id != null && o.id % 2 == 0; }catch(e){ return { ok: false, code: 1585035351111, id: o.id, message: e.message }; } }; ";
+                        ////////filter =
+                        ////////@" ___fn." + fn + @" = function(o){ 
+                        ////////    try { 
+                        ////////        return o.id != null && o.id % 2 == 0; 
+                        ////////    }catch(e){ 
+                        ////////        return { ok: false, code: 1585035351111, id: o.id, message: e.message }; 
+                        ////////    } 
+                        ////////};";
                         filter =
 @" ___fn." + fn + @" = function(o){ 
-    try { 
-        return o.id != null && o.id % 2 == 0; 
-    }catch(e){ 
+    try { " + fn_conditions + @" }catch(e){ 
         return { ok: false, code: 1585035351111, id: o.id, message: e.message }; 
     } 
 };";
                         JavaScriptContext.RunScript(filter, currentSourceContext++, "");
-
+                        string item = string.Empty;
                         for (var i = 0; i < a.Length; i++)
                         {
+                            item = m_cache[a[i]];
+
                             try
                             {
                                 string js_exe =
 @"(()=>{ 
     try { 
-        var o = " + a[i] + @"; 
+        var o = " + item + @"; 
         var ok = ___fn." + fn + @"(o); 
         if(ok == true) 
             return o.id; 
@@ -789,17 +804,19 @@ namespace cache_redis
 })()";
                                 var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, "");
                                 string v = result.ConvertToString().ToString();
-                                if (v.Length > 20) errs.Add(v);
+                                if (v.Length > 20)
+                                    errs.Add(v);
                                 else
                                 {
                                     long id = -1;
                                     long.TryParse(v, out id);
-                                    if (id != -1) ls.Add(id);
+                                    if (id != -1)
+                                        ls.Add(id);
                                 }
                             }
                             catch (Exception e)
                             {
-                                errs.Add(a[i]);
+                                errs.Add(item);
                             }
                         }
 
@@ -809,7 +826,10 @@ namespace cache_redis
             }
             catch (Exception ex)
             {
+                errs.Add(ex.Message);
             }
+
+            return new oSearchResult() { Keys = ls.ToArray(), Errors = errs.ToArray() };
         }
 
         static void js___free_memory()
@@ -911,7 +931,7 @@ namespace cache_redis
         {
             try
             {
-                string json = JsonConvert.SerializeObject(new oResponseJson().Error(message));
+                string json = new oResponseJson().Error(message);
                 Stream input = api___stream_string(json);
                 api___response_stream(".json", input, context);
             }
@@ -923,41 +943,15 @@ namespace cache_redis
             context.Response.OutputStream.Close();
         }
 
-        static void api___response_json_text(string json, HttpListenerContext context)
+        static void api___response_json_text_raw(HttpListenerContext context, string json)
         {
-            try
-            {
-                Stream input = api___stream_string(json);
-                api___response_stream(".json", input, context);
-            }
-            catch (Exception ex)
-            {
-                context.Response.StatusDescription = ex.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
-            context.Response.OutputStream.Close();
+            try { api___response_stream(".json", api___stream_string(json), context); } catch { }
         }
 
-        static void api___response_json_ok(object obj, HttpListenerContext context)
+        static void api___response_json_text_body(HttpListenerContext context, bool ok, string json = "null"
+            , int total = 0, int count = 0, int page_number = 0, int page_size = 0)
         {
-            try
-            {
-                string json;
-
-                if (obj == null)
-                    json = JsonConvert.SerializeObject(new oResponseJson().Ok());
-                else
-                    json = JsonConvert.SerializeObject(new oResponseJson().Ok());
-
-                Stream input = api___stream_string(json);
-                api___response_stream(".json", input, context);
-            }
-            catch (Exception ex)
-            {
-                context.Response.StatusDescription = ex.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
-            context.Response.OutputStream.Close();
+            try { api___response_stream(".json", api___stream_string(@"{""ok"":" + (ok ? "true" : "false") + @",""total"":" + total + @",""count"":" + count + @",""page_number"":" + page_number + @",""page_size"":" + page_size + @",""data"":" + json + "}"), context); } catch { }
         }
 
         #endregion
@@ -1017,9 +1011,7 @@ namespace cache_redis
             if (api___redis_check_ready(context) == false) return false;
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
-
-
-            api___response_json_ok(null, context);
+            api___response_json_text_body(context, true);
             api___close(context);
             return true;
         }
@@ -1029,23 +1021,60 @@ namespace cache_redis
             string[] a = context.Request.Url.Segments;
             string api = a.Length > 2 ? a[2].ToUpper() : "";
             if (api___redis_check_ready(context) == false) return false;
-            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
-            var redis = m_redis[api];
 
-            string[] keys = redis.Keys;
-            int max = keys.Length;
-            string[] rs = new string[max];
-            for (var i = 0; i < max; i++)
-                rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+            string fn_conditions = "";
+            if (context.Request.HttpMethod == "GET")
+            {
+                string url = context.Request.Url.ToString();
+                if (url.Contains("fn_conditions"))
+                    fn_conditions = url.Split(new string[] { "fn_conditions" }, StringSplitOptions.None)[1].Trim();
+                if (fn_conditions.Length > 0 && fn_conditions[0] == '=')
+                    fn_conditions = fn_conditions.Substring(1).Trim();
+            }
 
-            //js___index(rs[0]);
-            js___search(rs);
+            var m = js___search(api, fn_conditions);
 
-            //string json = "[" + string.Join(",", rs) + "]";
-            //Stream input = api___stream_string(json);
-            //api___response_stream(".json", input, context);
+            long[] ids = m.Keys;
+            string err = string.Join(Environment.NewLine, m.Errors);
+            if (string.IsNullOrEmpty(err))
+            {
+                if (ids.Length > 0)
+                {
+                    string s_page_number = context.Request.QueryString["page_number"];
+                    string s_page_size = context.Request.QueryString["page_size"];
+                    int page_number = 1, page_size = 15;
+                    int.TryParse(s_page_number, out page_number);
+                    int.TryParse(s_page_size, out page_size);
+                    if (page_number < 1) page_number = 1;
+                    if (page_size < 1) page_size = 15;
 
-            api___response_json_ok(null, context);
+                    int min = (page_number - 1) * page_size;
+                    int max = page_number * page_size;
+
+                    if (max > ids.Length) max = ids.Length;
+                    if (min > max) min = max - page_size;
+                    if (min < 0) min = 0;
+
+                    var m_cache = m___get(api);
+                    string[] ps = new string[max - min];
+                    int k = 0;
+                    for (int i = min; i < max; i++)
+                    {
+                        try
+                        {
+                            ps[k] = m_cache[ids[i].ToString()];
+                        }
+                        catch (Exception ex1)
+                        {
+                            ps[k] = ex1.Message;
+                        }
+                        k++;
+                    }
+                    api___response_json_text_body(context, true, "[" + string.Join(",", ps) + "]"
+                        , m_cache.Count, ids.Length, page_number, page_size);
+                }
+            }
+            else api___response_json_error(err, context);
             api___close(context);
             return true;
         }
@@ -1086,18 +1115,19 @@ namespace cache_redis
             m_cache.Clear();
 
             string[] keys = redis.Keys;
-            int max = keys.Length < 10 ? keys.Length : 10;
+            int max = keys.Length;
             string[] rs = new string[max];
 
             string json, ix;
-            for (var i = 0; i < max; i++) {
+            for (var i = 0; i < max; i++)
+            {
                 json = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
                 ix = js___index(cf.name, json);
                 if (!string.IsNullOrEmpty(ix)) json = ix;
                 m_cache.TryAdd(keys[i], json);
             }
 
-            api___response_json_text(@"{""ok"":true}", context);
+            api___response_json_text_body(context, true);
             api___close(context);
             return true;
         }
@@ -1110,7 +1140,7 @@ namespace cache_redis
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
             redis.BackgroundSave();
-            api___response_json_ok(null, context);
+            api___response_json_text_body(context, true);
             api___close(context);
             return true;
         }
@@ -1123,7 +1153,7 @@ namespace cache_redis
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
             redis.Save();
-            api___response_json_ok(null, context);
+            api___response_json_text_body(context, true);
             api___close(context);
             return true;
         }
@@ -1135,8 +1165,12 @@ namespace cache_redis
             if (api___redis_check_ready(context) == false) return false;
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
+            var m_cache = m___get(cf.name);
+
+            m_cache.Clear();
             redis.FlushDb();
-            api___response_json_ok(null, context);
+
+            api___response_json_text_body(context, true);
             api___close(context);
             return true;
         }
@@ -1215,7 +1249,7 @@ namespace cache_redis
                 rows.Clear();
                 busy___set(cf.name, false);
 
-                api___response_json_ok(null, context);
+                api___response_json_text_body(context, true);
                 api___close(context);
                 return true;
             }
@@ -1277,12 +1311,12 @@ namespace cache_redis
                         case "reset/lib.js":
                             #region
                             text = js___reset();
-                            if(text.Length > 0 && text[0] != '{')
+                            if (text.Length > 0 && text[0] != '{')
                                 api___response_json_error(text, context);
                             else
-                                api___response_json_text(text, context);
+                                api___response_json_text_raw(context, text);
                             break;
-                            #endregion
+                        #endregion
                         default:
                             string[] a = context.Request.Url.Segments;
                             string cmd = a.Length > 0 ? a[1] : "";
@@ -1295,8 +1329,8 @@ namespace cache_redis
                                 case "save/": return api___redis_save(context);
                                 case "clean_all/": return api___redis_clean_all(context);
                                 case "top/": return api___redis_get_top(context);
-                                case "search/": return api___ram_search(context);
                                 case "redis-push-ram/": return api___redis_push_ram(context);
+                                case "search/": return api___ram_search(context);
                             }
 
                             #region

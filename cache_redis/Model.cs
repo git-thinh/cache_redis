@@ -6,6 +6,17 @@ using System.Text;
 
 namespace cache_redis
 {
+    public class oSearchResult
+    {
+        public long[] Keys { set; get; }
+        public string[] Errors { set; get; }
+        public oSearchResult()
+        {
+            this.Keys = new long[] { };
+            this.Errors = new string[] { };
+        }
+    }
+
     public class oRedisInfo
     {
         [JsonIgnore]
