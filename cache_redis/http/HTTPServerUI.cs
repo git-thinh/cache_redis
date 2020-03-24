@@ -173,15 +173,21 @@ namespace cache_redis
             _listener.Start();
             while (true)
             {
+                HttpListenerContext context = null;
                 try
                 {
-                    HttpListenerContext context = _listener.GetContext();
+                    context = _listener.GetContext();
                     //Process(context);
                     FuncProcess(context);
                 }
                 catch (Exception ex)
                 {
-
+                    if (context != null)
+                    {
+                        context.Response.StatusDescription = ex.Message;
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        context.Response.Close();
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@
 using Fleck2;
 using Fleck2.Interfaces;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -915,11 +916,11 @@ namespace cache_redis
             context.Response.OutputStream.Close();
         }
 
-        static void api___response_json_error(HttpListenerContext context, string message)
+        static void api___response_json_error(HttpListenerContext context, string message, int code = 0)
         {
             try
             {
-                api___response_json_text_raw(context, oError.getJson(message));
+                api___response_json_text_raw(context, oError.getJson(message, code));
                 api___close(context);
             }
             catch { }
@@ -1311,11 +1312,87 @@ namespace cache_redis
             return false;
         }
 
-        static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
+        static string[] api___biz_valid(HttpListenerContext context, string cache_name, string data)
         {
+            if (string.IsNullOrEmpty(data))
+            {
+                api___response_json_error(context, "Data is null or empty");
+                return null;
+            }
 
-            return false;
-        };
+            if (data[0] != '[' || data[data.Length - 1] != ']' || !data.Contains("___tid") || !data.Contains("___api") || !data.Contains("___do") || !data.Contains("id"))
+            {
+                api___response_json_error(context, "Data must be json {___tid:...,___api:'USER|...',___do:'ADD|UPDATE|REMOVE', id:...}; ___tid is transaction ID");
+                return null;
+            }
+
+            string[] jsons = null;
+            try
+            {
+                var aj = JsonConvert.DeserializeObject<JObject[]>(data);
+                jsons = new string[aj.Length];
+                for (int i = 0; i < jsons.Length; i++)
+                    jsons[i] = JsonConvert.SerializeObject(aj[i], Formatting.Indented);
+            }
+            catch (Exception e)
+            {
+                api___response_json_error(context, e.Message, 65199229);
+                return null;
+            }
+
+            return jsons;
+        }
+
+        static bool api___biz_addnew(HttpListenerContext context, string data)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+
+            if (api___redis_check_ready(context) == false) return false;
+            string[] items = api___biz_valid(context, api, data);
+            if (items == null) return false;
+
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+
+            api___response_json_text_body(context, true);
+            api___close(context);
+            return true;
+        }
+
+        static bool api___biz_update(HttpListenerContext context, string data)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+
+            if (api___redis_check_ready(context) == false) return false;
+            string[] items = api___biz_valid(context, api, data);
+            if (items == null) return false;
+
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+
+            api___response_json_text_body(context, true);
+            api___close(context);
+            return true;
+        }
+
+        static bool api___biz_remove(HttpListenerContext context, string data)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+
+            if (api___redis_check_ready(context) == false) return false;
+            string[] items = api___biz_valid(context, api, data);
+            if (items == null) return false;
+
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+
+            api___response_json_text_body(context, true);
+            api___close(context);
+            return true;
+        }
 
         static readonly Func<HttpListenerContext, bool> HTTP_API_PROCESS = (context) =>
         {
@@ -1324,6 +1401,8 @@ namespace cache_redis
                 text = string.Empty, filename = path.Substring(1);
             string[] files, dirs;
             Stream input;
+            string[] a = context.Request.Url.Segments;
+            string cmd = a.Length > 0 ? a[1] : "";
 
             switch (method)
             {
@@ -1369,9 +1448,6 @@ namespace cache_redis
                             break;
                         #endregion
                         default:
-                            string[] a = context.Request.Url.Segments;
-                            string cmd = a.Length > 0 ? a[1] : "";
-
                             switch (cmd)
                             {
                                 case "reload_db/": return api___redis_reload_db(context);
@@ -1429,30 +1505,18 @@ namespace cache_redis
                 #endregion
 
                 #region [ POST ]
-                case "POST":
-                    input = context.Request.InputStream;
-                    if (input != null && input.Length > 0)
+                case "POST": 
+                    using (StreamReader reader = new StreamReader(context.Request.InputStream, Encoding.UTF8))
+                        text = reader.ReadToEnd();
+
+                    switch (cmd)
                     {
-                        input.Position = 0;
-                        using (StreamReader reader = new StreamReader(input, Encoding.UTF8))
-                            text = reader.ReadToEnd();
-                        oRedisCmd[] cmds = null;
-                        try
-                        {
-                            cmds = JsonConvert.DeserializeObject<oRedisCmd[]>(text);
-                            HTTP_API_PROCESS_CMD(context, cmds);
-                        }
-                        catch (Exception ex)
-                        {
-                            api___response_json_error(context, "Error convert json input: " + ex.Message);
-                            return false;
-                        }
+                        case "add/": return api___biz_addnew(context, text);
+                        case "update/": return api___biz_update(context, text);
+                        case "remove/": return api___biz_remove(context, text);
                     }
-                    else
-                    {
-                        api___response_json_error(context, "Body input is null");
-                        return false;
-                    }
+
+                    api___response_json_error(context, "Path must be add|update|remove/USER|...");
                     break;
                     #endregion
             }
