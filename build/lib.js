@@ -1,5 +1,9 @@
 ﻿var ___fn = {};
 
+function ___ping() {
+    return JSON.stringify({ ok: true, message:'This message called from file lib.js', time: new Date().toLocaleString() });
+}
+
 function ___guid() {
     return 'xx-xxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -67,7 +71,7 @@ function ___index(cache_name, o) {
             var val = o[col];
             if (col == 'id' && val != null) o[col] = Number(val);
 
-            if (col != 'str_call_out_tooken') {
+            if (col != 'str_call_out_tooken' && col[0] != '#') {
                 if (val != null && val != -1) {
                     if (isNumber) ids.push(val);
                     else utf8.push(val);

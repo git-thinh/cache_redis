@@ -181,9 +181,6 @@
     <Compile Include="System\ThreadSafeCache.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="DLL\Newtonsoft.Json.dll" />
     <Content Include="ChakraCore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

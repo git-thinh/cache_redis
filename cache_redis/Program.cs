@@ -708,33 +708,36 @@ namespace cache_redis
 
         static void js___init()
         {
-            js___connected = true;
+            try
+            {
+                js___connected = true;
 
-            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
-            Native.JsCreateContext(runtime, out context);
-            Native.JsSetCurrentContext(context);
+                Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
+                Native.JsCreateContext(runtime, out context);
+                Native.JsSetCurrentContext(context);
 
-            if (File.Exists("lib.js")) js___libs_text = File.ReadAllText("lib.js");
-            if (js___libs_text.Length > 0)
-                Native.JsRunScript(js___libs_text, currentSourceContext++, "", out JavaScriptValue r1);
+                if (File.Exists("lib.js")) js___libs_text = File.ReadAllText("lib.js");
+                if (js___libs_text.Length > 0)
+                    Native.JsRunScript(js___libs_text, currentSourceContext++, "", out JavaScriptValue r1);
+            }
+            catch { }
         }
 
         static string js___index(string cache_name, string json)
         {
-            if (!js___connected) js___init();
-
-            using (new JavaScriptContext.Scope(context))
+            try
             {
-                try
+                if (!js___connected) js___init();
+                using (new JavaScriptContext.Scope(context))
                 {
                     JavaScriptValue result;
                     result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(\'" + cache_name + "\', o); })()", currentSourceContext++, "");
                     string v = result.ConvertToString().ToString();
                     return v;
                 }
-                catch (Exception e)
-                {
-                }
+            }
+            catch (Exception e)
+            {
             }
             return null;
         }
@@ -813,11 +816,34 @@ namespace cache_redis
         {
             try
             {
+                js___connected = false;
                 // Dispose runtime
                 Native.JsSetCurrentContext(JavaScriptContext.Invalid);
                 Native.JsDisposeRuntime(runtime);
             }
             catch { }
+        }
+
+        static string js___reset()
+        {
+            try
+            {
+                js___free_memory();
+                js___init();
+
+                using (new JavaScriptContext.Scope(context))
+                {
+                    JavaScriptValue result;
+                    result = JavaScriptContext.RunScript("(()=>{ return ___ping(); })()", currentSourceContext++, "");
+                    string v = result.ConvertToString().ToString();
+                    return v;
+                }
+            }
+            catch (Exception e)
+            {
+                js___connected = false;
+                return e.Message;
+            }
         }
 
         #endregion
@@ -897,6 +923,21 @@ namespace cache_redis
             context.Response.OutputStream.Close();
         }
 
+        static void api___response_json_text(string json, HttpListenerContext context)
+        {
+            try
+            {
+                Stream input = api___stream_string(json);
+                api___response_stream(".json", input, context);
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusDescription = ex.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+            context.Response.OutputStream.Close();
+        }
+
         static void api___response_json_ok(object obj, HttpListenerContext context)
         {
             try
@@ -922,6 +963,8 @@ namespace cache_redis
         #endregion
 
         #region [ API PROCESS ]
+
+        static void api___close(HttpListenerContext context) => context.Response.OutputStream.Close();
 
         static bool api___redis_check_ready(HttpListenerContext context)
         {
@@ -977,10 +1020,11 @@ namespace cache_redis
 
 
             api___response_json_ok(null, context);
+            api___close(context);
             return true;
         }
 
-        static bool api___redis_search(HttpListenerContext context)
+        static bool api___ram_search(HttpListenerContext context)
         {
             string[] a = context.Request.Url.Segments;
             string api = a.Length > 2 ? a[2].ToUpper() : "";
@@ -1002,6 +1046,7 @@ namespace cache_redis
             //api___response_stream(".json", input, context);
 
             api___response_json_ok(null, context);
+            api___close(context);
             return true;
         }
 
@@ -1026,6 +1071,34 @@ namespace cache_redis
 
             Stream input = api___stream_string(json);
             api___response_stream(".json", input, context);
+            api___close(context);
+            return true;
+        }
+
+        static bool api___redis_push_ram(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+            var m_cache = m___get(cf.name);
+            m_cache.Clear();
+
+            string[] keys = redis.Keys;
+            int max = keys.Length < 10 ? keys.Length : 10;
+            string[] rs = new string[max];
+
+            string json, ix;
+            for (var i = 0; i < max; i++) {
+                json = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+                ix = js___index(cf.name, json);
+                if (!string.IsNullOrEmpty(ix)) json = ix;
+                m_cache.TryAdd(keys[i], json);
+            }
+
+            api___response_json_text(@"{""ok"":true}", context);
+            api___close(context);
             return true;
         }
 
@@ -1038,6 +1111,7 @@ namespace cache_redis
             var redis = m_redis[api];
             redis.BackgroundSave();
             api___response_json_ok(null, context);
+            api___close(context);
             return true;
         }
 
@@ -1050,6 +1124,7 @@ namespace cache_redis
             var redis = m_redis[api];
             redis.Save();
             api___response_json_ok(null, context);
+            api___close(context);
             return true;
         }
 
@@ -1062,6 +1137,7 @@ namespace cache_redis
             var redis = m_redis[api];
             redis.FlushDb();
             api___response_json_ok(null, context);
+            api___close(context);
             return true;
         }
 
@@ -1140,6 +1216,7 @@ namespace cache_redis
                 busy___set(cf.name, false);
 
                 api___response_json_ok(null, context);
+                api___close(context);
                 return true;
             }
             catch (Exception e111)
@@ -1197,6 +1274,15 @@ namespace cache_redis
                             api___response_stream(".json", input, context);
                             break;
                         #endregion
+                        case "reset/lib.js":
+                            #region
+                            text = js___reset();
+                            if(text.Length > 0 && text[0] != '{')
+                                api___response_json_error(text, context);
+                            else
+                                api___response_json_text(text, context);
+                            break;
+                            #endregion
                         default:
                             string[] a = context.Request.Url.Segments;
                             string cmd = a.Length > 0 ? a[1] : "";
@@ -1209,7 +1295,8 @@ namespace cache_redis
                                 case "save/": return api___redis_save(context);
                                 case "clean_all/": return api___redis_clean_all(context);
                                 case "top/": return api___redis_get_top(context);
-                                case "search/": return api___redis_search(context);
+                                case "search/": return api___ram_search(context);
+                                case "redis-push-ram/": return api___redis_push_ram(context);
                             }
 
                             #region
