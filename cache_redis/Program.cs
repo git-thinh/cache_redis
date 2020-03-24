@@ -1,4 +1,5 @@
-﻿using Fleck2;
+﻿using ChakraHost.Hosting;
+using Fleck2;
 using Fleck2.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -11,8 +12,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
-using TeamDevRedis;
 
 namespace cache_redis
 {
@@ -49,6 +50,92 @@ namespace cache_redis
                 return asm;
             };
         }
+
+        #region [ ENGINE JAVASCRIPT ]
+
+        static JavaScriptRuntime runtime;
+        static JavaScriptContext context;
+        static JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
+        static bool js___connected = false;
+        static string js___libs_text = string.Empty;
+
+        static void js___init()
+        {
+            js___connected = true;
+
+            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
+            Native.JsCreateContext(runtime, out context);
+            Native.JsSetCurrentContext(context);
+
+            if (File.Exists("lib.js")) js___libs_text = File.ReadAllText("lib.js");
+            if (js___libs_text.Length > 0)
+                Native.JsRunScript(js___libs_text, currentSourceContext++, "", out JavaScriptValue r1);
+        }
+
+        static void test_index(string json)
+        {
+            if (!js___connected) js___init();
+
+            using (new JavaScriptContext.Scope(context))
+            {
+                try
+                {
+                    JavaScriptValue result;
+                    result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(o); })()", currentSourceContext++, "");
+
+                    JavaScriptValue numberResult = result.ConvertToString();
+                    var val = numberResult.ToString();
+                }
+                catch (JavaScriptScriptException e)
+                {
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        }
+
+        static void test_search(string[] a)
+        {
+            List<long> ls = new List<long>() { };
+            List<string> errs = new List<string>() { };
+
+            if (!js___connected) js___init();
+
+            if (a.Length > 0)
+            {
+                using (new JavaScriptContext.Scope(context))
+                {
+                    string fn = "___" + Guid.NewGuid().ToString().Replace('-', '_');
+                    string filter = " ___fn." + fn + " = function(o){ try { return o.id != null && o.id % 2 == 0; }catch(e){ return { ok: false, code: 500, id: o.id, message: e.message }; } }; ";
+                    JavaScriptContext.RunScript(filter, currentSourceContext++, "");
+
+                    for (var i = 0; i < a.Length; i++)
+                    {
+                        try
+                        {
+                            string js_exe = "(()=>{ var o = " + a[i] + "; var ok = ___fn." + fn + "(o); if(ok == true) return o.id; else if(ok == false) return -1; else return JSON.stringify(ok); })()";
+                            var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, "");
+                            string v = result.ConvertToString().ToString();
+                            if (v.Length > 20) errs.Add(v);
+                            else
+                            {
+                                long id = -1;
+                                long.TryParse(v, out id);
+                                if (id != -1) ls.Add(id);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+
+                    JavaScriptContext.RunScript(" delete ___fn." + fn, currentSourceContext++, "");
+                }
+            }
+        }
+
+        #endregion
 
         #region [ API BASE ]
 
@@ -151,61 +238,161 @@ namespace cache_redis
 
         #region [ API PROCESS ]
 
+        static bool api___redis_check_ready(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api.Length == 0)
+            {
+                api___response_json_error("Uri must be / " + (a.Length > 0 ? a[1] : "[ACTION_NAME]") + "/[CACHE_NAME]", context);
+                return false;
+            }
+
+            if (m_redis.ContainsKey(api) == false)
+            {
+                api___response_json_error("Cache engine " + api + " not exist", context);
+                return false;
+            }
+
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            if (cf == null)
+            {
+                api___response_json_error("Config " + api + " not exist", context);
+                return false;
+            }
+
+            if (m_config.db_connect == null || m_config.db_connect.Count == 0 || m_config.db_connect.ContainsKey(cf.scope) == false)
+            {
+                api___response_json_error("db_connect not contain connectString " + cf.scope, context);
+                return false;
+            }
+
+            return true;
+        }
+
         static bool api___redis_reset(HttpListenerContext context)
         {
             string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
 
-            return false;
+
+            api___response_json_ok(null, context);
+            return true;
+        }
+
+        static bool api___redis_search(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+
+            string[] keys = redis.Keys;
+            int max = keys.Length;
+            string[] rs = new string[max];
+            for (var i = 0; i < max; i++)
+                rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+
+            //test_index(rs[0]);
+            test_search(rs);
+
+            //string json = "[" + string.Join(",", rs) + "]";
+            //Stream input = api___stream_string(json);
+            //api___response_stream(".json", input, context);
+
+            api___response_json_ok(null, context);
+            return true;
+        }
+
+        static bool api___redis_get_top(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+
+            string[] keys = redis.Keys;
+            int max = keys.Length < 10 ? keys.Length : 10;
+            string[] rs = new string[max];
+            for (var i = 0; i < max; i++)
+                rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+            string json = "[" + string.Join(",", rs) + "]";
+
+            Stream input = api___stream_string(json);
+            api___response_stream(".json", input, context);
+            return true;
+        }
+
+        static bool api___redis_bgsave(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+            redis.BackgroundSave();
+            api___response_json_ok(null, context);
+            return true;
+        }
+
+        static bool api___redis_save(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+            redis.Save();
+            api___response_json_ok(null, context);
+            return true;
+        }
+
+        static bool api___redis_clean_all(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string api = a.Length > 2 ? a[2].ToUpper() : "";
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
+            redis.FlushDb();
+            api___response_json_ok(null, context);
+            return true;
         }
 
         static bool api___redis_reload_db(HttpListenerContext context)
         {
             string[] a = context.Request.Url.Segments;
             string api = a.Length > 2 ? a[2].ToUpper() : "";
-            if (api.Length == 0)
-            {
+            if (api___redis_check_ready(context) == false) return false;
+            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
+            var redis = m_redis[api];
 
+            string file_sql = Path.Combine(ROOT_PATH, "config\\sql\\" + cf.name + ".sql");
+            if (File.Exists(file_sql) == false)
+            {
+                api___response_json_error("File " + file_sql + " not exist", context);
+                return false;
             }
-            else
+            string sql_select = File.ReadAllText(file_sql);
+
+            redis.FlushDb();
+
+            string json;
+            bool existID = false;
+            Dictionary<string, string> rows = new Dictionary<string, string>() { };
+            using (var cn = new SqlConnection(m_config.db_connect[cf.scope]))
             {
-                if (m_redis.ContainsKey(api) == false)
+                cn.Open();
+                try
                 {
-                    api___response_json_error("Cache engine " + api + " not exist", context);
-                    return false;
-                }
-
-                var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
-                if (cf == null)
-                {
-                    api___response_json_error("Config " + api + " not exist", context);
-                    return false;
-                }
-
-                if (m_config.db_connect == null || m_config.db_connect.Count == 0 || m_config.db_connect.ContainsKey(cf.scope) == false)
-                {
-                    api___response_json_error("db_connect not contain connectString " + cf.scope, context);
-                    return false;
-                }
-
-                string file_sql = Path.Combine(ROOT_PATH, "config\\sql\\" + cf.name + ".sql");
-                if (File.Exists(file_sql) == false) { 
-                    api___response_json_error("File " + file_sql + " not exist", context);
-                    return false;                
-                }
-                string sql_select = File.ReadAllText(file_sql);
-
-                m_redis[api].SendCommand(RedisCommand.FLUSHDB);
-
-                string json;
-                bool existID = false;
-                Dictionary<long, string> rows = new Dictionary<long, string>() { };
-                using (var cn = new SqlConnection(m_config.db_connect[cf.scope]))
-                {
-                    cn.Open();
-
                     var cm = cn.CreateCommand();
                     cm.CommandText = sql_select;
-                    
+
                     using (SqlDataReader reader = cm.ExecuteReader())
                     {
                         if (reader.HasRows)
@@ -228,19 +415,23 @@ namespace cache_redis
                                 id = k;
                                 if (existID) long.TryParse(dic["id"].ToString(), out id);
                                 json = JsonConvert.SerializeObject(dic);
-                                rows.Add(id, json);
+                                rows.Add(id.ToString(), json);
                                 k++;
                             }
                         }
                     }
-
-                    cn.Close();
                 }
-                foreach (var kv in rows)
-                    m_redis[api].SendCommand(RedisCommand.SET, kv.Key.ToString(), kv.Value);
+                catch (Exception e111)
+                {
+
+                }
+                cn.Close();
             }
+
+            redis.Set(rows);
+
             api___response_json_ok(null, context);
-            return false;
+            return true;
         }
 
         static readonly Func<HttpListenerContext, oRedisCmd[], bool> HTTP_API_PROCESS_CMD = (context, cmds) =>
@@ -292,8 +483,19 @@ namespace cache_redis
                             break;
                         #endregion
                         default:
-                            if (filename.StartsWith("reload_db")) return api___redis_reload_db(context);
-                            if (filename.StartsWith("reset")) return api___redis_reset(context);
+                            string[] a = context.Request.Url.Segments;
+                            string cmd = a.Length > 0 ? a[1] : "";
+
+                            switch (cmd)
+                            {
+                                case "reload_db/": return api___redis_reload_db(context);
+                                case "reset/": return api___redis_reset(context);
+                                case "bgsave/": return api___redis_bgsave(context);
+                                case "save/": return api___redis_save(context);
+                                case "clean_all/": return api___redis_clean_all(context);
+                                case "top/": return api___redis_get_top(context);
+                                case "search/": return api___redis_search(context);
+                            }
 
                             #region
 
@@ -385,8 +587,8 @@ namespace cache_redis
         static HTTPServerUI http_api;
         static WebSocketServer server_ws;
         static List<IWebSocketConnection> allSockets = new List<IWebSocketConnection>();
-        static ConcurrentDictionary<string, IRedisDataAccessProvider> m_redis
-            = new ConcurrentDictionary<string, IRedisDataAccessProvider>() { };
+        static ConcurrentDictionary<string, Redis> m_redis
+            = new ConcurrentDictionary<string, Redis>() { };
         static void app___free_resouce()
         {
             try
@@ -395,7 +597,7 @@ namespace cache_redis
 
                 m_config.list_cache.ForEach(cf =>
                 {
-                    try { m_redis[cf.name].Close(); } catch (Exception e1) { }
+                    try { m_redis[cf.name].Dispose(); } catch (Exception e1) { }
                     try { cf.process.Kill(); } catch (Exception e2) { }
                 });
                 m_redis.Clear();
@@ -484,9 +686,10 @@ namespace cache_redis
                             cf.port = port;
                             cf.ready = true;
 
-                            RedisDataAccessProvider redis = new RedisDataAccessProvider();
-                            redis.Configuration = new TeamDevRedis.LanguageItems.Configuration() { Host = "127.0.0.1", Port = port };
-                            redis.Connect();
+                            //RedisDataAccessProvider redis = new RedisDataAccessProvider();
+                            //redis.Configuration = new TeamDevRedis.LanguageItems.Configuration() { Host = "127.0.0.1", Port = port };
+                            //redis.Connect();
+                            var redis = new Redis("127.0.0.1", port);
 
                             if (m_redis.ContainsKey(cf.name))
                                 m_redis.TryAdd(cf.name, redis);

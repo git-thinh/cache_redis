@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using TeamDevRedis;
+using System.Text; 
 
 namespace cache_redis
 {

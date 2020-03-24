@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,6 +43,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValue.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="ChakraCore\Hosting\Native.cs" />
     <Compile Include="Fleck2\Core\FleckExtensions.cs" />
     <Compile Include="Fleck2\Core\FleckLog.cs" />
     <Compile Include="Fleck2\Core\FrameType.cs" />
@@ -74,30 +103,7 @@
     <Compile Include="Model.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Attributes\DocumentStoreIndexAttribute.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Attributes\DocumentStoreKeyAttribute.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Attributes\DocumentValueAttribute.cs" />
-    <Compile Include="Redis\TeamDev.Redis\CommandDescriptions.cs" />
-    <Compile Include="Redis\TeamDev.Redis\CommandTracing.cs" />
-    <Compile Include="Redis\TeamDev.Redis\DataAccessProvider.cs" />
-    <Compile Include="Redis\TeamDev.Redis\DocumentStore.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Exceptions\UnbalancedReadException.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Interface\IComplexItem.cs" />
-    <Compile Include="Redis\TeamDev.Redis\Interface\ILanguageItem.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\Configuration.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageHash.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageItemCollection.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageKey.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageList.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageMessaging.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageSet.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageSortedSet.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageString.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\LanguageTransactions.cs" />
-    <Compile Include="Redis\TeamDev.Redis\LanguageItems\TimeExtensions.cs" />
-    <Compile Include="Redis\TeamDev.Redis\RedisCommandsEnum.cs" />
-    <Compile Include="Redis\TeamDev.Redis\RedisDataAccessProvider.cs" />
-    <Compile Include="Redis\TeamDev.Redis\StoreEntityTypesCache.cs" />
+    <Compile Include="Redis\redis-sharp.cs" />
     <Compile Include="System\ConcurrentDictionary.cs" />
     <Compile Include="System\ReaderWriterLockSlim.cs" />
     <Compile Include="System\System.Collections.Generic\HashSet.cs" />
@@ -175,18 +181,15 @@
     <Compile Include="System\ThreadSafeCache.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="lib.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="DLL\Newtonsoft.Json.dll" />
+    <Content Include="ChakraCore.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="http\ReadMe.txt" />
-    <Content Include="tool\node\x32\node.exe" />
-    <Content Include="tool\node\x32\openssl-cli.exe" />
-    <Content Include="tool\node\x64\node.exe" />
-    <Content Include="tool\node\x64\openssl-cli.exe" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="tool\Redis-x64-4.0.14.2.zip" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,10 +3,10 @@
   "description": "",
   "db_connect": {
     "pol": "server=192.168.10.54;database=POL_20191230_020320;UId=sa; Password=dev@123;Connection Timeout=180;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
-    "pos": "server=192.168.10.37;database=Release_FB51_App;UId=mobile; Password=HjdbFV7jos9bc6lw;Connection Timeout=180;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+    "pos": "server=THINHNUC\\MSSQL;database=POS_TEST;UId=sa; Password=dev@123;Connection Timeout=180;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
   },
   "port_api": 5500,
-  "port_ws": 64696,
+  "port_ws": 54462,
   "port_tcp": 5511,
   "enable": false,
   "ready": false,
@@ -30,7 +30,7 @@
       "enable": true,
       "ready": true,
       "busy": false,
-      "port": 64694
+      "port": 54461
     },
     {
       "id": 12,
