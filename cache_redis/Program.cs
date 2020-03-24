@@ -914,20 +914,14 @@ namespace cache_redis
             context.Response.OutputStream.Close();
         }
 
-        static void api___response_json_error(string message, HttpListenerContext context)
+        static void api___response_json_error(HttpListenerContext context, string message)
         {
             try
             {
-                string json = new oResponseJson().Error(message);
-                Stream input = api___stream_string(json);
-                api___response_stream(".json", input, context);
+                api___response_json_text_raw(context, oError.getJson(message));
+                api___close(context);
             }
-            catch (Exception ex)
-            {
-                context.Response.StatusDescription = ex.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
-            context.Response.OutputStream.Close();
+            catch { }
         }
 
         static void api___response_json_text_raw(HttpListenerContext context, string json)
@@ -945,7 +939,7 @@ namespace cache_redis
 
         #region [ API PROCESS ]
 
-        static void api___close(HttpListenerContext context) => context.Response.OutputStream.Close();
+        static void api___close(HttpListenerContext context) { try { context.Response.OutputStream.Close(); } catch { } }
 
         static bool api___redis_check_ready(HttpListenerContext context)
         {
@@ -953,41 +947,57 @@ namespace cache_redis
             string api = a.Length > 2 ? a[2].ToUpper() : "";
             if (api.Length == 0)
             {
-                api___response_json_error("Uri must be / " + (a.Length > 0 ? a[1] : "[ACTION_NAME]") + "/[CACHE_NAME]", context);
+                api___response_json_error(context, "Uri must be / " + (a.Length > 0 ? a[1] : "[ACTION_NAME]") + "/[CACHE_NAME]");
                 return false;
             }
 
             if (m_redis.ContainsKey(api) == false)
             {
-                api___response_json_error("Cache engine " + api + " not exist", context);
+                api___response_json_error(context, "Cache engine " + api + " not exist");
                 return false;
             }
 
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             if (cf == null)
             {
-                api___response_json_error("Config " + api + " not exist", context);
+                api___response_json_error(context, "Config " + api + " not exist");
                 return false;
             }
 
             if (m_config.db_connect == null || m_config.db_connect.Count == 0 || m_config.db_connect.ContainsKey(cf.scope) == false)
             {
-                api___response_json_error("db_connect not contain connectString " + cf.scope, context);
+                api___response_json_error(context, "db_connect not contain connectString " + cf.scope);
                 return false;
             }
 
             if (m___get(cf.name) == null)
             {
-                api___response_json_error("m_names not contain name of Cache Engine " + cf.name, context);
+                api___response_json_error(context, "m_names not contain name of Cache Engine " + cf.name);
                 return false;
             }
 
             if (busy___get(cf.name))
             {
-                api___response_json_error("Cache Engine " + cf.name + " is busy", context);
+                api___response_json_error(context, "Cache Engine " + cf.name + " is busy");
                 return false;
             }
 
+            return true;
+        }
+
+        static bool api___get_uuid(HttpListenerContext context)
+        {
+            string[] a = context.Request.Url.Segments;
+            string id = a.Length > 2 ? a[2].ToUpper() : "";
+            int k = 0;
+            int.TryParse(id, out k);
+            if (k < 1)
+                api___response_json_error(context, "Url must be /uuid/[1..]");
+            else
+            {
+                api___response_json_text_body(context, true);
+            }
+            api___close(context);
             return true;
         }
 
@@ -1099,7 +1109,7 @@ namespace cache_redis
                         , m_cache.Count, ids.Length, page_number, page_size);
                 }
             }
-            else api___response_json_error(err, context);
+            else api___response_json_error(context, err);
             api___close(context);
             return true;
         }
@@ -1213,7 +1223,7 @@ namespace cache_redis
                 string file_sql = Path.Combine(ROOT_PATH, "config\\sql\\" + cf.name + ".sql");
                 if (File.Exists(file_sql) == false)
                 {
-                    api___response_json_error("File " + file_sql + " not exist", context);
+                    api___response_json_error(context, "File " + file_sql + " not exist");
                     return false;
                 }
                 string sql_select = File.ReadAllText(file_sql);
@@ -1280,7 +1290,7 @@ namespace cache_redis
             }
             catch (Exception e111)
             {
-                api___response_json_error(e111.Message, context);
+                api___response_json_error(context, e111.Message);
             }
             return false;
         }
@@ -1337,7 +1347,7 @@ namespace cache_redis
                             #region
                             text = js___reset();
                             if (text.Length > 0 && text[0] != '{')
-                                api___response_json_error(text, context);
+                                api___response_json_error(context, text);
                             else
                                 api___response_json_text_raw(context, text);
                             break;
@@ -1356,6 +1366,7 @@ namespace cache_redis
                                 case "top/": return api___redis_get_top(context);
                                 case "redis-push-ram/": return api___redis_push_ram(context);
                                 case "search/": return api___ram_search(context);
+                                case "uuid/": return api___get_uuid(context);
                             }
 
                             #region
@@ -1417,13 +1428,13 @@ namespace cache_redis
                         }
                         catch (Exception ex)
                         {
-                            api___response_json_error("Error convert json input: " + ex.Message, context);
+                            api___response_json_error(context, "Error convert json input: " + ex.Message);
                             return false;
                         }
                     }
                     else
                     {
-                        api___response_json_error("Body input is null", context);
+                        api___response_json_error(context, "Body input is null");
                         return false;
                     }
                     break;
