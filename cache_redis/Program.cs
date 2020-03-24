@@ -1057,22 +1057,24 @@ namespace cache_redis
 
                     if (!string.IsNullOrEmpty(fn_map))
                     {
-                        fn_map = " return " + fn_map;
-                        using (new JavaScriptContext.Scope(js_context))
+                        try
                         {
-                            string f2 = "___" + Guid.NewGuid().ToString().Replace('-', '_');
-                            string sf2 = @" ___fn." + f2 + @" = function(o){ try { " + fn_map + @" }catch(e){ return { ok: false, code: 8603536, id: o.id, message: e.message }; } };";
-                            JavaScriptContext.RunScript(sf2, currentSourceContext++, string.Empty);
-                            string item = string.Empty;
-                            for (var i = 0; i < ps.Length; i++)
+                            fn_map = " return " + fn_map;
+                            using (new JavaScriptContext.Scope(js_context))
                             {
-                                item = ps[i];
-                                if (item[0] != '{') continue;
-
-                                try
+                                string f2 = "___" + Guid.NewGuid().ToString().Replace('-', '_');
+                                string sf2 = @" ___fn." + f2 + @" = function(o){ try { " + fn_map + @" }catch(e){ return { ok: false, code: 8603536, id: o.id, message: e.message }; } };";
+                                JavaScriptContext.RunScript(sf2, currentSourceContext++, string.Empty);
+                                string item = string.Empty;
+                                for (var i = 0; i < ps.Length; i++)
                                 {
-                                    string js_exe =
-@"(()=>{ 
+                                    item = ps[i];
+                                    if (item[0] != '{') continue;
+
+                                    try
+                                    {
+                                        string js_exe =
+    @"(()=>{ 
     try { 
         var o = " + item + @"; 
         var o2 = ___fn." + f2 + @"(o); 
@@ -1081,14 +1083,16 @@ namespace cache_redis
         return JSON.stringify({ ok: false, code: 59512726, id: o.id, message: e.message }); 
     } 
 })()";
-                                    var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, string.Empty);
-                                    ps[i] = result.ConvertToString().ToString();
+                                        var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, string.Empty);
+                                        ps[i] = result.ConvertToString().ToString();
+                                    }
+                                    catch (Exception e123) { ps[i] = oError.getJson(e123.Message, 59835926); }
                                 }
-                                catch(Exception e123) { ps[i] = oError.getJson(e123.Message, 59835926); }
-                            }
 
-                            JavaScriptContext.RunScript(" delete ___fn." + f2, currentSourceContext++, string.Empty);
+                                JavaScriptContext.RunScript(" delete ___fn." + f2, currentSourceContext++, string.Empty);
+                            }
                         }
+                        catch { }
                     }
 
                     api___response_json_text_body(context, true, "[" + string.Join(",", ps) + "]"
