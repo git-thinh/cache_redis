@@ -6,6 +6,18 @@ using System.Text;
 
 namespace cache_redis
 {
+    public class oError
+    {
+        public bool ok { set; get; }
+        public int code { set; get; }
+        public string message { set; get; }
+
+        public static string getJson(string message_, int code_ = 0) {
+            var m = new oError() { ok = false, code = code_, message = message_ };
+            return JsonConvert.SerializeObject(m, Formatting.Indented);
+        }
+    }
+
     public class oSearchResult
     {
         public long[] Keys { set; get; }

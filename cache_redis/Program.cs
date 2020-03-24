@@ -700,8 +700,8 @@ namespace cache_redis
 
         #region [ JS SEARCH - INDEX ]
 
-        static JavaScriptRuntime runtime;
-        static JavaScriptContext context;
+        static JavaScriptRuntime js_runtime;
+        static JavaScriptContext js_context;
         static JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
         static bool js___connected = false;
         static string js___libs_text = string.Empty;
@@ -712,9 +712,9 @@ namespace cache_redis
             {
                 js___connected = true;
 
-                Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
-                Native.JsCreateContext(runtime, out context);
-                Native.JsSetCurrentContext(context);
+                Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out js_runtime);
+                Native.JsCreateContext(js_runtime, out js_context);
+                Native.JsSetCurrentContext(js_context);
 
                 if (File.Exists("lib.js")) js___libs_text = File.ReadAllText("lib.js");
                 if (js___libs_text.Length > 0)
@@ -728,10 +728,10 @@ namespace cache_redis
             try
             {
                 if (!js___connected) js___init();
-                using (new JavaScriptContext.Scope(context))
+                using (new JavaScriptContext.Scope(js_context))
                 {
                     JavaScriptValue result;
-                    result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(\'" + cache_name + "\', o); })()", currentSourceContext++, "");
+                    result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(\'" + cache_name + "\', o); })()", currentSourceContext++, string.Empty);
                     string v = result.ConvertToString().ToString();
                     return v;
                 }
@@ -760,26 +760,13 @@ namespace cache_redis
                     if (string.IsNullOrEmpty(fn_conditions)) fn_conditions = " return true; ";
                     else fn_conditions = " return " + fn_conditions;
 
-                    string fn, filter;
+                    string f1, sf1;
 
-                    using (new JavaScriptContext.Scope(context))
+                    using (new JavaScriptContext.Scope(js_context))
                     {
-                        fn = "___" + Guid.NewGuid().ToString().Replace('-', '_');
-                        ////////filter =
-                        ////////@" ___fn." + fn + @" = function(o){ 
-                        ////////    try { 
-                        ////////        return o.id != null && o.id % 2 == 0; 
-                        ////////    }catch(e){ 
-                        ////////        return { ok: false, code: 1585035351111, id: o.id, message: e.message }; 
-                        ////////    } 
-                        ////////};";
-                        filter =
-@" ___fn." + fn + @" = function(o){ 
-    try { " + fn_conditions + @" }catch(e){ 
-        return { ok: false, code: 1585035351111, id: o.id, message: e.message }; 
-    } 
-};";
-                        JavaScriptContext.RunScript(filter, currentSourceContext++, "");
+                        f1 = "___" + Guid.NewGuid().ToString().Replace('-', '_');
+                        sf1 = @" ___fn." + f1 + @" = function(o){ try { " + fn_conditions + @" }catch(e){ return { ok: false, code: 1585035351111, id: o.id, message: e.message }; } };";
+                        JavaScriptContext.RunScript(sf1, currentSourceContext++, string.Empty);
                         string item = string.Empty;
                         for (var i = 0; i < a.Length; i++)
                         {
@@ -791,7 +778,7 @@ namespace cache_redis
 @"(()=>{ 
     try { 
         var o = " + item + @"; 
-        var ok = ___fn." + fn + @"(o); 
+        var ok = ___fn." + f1 + @"(o); 
         if(ok == true) 
             return o.id; 
         else if(ok == false) 
@@ -802,7 +789,7 @@ namespace cache_redis
         return JSON.stringify({ ok: false, code: 1585035452039, id: o.id, message: e.message }); 
     } 
 })()";
-                                var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, "");
+                                var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, string.Empty);
                                 string v = result.ConvertToString().ToString();
                                 if (v.Length > 20)
                                     errs.Add(v);
@@ -816,17 +803,17 @@ namespace cache_redis
                             }
                             catch (Exception e)
                             {
-                                errs.Add(item);
+                                errs.Add(oError.getJson(e.Message, 60189311));
                             }
                         }
 
-                        if (string.IsNullOrEmpty(fn) == false) JavaScriptContext.RunScript(" delete ___fn." + fn, currentSourceContext++, "");
+                        JavaScriptContext.RunScript(" delete ___fn." + f1, currentSourceContext++, string.Empty);
                     }
                 }
             }
             catch (Exception ex)
             {
-                errs.Add(ex.Message);
+                errs.Add(oError.getJson(ex.Message, 60189399));
             }
 
             return new oSearchResult() { Keys = ls.ToArray(), Errors = errs.ToArray() };
@@ -839,7 +826,7 @@ namespace cache_redis
                 js___connected = false;
                 // Dispose runtime
                 Native.JsSetCurrentContext(JavaScriptContext.Invalid);
-                Native.JsDisposeRuntime(runtime);
+                Native.JsDisposeRuntime(js_runtime);
             }
             catch { }
         }
@@ -851,7 +838,7 @@ namespace cache_redis
                 js___free_memory();
                 js___init();
 
-                using (new JavaScriptContext.Scope(context))
+                using (new JavaScriptContext.Scope(js_context))
                 {
                     JavaScriptValue result;
                     result = JavaScriptContext.RunScript("(()=>{ return ___ping(); })()", currentSourceContext++, "");
@@ -1023,6 +1010,7 @@ namespace cache_redis
             if (api___redis_check_ready(context) == false) return false;
 
             string fn_conditions = "";
+            string fn_map = "";
             if (context.Request.HttpMethod == "GET")
             {
                 string url = context.Request.Url.ToString();
@@ -1030,6 +1018,8 @@ namespace cache_redis
                     fn_conditions = url.Split(new string[] { "fn_conditions" }, StringSplitOptions.None)[1].Trim();
                 if (fn_conditions.Length > 0 && fn_conditions[0] == '=')
                     fn_conditions = fn_conditions.Substring(1).Trim();
+
+                fn_map = context.Request.QueryString["fn_map"];
             }
 
             var m = js___search(api, fn_conditions);
@@ -1060,16 +1050,47 @@ namespace cache_redis
                     int k = 0;
                     for (int i = min; i < max; i++)
                     {
-                        try
-                        {
-                            ps[k] = m_cache[ids[i].ToString()];
-                        }
-                        catch (Exception ex1)
-                        {
-                            ps[k] = ex1.Message;
-                        }
+                        try { ps[k] = m_cache[ids[i].ToString()]; }
+                        catch (Exception ex1) { ps[k] = oError.getJson(ex1.Message, 60086326); }
                         k++;
                     }
+
+                    if (!string.IsNullOrEmpty(fn_map))
+                    {
+                        fn_map = " return " + fn_map;
+                        using (new JavaScriptContext.Scope(js_context))
+                        {
+                            string f2 = "___" + Guid.NewGuid().ToString().Replace('-', '_');
+                            string sf2 = @" ___fn." + f2 + @" = function(o){ try { " + fn_map + @" }catch(e){ return { ok: false, code: 8603536, id: o.id, message: e.message }; } };";
+                            JavaScriptContext.RunScript(sf2, currentSourceContext++, string.Empty);
+                            string item = string.Empty;
+                            for (var i = 0; i < ps.Length; i++)
+                            {
+                                item = ps[i];
+                                if (item[0] != '{') continue;
+
+                                try
+                                {
+                                    string js_exe =
+@"(()=>{ 
+    try { 
+        var o = " + item + @"; 
+        var o2 = ___fn." + f2 + @"(o); 
+        return JSON.stringify(o2); 
+    } catch(e) { 
+        return JSON.stringify({ ok: false, code: 59512726, id: o.id, message: e.message }); 
+    } 
+})()";
+                                    var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, string.Empty);
+                                    ps[i] = result.ConvertToString().ToString();
+                                }
+                                catch(Exception e123) { ps[i] = oError.getJson(e123.Message, 59835926); }
+                            }
+
+                            JavaScriptContext.RunScript(" delete ___fn." + f2, currentSourceContext++, string.Empty);
+                        }
+                    }
+
                     api___response_json_text_body(context, true, "[" + string.Join(",", ps) + "]"
                         , m_cache.Count, ids.Length, page_number, page_size);
                 }
