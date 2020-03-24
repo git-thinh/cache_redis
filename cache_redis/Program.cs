@@ -12,7 +12,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace cache_redis
@@ -51,7 +50,328 @@ namespace cache_redis
             };
         }
 
-        #region [ ENGINE JAVASCRIPT ]
+        #region [ MEMORY CACHE ]
+
+        static ConcurrentDictionary<string, string> m_01 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_02 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_03 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_04 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_05 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_06 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_07 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_08 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_09 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_10 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_11 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_12 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_13 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_14 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_15 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_16 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_17 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_18 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_19 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_20 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_21 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_22 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_23 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_24 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_25 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_26 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_27 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_28 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_29 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_30 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_31 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_32 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_33 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_34 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_35 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_36 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_37 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_38 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_39 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_40 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_41 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_42 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_43 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_44 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_45 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_46 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_47 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_48 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_49 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_50 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_51 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_52 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_53 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_54 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_55 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_56 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_57 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_58 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_59 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_60 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_61 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_62 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_63 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_64 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_65 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_66 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_67 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_68 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_69 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_70 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_71 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_72 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_73 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_74 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_75 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_76 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_77 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_78 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_79 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_80 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_81 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_82 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_83 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_84 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_85 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_86 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_87 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_88 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_89 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_90 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_91 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_92 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_93 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_94 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_95 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_96 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_97 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_98 = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<string, string> m_99 = new ConcurrentDictionary<string, string>();
+
+        static readonly string[] m_names = new string[99];
+        static ConcurrentDictionary<string, string> m___get(string cache_name)
+        {
+            int index = -1;
+            if (string.IsNullOrEmpty(cache_name)) return null;
+
+            for (int i = 0; i < 100; i++) if (m_names[i] == cache_name) { index = i; break; }
+            if (index == -1) return null;
+
+            switch (index)
+            {
+                case 1: return m_01;
+                case 2: return m_02;
+                case 3: return m_03;
+                case 4: return m_04;
+                case 5: return m_05;
+                case 6: return m_06;
+                case 7: return m_07;
+                case 8: return m_08;
+                case 9: return m_09;
+                case 10: return m_10;
+                case 11: return m_11;
+                case 12: return m_12;
+                case 13: return m_13;
+                case 14: return m_14;
+                case 15: return m_15;
+                case 16: return m_16;
+                case 17: return m_17;
+                case 18: return m_18;
+                case 19: return m_19;
+                case 20: return m_20;
+                case 21: return m_21;
+                case 22: return m_22;
+                case 23: return m_23;
+                case 24: return m_24;
+                case 25: return m_25;
+                case 26: return m_26;
+                case 27: return m_27;
+                case 28: return m_28;
+                case 29: return m_29;
+                case 30: return m_30;
+                case 31: return m_31;
+                case 32: return m_32;
+                case 33: return m_33;
+                case 34: return m_34;
+                case 35: return m_35;
+                case 36: return m_36;
+                case 37: return m_37;
+                case 38: return m_38;
+                case 39: return m_39;
+                case 40: return m_40;
+                case 41: return m_41;
+                case 42: return m_42;
+                case 43: return m_43;
+                case 44: return m_44;
+                case 45: return m_45;
+                case 46: return m_46;
+                case 47: return m_47;
+                case 48: return m_48;
+                case 49: return m_49;
+                case 50: return m_50;
+                case 51: return m_51;
+                case 52: return m_52;
+                case 53: return m_53;
+                case 54: return m_54;
+                case 55: return m_55;
+                case 56: return m_56;
+                case 57: return m_57;
+                case 58: return m_58;
+                case 59: return m_59;
+                case 60: return m_60;
+                case 61: return m_61;
+                case 62: return m_62;
+                case 63: return m_63;
+                case 64: return m_64;
+                case 65: return m_65;
+                case 66: return m_66;
+                case 67: return m_67;
+                case 68: return m_68;
+                case 69: return m_69;
+                case 70: return m_70;
+                case 71: return m_71;
+                case 72: return m_72;
+                case 73: return m_73;
+                case 74: return m_74;
+                case 75: return m_75;
+                case 76: return m_76;
+                case 77: return m_77;
+                case 78: return m_78;
+                case 79: return m_79;
+                case 80: return m_80;
+                case 81: return m_81;
+                case 82: return m_82;
+                case 83: return m_83;
+                case 84: return m_84;
+                case 85: return m_85;
+                case 86: return m_86;
+                case 87: return m_87;
+                case 88: return m_88;
+                case 89: return m_89;
+                case 90: return m_90;
+                case 91: return m_91;
+                case 92: return m_92;
+                case 93: return m_93;
+                case 94: return m_94;
+                case 95: return m_95;
+                case 96: return m_96;
+                case 97: return m_97;
+                case 98: return m_98;
+                case 99: return m_99;
+            }
+
+            return null;
+        }
+
+        static void m___free_memory() {
+            m_01.Clear();
+            m_02.Clear();
+            m_03.Clear();
+            m_04.Clear();
+            m_05.Clear();
+            m_06.Clear();
+            m_07.Clear();
+            m_08.Clear();
+            m_09.Clear();
+            m_10.Clear();
+            m_11.Clear();
+            m_12.Clear();
+            m_13.Clear();
+            m_14.Clear();
+            m_15.Clear();
+            m_16.Clear();
+            m_17.Clear();
+            m_18.Clear();
+            m_19.Clear();
+            m_20.Clear();
+            m_21.Clear();
+            m_22.Clear();
+            m_23.Clear();
+            m_24.Clear();
+            m_25.Clear();
+            m_26.Clear();
+            m_27.Clear();
+            m_28.Clear();
+            m_29.Clear();
+            m_30.Clear();
+            m_31.Clear();
+            m_32.Clear();
+            m_33.Clear();
+            m_34.Clear();
+            m_35.Clear();
+            m_36.Clear();
+            m_37.Clear();
+            m_38.Clear();
+            m_39.Clear();
+            m_40.Clear();
+            m_41.Clear();
+            m_42.Clear();
+            m_43.Clear();
+            m_44.Clear();
+            m_45.Clear();
+            m_46.Clear();
+            m_47.Clear();
+            m_48.Clear();
+            m_49.Clear();
+            m_50.Clear();
+            m_51.Clear();
+            m_52.Clear();
+            m_53.Clear();
+            m_54.Clear();
+            m_55.Clear();
+            m_56.Clear();
+            m_57.Clear();
+            m_58.Clear();
+            m_59.Clear();
+            m_60.Clear();
+            m_61.Clear();
+            m_62.Clear();
+            m_63.Clear();
+            m_64.Clear();
+            m_65.Clear();
+            m_66.Clear();
+            m_67.Clear();
+            m_68.Clear();
+            m_69.Clear();
+            m_70.Clear();
+            m_71.Clear();
+            m_72.Clear();
+            m_73.Clear();
+            m_74.Clear();
+            m_75.Clear();
+            m_76.Clear();
+            m_77.Clear();
+            m_78.Clear();
+            m_79.Clear();
+            m_80.Clear();
+            m_81.Clear();
+            m_82.Clear();
+            m_83.Clear();
+            m_84.Clear();
+            m_85.Clear();
+            m_86.Clear();
+            m_87.Clear();
+            m_88.Clear();
+            m_89.Clear();
+            m_90.Clear();
+            m_91.Clear();
+            m_92.Clear();
+            m_93.Clear();
+            m_94.Clear();
+            m_95.Clear();
+            m_96.Clear();
+            m_97.Clear();
+            m_98.Clear();
+            m_99.Clear();
+        }
+
+        #endregion
+
+        #region [ ENGINE CHAKRA ]
 
         static JavaScriptRuntime runtime;
         static JavaScriptContext context;
@@ -72,7 +392,7 @@ namespace cache_redis
                 Native.JsRunScript(js___libs_text, currentSourceContext++, "", out JavaScriptValue r1);
         }
 
-        static void test_index(string json)
+        static string js___index(string json)
         {
             if (!js___connected) js___init();
 
@@ -82,57 +402,95 @@ namespace cache_redis
                 {
                     JavaScriptValue result;
                     result = JavaScriptContext.RunScript("(()=>{ var o = " + json + "; \r\n return ___index(o); })()", currentSourceContext++, "");
-
-                    JavaScriptValue numberResult = result.ConvertToString();
-                    var val = numberResult.ToString();
-                }
-                catch (JavaScriptScriptException e)
-                {
+                    string v = result.ConvertToString().ToString();
+                    return v;
                 }
                 catch (Exception e)
                 {
                 }
             }
+            return null;
         }
 
-        static void test_search(string[] a)
+        static void js___search(string[] a)
         {
             List<long> ls = new List<long>() { };
             List<string> errs = new List<string>() { };
-
-            if (!js___connected) js___init();
-
-            if (a.Length > 0)
+            try
             {
-                using (new JavaScriptContext.Scope(context))
-                {
-                    string fn = "___" + Guid.NewGuid().ToString().Replace('-', '_');
-                    string filter = " ___fn." + fn + " = function(o){ try { return o.id != null && o.id % 2 == 0; }catch(e){ return { ok: false, code: 500, id: o.id, message: e.message }; } }; ";
-                    JavaScriptContext.RunScript(filter, currentSourceContext++, "");
+                if (!js___connected) js___init();
 
-                    for (var i = 0; i < a.Length; i++)
+                if (a.Length > 0)
+                {
+                    string fn, filter;
+
+                    using (new JavaScriptContext.Scope(context))
                     {
-                        try
+                        fn = "___" + Guid.NewGuid().ToString().Replace('-', '_');
+                        //filter = " ___fn." + fn + " = function(o){ try { return o.id != null && o.id % 2 == 0; }catch(e){ return { ok: false, code: 1585035351111, id: o.id, message: e.message }; } }; ";
+                        filter =
+@" ___fn." + fn + @" = function(o){ 
+    try { 
+        return o.id != null && o.id % 2 == 0; 
+    }catch(e){ 
+        return { ok: false, code: 1585035351111, id: o.id, message: e.message }; 
+    } 
+};";
+                        JavaScriptContext.RunScript(filter, currentSourceContext++, "");
+
+                        for (var i = 0; i < a.Length; i++)
                         {
-                            string js_exe = "(()=>{ var o = " + a[i] + "; var ok = ___fn." + fn + "(o); if(ok == true) return o.id; else if(ok == false) return -1; else return JSON.stringify(ok); })()";
-                            var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, "");
-                            string v = result.ConvertToString().ToString();
-                            if (v.Length > 20) errs.Add(v);
-                            else
+                            try
                             {
-                                long id = -1;
-                                long.TryParse(v, out id);
-                                if (id != -1) ls.Add(id);
+                                string js_exe =
+@"(()=>{ 
+    try { 
+        var o = " + a[i] + @"; 
+        var ok = ___fn." + fn + @"(o); 
+        if(ok == true) 
+            return o.id; 
+        else if(ok == false) 
+            return -1; 
+        else 
+            return JSON.stringify(ok); 
+    } catch(e) { 
+        return JSON.stringify({ ok: false, code: 1585035452039, id: o.id, message: e.message }); 
+    } 
+})()";
+                                var result = JavaScriptContext.RunScript(js_exe, currentSourceContext++, "");
+                                string v = result.ConvertToString().ToString();
+                                if (v.Length > 20) errs.Add(v);
+                                else
+                                {
+                                    long id = -1;
+                                    long.TryParse(v, out id);
+                                    if (id != -1) ls.Add(id);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                errs.Add(a[i]);
                             }
                         }
-                        catch (Exception e)
-                        {
-                        }
-                    }
 
-                    JavaScriptContext.RunScript(" delete ___fn." + fn, currentSourceContext++, "");
+                        if (string.IsNullOrEmpty(fn) == false) JavaScriptContext.RunScript(" delete ___fn." + fn, currentSourceContext++, "");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        static void js___free_memory()
+        {
+            try
+            {
+                // Dispose runtime
+                Native.JsSetCurrentContext(JavaScriptContext.Invalid);
+                Native.JsDisposeRuntime(runtime);
+            }
+            catch { }
         }
 
         #endregion
@@ -267,6 +625,12 @@ namespace cache_redis
                 return false;
             }
 
+            if (m___get(cf.name) == null)
+            {
+                api___response_json_error("m_names not contain name of Cache Engine " + cf.name, context);
+                return false;
+            }
+
             return true;
         }
 
@@ -297,8 +661,8 @@ namespace cache_redis
             for (var i = 0; i < max; i++)
                 rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
 
-            //test_index(rs[0]);
-            test_search(rs);
+            //js___index(rs[0]);
+            js___search(rs);
 
             //string json = "[" + string.Join(",", rs) + "]";
             //Stream input = api___stream_string(json);
@@ -315,12 +679,16 @@ namespace cache_redis
             if (api___redis_check_ready(context) == false) return false;
             var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
             var redis = m_redis[api];
+            var m_cache = m___get(cf.name);
 
             string[] keys = redis.Keys;
             int max = keys.Length < 10 ? keys.Length : 10;
             string[] rs = new string[max];
+            
             for (var i = 0; i < max; i++)
-                rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+                //rs[i] = ASCIIEncoding.UTF8.GetString(redis.Get(keys[i]));
+                if (m_cache.ContainsKey(keys[i])) rs[i] = m_cache[keys[i]];
+
             string json = "[" + string.Join(",", rs) + "]";
 
             Stream input = api___stream_string(json);
@@ -384,7 +752,10 @@ namespace cache_redis
 
             string json;
             bool existID = false;
+            
             Dictionary<string, string> rows = new Dictionary<string, string>() { };
+            var m_cache = m___get(cf.name);
+
             using (var cn = new SqlConnection(m_config.db_connect[cf.scope]))
             {
                 cn.Open();
@@ -415,7 +786,13 @@ namespace cache_redis
                                 id = k;
                                 if (existID) long.TryParse(dic["id"].ToString(), out id);
                                 json = JsonConvert.SerializeObject(dic);
+                                
+                                string ix = js___index(json);
+                                if (!string.IsNullOrEmpty(ix)) json = ix;
+
                                 rows.Add(id.ToString(), json);
+                                if (m_cache != null) m_cache.TryAdd(id.ToString(), json);
+
                                 k++;
                             }
                         }
@@ -429,6 +806,7 @@ namespace cache_redis
             }
 
             redis.Set(rows);
+            rows.Clear();
 
             api___response_json_ok(null, context);
             return true;
@@ -604,6 +982,9 @@ namespace cache_redis
 
                 allSockets.Clear();
                 server_ws.Dispose();
+
+                m___free_memory();
+                js___free_memory();
             }
             catch (Exception err) { }
         }
@@ -655,6 +1036,8 @@ namespace cache_redis
                 m_config.busy = true;
                 m_config.list_cache.ForEach(cf =>
                 {
+                    if (cf.id < 100 && cf.id > -1) m_names[cf.id] = cf.name;
+
                     if (cf.enable)
                     {
                         int port = tcp___get_free_port();

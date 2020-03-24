@@ -53,23 +53,28 @@ function ___convert_unicode_to_ascii(str) {
 
 function ___index(o) {
     if (o == null) o = {};
-    var ids = [], utf8 = [];
 
-    for (var col in o) {
-        var isNumber = typeof o[col] == 'number';
-        var val = o[col];
-        if (col == 'id' && val != null) o[col] = Number(val);
+    try {
 
-        if (val != null && val != -1) {
-            if (isNumber) ids.push(val);
-            else utf8.push(val);
+        var ids = [], utf8 = [];
+
+        for (var col in o) {
+            var isNumber = typeof o[col] == 'number';
+            var val = o[col];
+            if (col == 'id' && val != null) o[col] = Number(val);
+
+            if (val != null && val != -1) {
+                if (isNumber) ids.push(val);
+                else utf8.push(val);
+            }
         }
-    }
 
-    o['#ids'] = ids.join(' ');
-    o['#utf8'] = utf8.join(' ');
-    o['#ascii'] = ___convert_unicode_to_ascii(o['#utf8']);
-    o['#org'] = o['#ids'] + ' ' + o['#utf8'];
+        o['#ids'] = ids.join(' ');
+        o['#utf8'] = utf8.join(' ');
+        o['#ascii'] = ___convert_unicode_to_ascii(o['#utf8']);
+        o['#org'] = o['#ids'] + ' ' + o['#utf8'];
+
+    } catch (e) { ; }
 
     return JSON.stringify(o);
 }
