@@ -6,7 +6,7 @@
     "pos": "server=THINHNUC\\MSSQL;database=POS_TEST;UId=sa; Password=dev@123;Connection Timeout=180;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
   },
   "port_api": 5500,
-  "port_ws": 58643,
+  "port_ws": 49231,
   "port_tcp": 5511,
   "enable": false,
   "ready": false,
@@ -30,7 +30,7 @@
       "enable": true,
       "ready": true,
       "busy": false,
-      "port": 58642
+      "port": 49230
     },
     {
       "id": 12,

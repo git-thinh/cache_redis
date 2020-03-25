@@ -18,21 +18,23 @@ var valid = {
 /*[START]*/
 
 var ERRORS = [];
-for (var key in obj) {
-    if (valid[key] != null) {
-        var val = obj[key];
-        var cf = valid[key];
-        var para = cf.para;
-        switch (cf.name) {
-            case 'NOT_EMPTY':
-                if (val == null || val.toString().trim().length == 0)
-                    ERRORS.push(cf);
-                break;
-            case 'GREATER_THAN':
-                break;
+try {
+    for (var key in obj) {
+        if (valid[key] != null) {
+            var val = obj[key];
+            var cf = valid[key];
+            var para = cf.para;
+            switch (cf.name) {
+                case 'NOT_EMPTY':
+                    if (val == null || val.toString().trim().length == 0)
+                        ERRORS.push(cf);
+                    break;
+                case 'GREATER_THAN':
+                    break;
+            }
         }
     }
-}
+} catch (e) { ; }
 
 /*[COMPLETE]*/
 

@@ -895,6 +895,42 @@ namespace cache_redis
 
         #endregion
 
+        #region [ VALID ]
+
+        static ConcurrentDictionary<string, string> m_valid_add
+            = new ConcurrentDictionary<string, string>() { };
+        static string m_valid_text_js = string.Empty;
+
+        static void valid__reset()
+        {
+            m_valid_add.Clear();
+
+            if (File.Exists("valid.js")) {
+                string js = File.ReadAllText("valid.js");
+                int pos = js.IndexOf("/*[START]*/");
+                if (pos != -1) js = js.Substring(pos, js.Length - pos);
+                m_valid_text_js = Environment.NewLine + js;
+            }
+
+            if (Directory.Exists("valid_add"))
+            {
+                var fs = Directory.GetFiles("valid_add", "*.json");
+                foreach (var f in fs)
+                {
+                    try
+                    {
+                        string name = Path.GetFileName(f);
+                        name = name.Substring(0, name.Length - 5).ToUpper();
+                        string s = File.ReadAllText(f);
+                        m_valid_add.TryAdd(name, s);
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        #endregion
+
         #region [ API BASE ]
 
         static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
@@ -1622,7 +1658,6 @@ namespace cache_redis
 
                     switch (filename)
                     {
-                        case "list.html":
                         case "list":
                             #region
                             dirs = Directory.GetDirectories(ROOT_PATH_UI);
@@ -1640,14 +1675,13 @@ namespace cache_redis
                             break;
                         #endregion
                         case "config":
-                        case "config.html":
                             #region
                             text = JsonConvert.SerializeObject(m_config);
                             input = api___stream_string(text);
                             api___response_stream(".json", input, context);
                             break;
                         #endregion
-                        case "reset/lib.js":
+                        case "lib/reset":
                             #region
                             text = js___reset();
                             if (text.Length > 0 && text[0] != '{')
@@ -1657,12 +1691,31 @@ namespace cache_redis
                             break;
                         #endregion
                         case "schema":
-                        case "schema.html":
                             #region
                             text = JsonConvert.SerializeObject(m_schema, Formatting.Indented);
                             api___response_json_text_raw(context, text);
                             break;
+                            #endregion
+                        case "schema/reset":
+                            #region
+                            schema___reset();
+                            text = JsonConvert.SerializeObject(m_schema, Formatting.Indented);
+                            api___response_json_text_raw(context, text);
+                            break;
                         #endregion
+                        case "valid":
+                            #region
+                            text = JsonConvert.SerializeObject(m_valid_add, Formatting.Indented);
+                            api___response_json_text_raw(context, text);
+                            break;
+                            #endregion
+                        case "valid/reset":
+                            #region
+                            valid__reset();
+                            text = JsonConvert.SerializeObject(m_valid_add, Formatting.Indented);
+                            api___response_json_text_raw(context, text);
+                            break;
+                            #endregion
                         default:
                             switch (cmd)
                             {
@@ -1676,7 +1729,6 @@ namespace cache_redis
                                 case "search/": return api___ram_search(context);
                                 case "uuid/": return api___get_uuid(context);
                             }
-
                             #region
 
                             if (string.IsNullOrEmpty(filename))
@@ -1777,6 +1829,7 @@ namespace cache_redis
         static void Main(string[] args)
         {
             schema___reset();
+            valid__reset();
 
             #region [ CONFIG.JSON ]
 
