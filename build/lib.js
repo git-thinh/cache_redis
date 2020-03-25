@@ -71,7 +71,7 @@ function ___index(cache_name, o) {
             var val = o[col];
             if (col == 'id' && val != null) o[col] = Number(val);
 
-            if (col != 'str_call_out_tooken' && col[0] != '#') {
+            if (col != 'str_call_out_tooken' && col[0] != '#' && col.indexOf('___') != 0) {
                 if (val != null && val != -1) {
                     if (isNumber) ids.push(val);
                     else utf8.push(val);

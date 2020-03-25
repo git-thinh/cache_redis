@@ -1,0 +1,22 @@
+{
+  "int_days": {
+    "name": "GREATER_THAN",
+    "para": 30
+  },
+  "lng_money": {
+    "name": "GREATER_THAN",
+    "para": 500000
+  },
+  "asset_type_id": {
+    "name": "GREATER_THAN",
+    "para": 0
+  },
+  "city_id": {
+    "name": "GREATER_THAN",
+    "para": 0
+  },
+  "district_id": {
+    "name": "GREATER_THAN",
+    "para": 0
+  }
+}

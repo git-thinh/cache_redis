@@ -1,0 +1,11 @@
+﻿{
+  "str_user_name": {
+    "name": "NOT_EMPTY",
+    "message": "Vui lòng nhập thông tin tên tài khoản"
+  },
+  "str_pass_word": {
+    "name": "NOT_EMPTY",
+    "para": null,
+    "message": "Vui lòng nhập thông tin mật khẩu"
+  }
+}

@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build\lib.js = build\lib.js
 		ReadMe.txt = ReadMe.txt
+		build\valid.js = build\valid.js
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "studio-redis", "studio-redis\studio-redis.csproj", "{E03EBA0B-00A6-4EF0-A976-B344AB22FE41}"
@@ -62,6 +63,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dbs", "dbs", "{526E5744-029
 		build\dbs\user_addnew.sql = build\dbs\user_addnew.sql
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "valid_add", "valid_add", "{0291B1FB-0193-4A61-97C4-486579CA90A3}"
+	ProjectSection(SolutionItems) = preProject
+		build\valid_add\CUSTOMER.json = build\valid_add\CUSTOMER.json
+		build\valid_add\PAWN.json = build\valid_add\PAWN.json
+		build\valid_add\USER.json = build\valid_add\USER.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +95,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DF6B3354-D865-4AD5-B9C5-3643AEF28E4F} = {D0E81EA4-41C8-4954-9AD2-3F46C0D8E83D}
 		{526E5744-0290-4DC1-99DE-70AEB49D2190} = {D0E81EA4-41C8-4954-9AD2-3F46C0D8E83D}
+		{0291B1FB-0193-4A61-97C4-486579CA90A3} = {D0E81EA4-41C8-4954-9AD2-3F46C0D8E83D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A6AB6DAA-D5BA-41FB-B721-4E4EFE83E736}

@@ -1479,6 +1479,14 @@ namespace cache_redis
                     try
                     {
                         string j = JsonConvert.SerializeObject(it);
+                        string ix = js___index(api, j);
+                        if (string.IsNullOrEmpty(ix))
+                        {
+                            api___response_json_error(context, "Cannot make index [" + i.ToString() + "] for update item: " + id.ToString());
+                            return null;
+                        }
+                        j = ix;
+
                         var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(j);
                         input.Remove("___do");
                         input.Remove("___api");
@@ -1559,9 +1567,38 @@ namespace cache_redis
             oPostItem[] items = api___biz_valid(context, tran_id, data);
             if (items == null) return false;
 
+            oPostItem po;
+            ConcurrentDictionary<string, string> cache;
+            Redis redis;
+            bool has = false;
+            string json, ix;
 
-            string json = JsonConvert.SerializeObject(items, Formatting.Indented);
-            api___response_json_text_body(context, true, json);
+            for (int i = 0; i < items.Length; i++) {
+                po = items[i];
+                json = JsonConvert.SerializeObject(po.ouput);
+
+                switch (po.___do)
+                {
+                    case "ADD":
+                        has = true;
+                        break;
+                    case "UPDATE":
+                        has = true;
+                        break;
+                    case "REMOVE":
+                        has = true;
+                        break;
+                }
+
+                if (has)
+                {
+                    cache = m___get(po.___api);
+                    redis = m_redis[po.___api];
+                }
+            }
+
+            string s = JsonConvert.SerializeObject(items, Formatting.Indented);
+            api___response_json_text_body(context, true, s);
             api___close(context);
             return true;
         }
