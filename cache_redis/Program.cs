@@ -255,12 +255,23 @@ namespace cache_redis
         static ConcurrentDictionary<string, string> m_99 = new ConcurrentDictionary<string, string>();
 
         static readonly string[] m_names = new string[99];
+
+        static bool m___check(string cache_name)
+        {
+            int index = -1;
+            if (string.IsNullOrEmpty(cache_name)) return false;
+
+            for (int i = 0; i < m_names.Length; i++) if (m_names[i] == cache_name) { index = i; break; }
+
+            return index != -1;
+        }
+
         static ConcurrentDictionary<string, string> m___get(string cache_name)
         {
             int index = -1;
             if (string.IsNullOrEmpty(cache_name)) return null;
 
-            for (int i = 0; i < 100; i++) if (m_names[i] == cache_name) { index = i; break; }
+            for (int i = 0; i < m_names.Length; i++) if (m_names[i] == cache_name) { index = i; break; }
             if (index == -1) return null;
 
             switch (index)
@@ -857,6 +868,33 @@ namespace cache_redis
 
         #endregion
 
+        #region [ SCHEMA ]
+
+        static ConcurrentDictionary<string, Dictionary<string, object>> m_schema
+            = new ConcurrentDictionary<string, Dictionary<string, object>>() { };
+        static void schema___reset()
+        {
+            m_schema.Clear();
+            if (Directory.Exists("schema"))
+            {
+                var fs = Directory.GetFiles("schema", "*.json");
+                foreach (var f in fs)
+                {
+                    try
+                    {
+                        string name = Path.GetFileName(f);
+                        name = name.Substring(0, name.Length - 5).ToUpper();
+                        string json = File.ReadAllText(f);
+                        var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                        m_schema.TryAdd(name, dic);
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        #endregion
+
         #region [ API BASE ]
 
         static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
@@ -953,6 +991,12 @@ namespace cache_redis
                 return false;
             }
 
+            if (m___check(api) == false)
+            {
+                api___response_json_error(context, "Api: " + api + " is not exist");
+                return false;
+            }
+
             if (m_redis.ContainsKey(api) == false)
             {
                 api___response_json_error(context, "Cache engine " + api + " not exist");
@@ -972,12 +1016,6 @@ namespace cache_redis
                 return false;
             }
 
-            if (m___get(cf.name) == null)
-            {
-                api___response_json_error(context, "m_names not contain name of Cache Engine " + cf.name);
-                return false;
-            }
-
             if (busy___get(cf.name))
             {
                 api___response_json_error(context, "Cache Engine " + cf.name + " is busy");
@@ -988,7 +1026,14 @@ namespace cache_redis
         }
 
         static int ___id = 100;
-        static bool api___get_uuid(HttpListenerContext context)
+        
+        static long api___get_uuid()
+        {
+            if (___id > 999) ___id = 100;
+            return long.Parse(DateTime.Now.ToString("yyMMddHHmmss") + ___id.ToString());
+        }
+
+        static bool api___get_uuid(HttpListenerContext context = null)
         {
             string[] a = context.Request.Url.Segments;
             string id = a.Length > 2 ? a[2].ToUpper() : "";
@@ -1312,7 +1357,7 @@ namespace cache_redis
             return false;
         }
 
-        static string[] api___biz_valid(HttpListenerContext context, string cache_name, string data)
+        static oPostItem[] api___biz_valid(HttpListenerContext context, string tran_id, string data)
         {
             if (string.IsNullOrEmpty(data))
             {
@@ -1320,19 +1365,185 @@ namespace cache_redis
                 return null;
             }
 
-            if (data[0] != '[' || data[data.Length - 1] != ']' || !data.Contains("___tid") || !data.Contains("___api") || !data.Contains("___do") || !data.Contains("id"))
+            if (string.IsNullOrEmpty(tran_id) || !data.Contains(tran_id))
             {
-                api___response_json_error(context, "Data must be json {___tid:...,___api:'USER|...',___do:'ADD|UPDATE|REMOVE', id:...}; ___tid is transaction ID");
+                api___response_json_error(context, "URL must be host/___tid and Data not contain ___tid: " + tran_id);
                 return null;
             }
 
-            string[] jsons = null;
+            if (data[0] != '[' || data[data.Length - 1] != ']'
+                || !data.Contains("___tid")
+                || !data.Contains("___api")
+                || !data.Contains("___dbs")
+                || !data.Contains("___do")
+                || !data.Contains("id"))
+            {
+                api___response_json_error(context, "Data must be json {___dbs:...,___tid:...,___api:'USER|...',___do:'ADD|UPDATE|REMOVE', id:...}; ___tid is transaction ID");
+                return null;
+            }
+
+            long ___tid = 0;
+            if (long.TryParse(tran_id, out ___tid) == false || ___tid < 1)
+            {
+                api___response_json_error(context, "URL must be host/___tid and Data not contain ___tid: " + tran_id + ", ___tid must be number > 0");
+                return null;
+            }
+
+            List<oPostItem> ls = new List<oPostItem>() { };
+
             try
             {
                 var aj = JsonConvert.DeserializeObject<JObject[]>(data);
-                jsons = new string[aj.Length];
-                for (int i = 0; i < jsons.Length; i++)
-                    jsons[i] = JsonConvert.SerializeObject(aj[i], Formatting.Indented);
+                var dt = DateTime.Now;
+                JObject it;
+                for (int i = 0; i < aj.Length; i++)
+                {
+                    it = aj[i];
+                    JToken j_id, j_tid, j_do, j_api, j_dbs;
+
+                    it.TryGetValue("id", out j_id);
+                    it.TryGetValue("___tid", out j_tid);
+                    it.TryGetValue("___api", out j_api);
+                    it.TryGetValue("___do", out j_do);
+                    it.TryGetValue("___dbs", out j_dbs);
+
+                    if (j_id == null)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] missing field id", 65199001);
+                        return null;
+                    }
+
+                    if (j_tid == null)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] missing field ___tid", 65199002);
+                        return null;
+                    }
+
+                    if (j_do == null)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] missing field ___do: ADD|UPDATE|REMOVE", 65199003);
+                        return null;
+                    }
+
+                    if (j_api == null)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] missing field ___api", 65199004);
+                        return null;
+                    }
+
+                    if (j_dbs == null)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] missing field ___dbs", 65199004);
+                        return null;
+                    }
+
+                    long id = 0, tid = 0;
+                    string api = j_api.ToString().ToUpper(),
+                        dbs = j_dbs.ToString(),
+                        _do = j_do.ToString().ToUpper();
+                    long.TryParse(j_id.ToString(), out id);
+                    long.TryParse(j_tid.ToString(), out tid);
+
+                    if (___tid != tid)
+                    {
+                        api___response_json_error(context, "On URL and Data then ___tid must be same");
+                        return null;
+                    }
+
+                    if (_do != "ADD" && _do != "UPDATE" && _do != "REMOVE")
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] field ___do must be ADD|UPDATE|REMOVE");
+                        return null;
+                    }
+
+                    if (m___check(api) == false)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] field ___api: " + api + " is not exist");
+                        return null;
+                    }
+
+                    if (m_schema.ContainsKey(api) == false)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] field ___api: " + api + " is not exist schema");
+                        return null;
+                    }
+
+                    string file_dbs = Path.Combine(ROOT_PATH, "dbs\\" + dbs + ".sql");
+                    if (File.Exists(file_dbs)==false)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] field ___dbs: " + dbs + " is not find file " + file_dbs);
+                        return null;
+                    }
+
+
+                    try
+                    {
+                        string j = JsonConvert.SerializeObject(it);
+                        var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(j);
+                        input.Remove("___do");
+                        input.Remove("___api");
+                        input.Remove("___dbs");
+                        input.Remove("___tid");
+
+                        var output = JsonConvert.DeserializeObject<Dictionary<string, object>>(j);
+                        output.Remove("___do");
+                        output.Remove("___api");
+                        output.Remove("___dbs");
+                        output.Remove("___tid");
+
+                        var schema = m_schema[api];
+                        foreach (var kv in schema) if (!output.ContainsKey(kv.Key)) output.Add(kv.Key, kv.Value);
+                        foreach (var kv in output)
+                        {
+                            string v = output[kv.Key] == null ? string.Empty : output[kv.Key].ToString();
+                            switch (v)
+                            {
+                                case "KEY_IDENTITY":
+                                    output[kv.Key] = api___get_uuid();
+                                    break;
+                                case "hhmmss":
+                                    output[kv.Key] = int.Parse(dt.ToString("hhmmss"));
+                                    break;
+                                case "yyMMdd":
+                                    output[kv.Key] = int.Parse(dt.ToString("yyMMdd"));
+                                    break;
+                                case "yyyyMMdd":
+                                    output[kv.Key] = int.Parse(dt.ToString("yyyyMMdd"));
+                                    break;
+                                case "yyMMddhhmmss":
+                                    output[kv.Key] = int.Parse(dt.ToString("yyMMddhhmmss"));
+                                    break;
+                                case "yyyyMMddhhmmss":
+                                    output[kv.Key] = long.Parse(dt.ToString("yyyyMMddhhmmss"));
+                                    break;
+                                case "-1|hhmmss":
+                                case "-1|yyMMdd":
+                                case "-1|yyyyMMdd":
+                                case "-1|yyMMddhhmmss":
+                                case "-1|yyyyMMddhhmmss":
+                                    output[kv.Key] = -1;
+                                    break;
+                            }
+                        }
+
+                        oPostItem pi = new oPostItem()
+                        {
+                            input = input,
+                            ouput = output,
+                            id = id,
+                            ___api = api,
+                            ___do = _do,
+                            ___dbs = dbs,
+                            ___tid = tid
+                        };
+                        ls.Add(pi);
+                    }
+                    catch (Exception e22)
+                    {
+                        api___response_json_error(context, "Command[" + i.ToString() + "] convert json error: " + e22.Message);
+                        return null;
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -1340,56 +1551,17 @@ namespace cache_redis
                 return null;
             }
 
-            return jsons;
+            return ls.ToArray();
         }
 
-        static bool api___biz_addnew(HttpListenerContext context, string data)
+        static bool api___post_update(HttpListenerContext context, string tran_id, string data)
         {
-            string[] a = context.Request.Url.Segments;
-            string api = a.Length > 2 ? a[2].ToUpper() : "";
-
-            if (api___redis_check_ready(context) == false) return false;
-            string[] items = api___biz_valid(context, api, data);
+            oPostItem[] items = api___biz_valid(context, tran_id, data);
             if (items == null) return false;
 
-            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
-            var redis = m_redis[api];
 
-            api___response_json_text_body(context, true);
-            api___close(context);
-            return true;
-        }
-
-        static bool api___biz_update(HttpListenerContext context, string data)
-        {
-            string[] a = context.Request.Url.Segments;
-            string api = a.Length > 2 ? a[2].ToUpper() : "";
-
-            if (api___redis_check_ready(context) == false) return false;
-            string[] items = api___biz_valid(context, api, data);
-            if (items == null) return false;
-
-            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
-            var redis = m_redis[api];
-
-            api___response_json_text_body(context, true);
-            api___close(context);
-            return true;
-        }
-
-        static bool api___biz_remove(HttpListenerContext context, string data)
-        {
-            string[] a = context.Request.Url.Segments;
-            string api = a.Length > 2 ? a[2].ToUpper() : "";
-
-            if (api___redis_check_ready(context) == false) return false;
-            string[] items = api___biz_valid(context, api, data);
-            if (items == null) return false;
-
-            var cf = m_config.list_cache.Where(x => x.name == api).Take(1).SingleOrDefault();
-            var redis = m_redis[api];
-
-            api___response_json_text_body(context, true);
+            string json = JsonConvert.SerializeObject(items, Formatting.Indented);
+            api___response_json_text_body(context, true, json);
             api___close(context);
             return true;
         }
@@ -1445,6 +1617,13 @@ namespace cache_redis
                                 api___response_json_error(context, text);
                             else
                                 api___response_json_text_raw(context, text);
+                            break;
+                        #endregion
+                        case "schema":
+                        case "schema.html":
+                            #region
+                            text = JsonConvert.SerializeObject(m_schema, Formatting.Indented);
+                            api___response_json_text_raw(context, text);
                             break;
                         #endregion
                         default:
@@ -1505,19 +1684,12 @@ namespace cache_redis
                 #endregion
 
                 #region [ POST ]
-                case "POST": 
+
+                case "POST":
                     using (StreamReader reader = new StreamReader(context.Request.InputStream, Encoding.UTF8))
                         text = reader.ReadToEnd();
+                    return api___post_update(context, cmd, text);
 
-                    switch (cmd)
-                    {
-                        case "add/": return api___biz_addnew(context, text);
-                        case "update/": return api___biz_update(context, text);
-                        case "remove/": return api___biz_remove(context, text);
-                    }
-
-                    api___response_json_error(context, "Path must be add|update|remove/USER|...");
-                    break;
                     #endregion
             }
             return false;
@@ -1567,6 +1739,8 @@ namespace cache_redis
 
         static void Main(string[] args)
         {
+            schema___reset();
+
             #region [ CONFIG.JSON ]
 
             string file_config = Path.Combine(ROOT_PATH, "config.json");

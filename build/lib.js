@@ -89,3 +89,10 @@ function ___index(cache_name, o) {
     return JSON.stringify(o);
 }
 
+function ___obj_build_addnew(cache_name, schema, o) {
+
+}
+
+function ___obj_build_login(cache_name, schema, o) {
+
+}

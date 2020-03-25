@@ -1,0 +1,20 @@
+﻿{
+	"id": "KEY_IDENTITY",
+	"str_call_out_tooken": "",
+	"int_approve_level": -1,
+	"str_user_position": "",
+	"group_id": -1,
+	"str_user_name": "",
+	"int_pol_status": -1,
+	"int_pol_region": -1,
+	"str_group_name": "",
+	"str_full_name": "",
+	"str_pass_word": "12345@abc",
+	"str_pass": "",
+	"str_possition": "",
+	"shop_id": -1,
+	"str_shop_name": "",
+	"bit_admin_caller": 0,
+	"str_user_email": "",
+	"group_qlkv": ""
+}

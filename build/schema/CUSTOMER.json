@@ -1,0 +1,12 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "int_status": -1,
+  "int_gender": -1,
+  "str_name": "",
+  "int_created_date": "yyyyMMdd",
+  "int_created_time": "hhmmss",
+  "int_birthday_date": 0,
+  "str_address": "",
+  "str_email": "",
+  "str_phone": ""
+}

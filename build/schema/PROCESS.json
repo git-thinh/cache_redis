@@ -1,0 +1,16 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "int_pol_pawn_id": -1,
+  "str_content": "",
+  "int_action": -1,
+  "str_action_name": "",
+  "int_pawn_status": -1,
+  "int_recept_group_id": -1,
+  "lng_created_at": "yyyyMMddhhmmss",
+  "int_created_by": -1,
+  "int_created_group_id": -1,
+  "str_created_group": "",
+  "int_status": -1,
+  "str_canceled_reason": "",
+  "str_created_by_name": ""
+}

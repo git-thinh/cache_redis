@@ -6,13 +6,32 @@ using System.Text;
 
 namespace cache_redis
 {
+    public class oPost
+    {
+        public bool ok { set; get; }
+        public int code { set; get; }
+        public string message { set; get; }
+    }
+
+    public class oPostItem
+    {
+        public long ___tid { set; get; }
+        public string ___api { set; get; }
+        public string ___do { set; get; }
+        public string ___dbs { set; get; }
+        public long id { set; get; }
+        public Dictionary<string,object> input { set; get; }
+        public Dictionary<string,object> ouput { set; get; }
+    }
+
     public class oError
     {
         public bool ok { set; get; }
         public int code { set; get; }
         public string message { set; get; }
 
-        public static string getJson(string message_, int code_ = 0) {
+        public static string getJson(string message_, int code_ = 0)
+        {
             var m = new oError() { ok = false, code = code_, message = message_ };
             return JsonConvert.SerializeObject(m, Formatting.Indented);
         }

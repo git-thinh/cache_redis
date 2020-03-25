@@ -1,0 +1,16 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "step_id": -1,
+  "ref_ids": "",
+  "user_ids": "",
+  "group_ids": "",
+  "str_emails": "",
+  "str_message": "",
+  "int_date": "yyyyMMdd",
+  "int_time": "hhmmss",
+  "int_send_date": "yyyyMMdd",
+  "int_send_time": "hhmmss",
+  "int_read_date": -1,
+  "int_read_time": -1,
+  "int_status": -1
+}

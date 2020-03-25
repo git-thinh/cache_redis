@@ -1,0 +1,14 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "pol_pawn_id": -1,
+  "int_recall_time": -1,
+  "int_no_contacted_at": -1,
+  "int_created_date": "yyyyMMdd",
+  "int_created_time": "hhmmss",
+
+  "lng_register_datetime": "-1|yyyyMMddhhmmss",
+  "lng_last_trans_datetime": "-1|yyyyMMddhhmmss",
+
+  "int_urgent_level": -1,
+  "int_order_priority": -1
+}

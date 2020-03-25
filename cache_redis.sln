@@ -34,6 +34,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "studio-redis", "studio-redis\studio-redis.csproj", "{E03EBA0B-00A6-4EF0-A976-B344AB22FE41}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schema", "schema", "{DF6B3354-D865-4AD5-B9C5-3643AEF28E4F}"
+	ProjectSection(SolutionItems) = preProject
+		build\schema\AREA.json = build\schema\AREA.json
+		build\schema\ASSET_TYPE.json = build\schema\ASSET_TYPE.json
+		build\schema\CHANNEL.json = build\schema\CHANNEL.json
+		build\schema\CUSTOMER.json = build\schema\CUSTOMER.json
+		build\schema\GROUP.json = build\schema\GROUP.json
+		build\schema\NOTIFY.json = build\schema\NOTIFY.json
+		build\schema\PAWN.json = build\schema\PAWN.json
+		build\schema\PAWN_DETAIL.json = build\schema\PAWN_DETAIL.json
+		build\schema\PRIORITY.json = build\schema\PRIORITY.json
+		build\schema\PROCESS.json = build\schema\PROCESS.json
+		build\schema\REASON_FAIL.json = build\schema\REASON_FAIL.json
+		build\schema\REGION.json = build\schema\REGION.json
+		build\schema\SHOP.json = build\schema\SHOP.json
+		build\schema\STEP.json = build\schema\STEP.json
+		build\schema\SUPPORT_SCHEDULE.json = build\schema\SUPPORT_SCHEDULE.json
+		build\schema\SYS_CONFIG.json = build\schema\SYS_CONFIG.json
+		build\schema\SYS_EMAIL.json = build\schema\SYS_EMAIL.json
+		build\schema\SYS_SMS.json = build\schema\SYS_SMS.json
+		build\schema\USER.json = build\schema\USER.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dbs", "dbs", "{526E5744-0290-4DC1-99DE-70AEB49D2190}"
+	ProjectSection(SolutionItems) = preProject
+		build\dbs\user_addnew.sql = build\dbs\user_addnew.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +83,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DF6B3354-D865-4AD5-B9C5-3643AEF28E4F} = {D0E81EA4-41C8-4954-9AD2-3F46C0D8E83D}
+		{526E5744-0290-4DC1-99DE-70AEB49D2190} = {D0E81EA4-41C8-4954-9AD2-3F46C0D8E83D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A6AB6DAA-D5BA-41FB-B721-4E4EFE83E736}

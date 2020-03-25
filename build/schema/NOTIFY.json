@@ -1,0 +1,13 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "int_type": -1,
+  "str_actions": "",
+  "step_id": -1,
+  "ref_ids": "",
+  "user_ids": "",
+  "group_ids": "",
+  "message": "",
+  "int_date": "yyyyMMdd",
+  "int_time": "hhmmss",
+  "int_status": -1
+}

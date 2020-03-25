@@ -1,0 +1,10 @@
+﻿{
+  "id": "KEY_IDENTITY",
+  "int_state": -1,
+  "int_pawn_online_id": -1,
+  "int_support_time": "yyyyMMddhhmmss",
+  "int_created_by": -1,
+  "int_created_at": "yyyyMMddhhmmss",
+  "str_note": "",
+  "str_created_by_name": ""
+}
