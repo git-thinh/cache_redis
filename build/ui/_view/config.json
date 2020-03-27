@@ -1,0 +1,20 @@
+{
+  "loading": {
+    "title": "Loading",
+    "views": [
+      {
+        "name": "loading",
+        "enable": true
+      }
+    ]
+  },
+  "user": {
+    "title": "User",
+    "views": [
+      {
+        "name": "login",
+        "enable": true
+      }
+    ]
+  }
+}
