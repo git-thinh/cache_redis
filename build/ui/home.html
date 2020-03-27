@@ -28,7 +28,7 @@
         <div class="w-100 d-none d-md-block">
             <div class="w-100 d-flex flex-column">
                 <div class="w-100 bg-danger">
-                    <component v-bind:is="view___header_nav"></component>
+                    <component v-bind:is="view___header_top" :obj-user="objUser"></component>
                 </div>
                 <div class="w-100">
                     <component v-bind:is="view___header_breadcrumb"></component>
@@ -48,7 +48,7 @@
                     <component v-bind:is="view___main_left"></component>
                 </div>
                 <div role="main" class="flex-fill h-100 bg-warning">
-                    <component v-bind:is="view___main_body"></component>
+                    <component v-bind:is="view___main_body" :obj-user="objUser"></component>
                 </div>
             </div>
 
@@ -56,6 +56,7 @@
         <div class="w-100 bg-danger">
             <component v-bind:is="view___footer"></component>
         </div>
+        <user___logout></user___logout>
     </div>
 </body>
 </html>

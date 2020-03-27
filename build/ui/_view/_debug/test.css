@@ -1,36 +1,38 @@
 ﻿
-.sidebar___test {
+._debug___test {
     position: fixed;
     height: 100vh;
+    top: 30px;
     right: 0;
 }
 
-    .sidebar___test.show {
+    ._debug___test.show {
         background-color: dodgerblue;
         width: 200px;
+        z-index: 99;
     }
 
-    .sidebar___test.hide {
+    ._debug___test.hide {
         width: 50px;
         height: 20px;
     }
 
-    .sidebar___test button {
+    ._debug___test button {
         margin-left: 100px;
     }
 
-    .sidebar___test.hide button {
+    ._debug___test.hide button {
         margin-left: 0px;
     }
 
-    .sidebar___test ul {
+    ._debug___test ul {
         height: 100%;
         list-style: none;
         padding: 0;
     }
 
-        .sidebar___test ul li ol li,
-        .sidebar___test ul li {
+        ._debug___test ul li ol li,
+        ._debug___test ul li {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -39,28 +41,28 @@
             user-select: none;
         }
 
-        .sidebar___test ul li {
+        ._debug___test ul li {
             margin: 0;
             border-bottom: 1px solid #ccc;
             padding: 0 0 0 9px;
         }
 
-            .sidebar___test ul li ol {
-                padding: 0;
+            ._debug___test ul li ol {
+                padding: 0 0 0 22px;
                 list-style: none;
             }
 
-                .sidebar___test ul li ol li {
-                    padding: 0 0 0 20px;
+                ._debug___test ul li ol li {
+                    padding: 0 0 0 3px;
                     height: 27px;
                     font-weight: bold;
                 }
 
-                    .sidebar___test ul li ol li:hover {
+                    ._debug___test ul li ol li:hover {
                         color: orangered;
                         cursor: pointer;
                     }
 
-                    .sidebar___test ul li ol li:last-of-type {
+                    ._debug___test ul li ol li:last-of-type {
                         border-bottom: none;
                     }

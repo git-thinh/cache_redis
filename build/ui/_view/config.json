@@ -11,6 +11,18 @@
       }
     ]
   },
+  "_debug": {
+    "title": "Debug",
+    "views": [
+      {
+        "title": "Test module",
+        "name": "test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "sidebar_right",
+        "enable": true
+      }
+    ]
+  },
   "sidebar": {
     "title": "Sidebar",
     "views": [
@@ -18,7 +30,7 @@
         "title": "Test module",
         "name": "test",
         "area_allow": [ "url", "menu" ],
-        "area_init": "sidebar_right",
+        "area_init": "",
         "enable": true
       }
     ]
@@ -30,7 +42,27 @@
         "title": "Login",
         "name": "login",
         "area_allow": [ "url", "menu" ],
-        "area_init": "main_body",
+        "area_init": "",
+        "enable": true
+      },
+      {
+        "title": "Logout",
+        "name": "logout",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      }
+    ]
+  },
+  "header": {
+    "title": "Header",
+    "views": [
+      {
+        "title": "Header top",
+        "name": "top",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "header_top",
+        "requiresAuth": true,
         "enable": true
       }
     ]
@@ -42,10 +74,16 @@
         "title": "Table basic",
         "name": "table_basic",
         "area_allow": [ "url", "menu" ],
-        "area_init": "",
+        "area_init": "main_body",
         "requiresAuth": true,
         "enable": true
       }
+    ]
+  },
+  "form": {
+    "title": "Form",
+    "views": [
+      { "name": "form01" }
     ]
   }
 }

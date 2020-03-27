@@ -1,41 +1,54 @@
-﻿var ___APP, ___VIEW = {}, ___COM = {}, ___HTML = {};
+﻿var ___APP, ___VIEW = {}, ___COM = {}, ___HTML = {}, ___V_LOGOUT, ___V_MAIN;
 var ___DATA = {
     view___sidebar_left: null,
     view___sidebar_right: null,
-    view___header_nav: null,
+    view___header_top: null,
     view___header_breadcrumb: null,
     view___header_tab: null,
     view___header_filter: null,
     view___main_left: null,
     view___main_body: null,
-    view___footer: null
+    view___footer: null,
+    objUser: {}
 };
 
 var ___MIXIN = {
-    props: [],
+    props: ['obj-user'],
+    data: function () {
+        return {
+            role___: null
+        }
+    },
     computed: {
         view_id: function () { return this.$vnode.componentOptions.tag; }
     },
-    created: function () {
-        var _self = this;
-        //console.log(_self.view_id);
-    },
+    created: function () { },
     mounted: function () {
         var _self = this;
-        var el = _self.$el;
-        classie.add(el, _self.view_id);
-        //console.log(el);
+        _self.___init_class();
+        console.log('MIXIN: mounted -> ' + _self.view_id);
+        if (_self.view_id.indexOf('___logout') != -1) ___V_LOGOUT = _self;
     },
     methods: {
+        ___init_class: function () {
+            var _self = this;
+            var el = _self.$el;
+            classie.add(el, '___com').add(el, _self.view_id);
+            var pa = el.parentElement;
+            if (pa && pa.hasAttribute('role')) {
+                var role = pa.getAttribute('role');
+                //console.log('MIXIN: ___init_class ' + _self.view_id + ', role = ', role);
+                _self.role___ = role;
+            }
+        }
     },
     watch: {
         $data: {
             handler: function (val, oldVal) {
                 var _self = this;
-                //console.log('WATCH: ' + _self.view_id);
+                console.log('WATCH: ' + _self.view_id);
                 Vue.nextTick(function () {
-                    var el = _self.$el;
-                    classie.add(el, _self.view_id);
+                    _self.___init_class();
                 });
             },
             deep: true
@@ -72,7 +85,7 @@ var view___init = (callback) => {
 
                 if (type == 'js') {
                     if (r.ok) text = await r.text();
-                    else text = '{ mixins: [___MIXIN], template: "<div></div>", data: function () { return {}; }, mounted: function () {}, methods: {} }';
+                    else text = '{ data: function () { return {}; }, mounted: function () {}, methods: {} }';
 
                     text = text.trim().substr(1);
                     text = '___COM["' + key + '"] = { mixins: [___MIXIN], template: ___HTML["' + key + '"], \r\n ' + text + ' \r\n ' +
@@ -82,6 +95,8 @@ var view___init = (callback) => {
                     index = ___VIEW[scope].views.findIndex(function (o) { return o.name == api; });
                     //console.log(scope, api, index);
                     if (index != -1) ___VIEW[scope].views[index].url_js = url_js;
+                    ___VIEW[scope].views[index].ok = false;
+                    ___VIEW[scope].views[index].key = key;
 
                     a.push({ key: key, scope: scope, api: api, type: 'js', url_js: url_js });
                 } else if (r.ok) {
@@ -91,11 +106,11 @@ var view___init = (callback) => {
                             ___HTML[key] = text;
                             break;
                         case 'ss': // css
-                            //var url_css = '/_view/' + scope + '/' + api + '.css';
-                            var url_css = URL.createObjectURL(new Blob([text], { type: 'text/css' }));
-                            index = ___VIEW[scope].views.findIndex(function (o) { return o.name == api; });
-                            console.log(scope, api, index);
-                            if (index != -1) ___VIEW[scope].views[index].url_css = url_css;
+                            var url_css = '/_view/' + scope + '/' + api + '.css';
+                            //var url_css = URL.createObjectURL(new Blob([text], { type: 'text/css' }));
+                            //index = ___VIEW[scope].views.findIndex(function (o) { return o.name == api; });
+                            ////console.log(scope, api, index);
+                            //if (index != -1) ___VIEW[scope].views[index].url_css = url_css;
 
                             var el = document.createElement('link');
                             el.setAttribute('rel', 'stylesheet');
@@ -110,6 +125,7 @@ var view___init = (callback) => {
             return a;
         }).then(async a => {
             var js_add = await Promise.all(a.map(it => {
+                if (___HTML[it.key] == null) ___HTML[it.key] = '<div></div>';
                 return new Promise((resolve, reject) => {
                     var el = document.createElement('script');
                     el.setAttribute('src', it.url_js);
@@ -128,17 +144,63 @@ var view___init = (callback) => {
             var index = ___VIEW[r.scope].views.findIndex(function (o) { return o.name == r.api; });
             if (index != -1) {
                 var it = ___VIEW[r.scope].views[index];
-                it.key = r.key;
-                if (it.area_init != null && it.area_init.length > 0) {
-                    ___DATA['view___' + it.area_init] = r.key;
-                    console.log('VIEW___INIT: ' + it.area_init + ' ----> ' + r.key);
-                }
+                it.ok = true;
+                //if (it.ok && it.area_init != null && it.area_init.length > 0) {
+                //    ___DATA['view___' + it.area_init] = r.key;
+                //    console.log('VIEW___INIT: ' + it.area_init + ' ----> ' + r.key);
+                //}
             }
         });
 
-        callback({ ok: true });
+        callback({ ok: true, configs: results });
     }).catch((err) => callback({ ok: false, message: err.message }));
 };
+
+view___init((m) => {
+    console.log('VIEW___INIT ----> ' + m.ok);
+    if (m.ok == false) return;
+
+    ___APP = new Vue({
+        el: '#app',
+        data: function () { return ___DATA; },
+        mounted: function () {
+            var _self = this;
+            Vue.nextTick(function () {
+                _self.reload();
+            });
+        },
+        methods: {
+            reload: function () {
+                var _self = this;
+
+                if (localStorage['USER_TOKEN'] == null) {
+                    ___APP.$data.view___main_body = 'user___login';
+                } else {
+                    ___APP.$data.objUser = JSON.parse(localStorage['USER']);
+
+                    var cf, cf_views = {};
+                    var views = Object.keys(___VIEW);
+
+                    for (var i = 0; i < views.length; i++) {
+                        if (Array.isArray(___VIEW[views[i]].views)) {
+                            for (var j = 0; j < ___VIEW[views[i]].views.length; j++) {
+                                cf = ___VIEW[views[i]].views[j];
+                                if (cf.ok && cf.area_init != null && cf.area_init.length > 0) {
+                                    cf_views['view___' + cf.area_init] = cf.key;
+                                    //___APP.$data['view___' + cf.area_init] = cf.key;
+                                    console.log('VIEW___INIT: ' + cf.area_init + ' ----> ' + cf.key);
+                                }
+                            }
+                        }
+                    }
+
+                    for (var vi in cf_views) ___APP.$data[vi] = cf_views[vi];
+                }
+
+            }
+        }
+    });
+});
 
 window.addEventListener("hashchange", function (h) {
     var old_hash = new URL(h.oldURL).hash;
@@ -150,21 +212,54 @@ window.addEventListener("hashchange", function (h) {
 }, false);
 
 const view___load = (view, view_called) => {
-    if (view == null || view.length == 0 || ___HTML[view] == null) return;
+    if (view == null || view.length == 0) return;
+
+    if (___HTML[view] == null)
+        return console.error('VIEW___LOAD: ERROR -> ' + view + ': Template HTML is not exist');
+
+    var cf;
+    var views = Object.keys(___VIEW);
+    for (var i = 0; i < views.length; i++) {
+        if (Array.isArray(___VIEW[views[i]].views)) {
+            for (var j = 0; j < ___VIEW[views[i]].views.length; j++) {
+                if (___VIEW[views[i]].views[j].key == view) {
+                    cf = ___VIEW[views[i]].views[j];
+                    break;
+                }
+            }
+        }
+        if (cf != null) break;
+    }
 
     console.log('VIEW___LOAD: ' + view);
 
-    ___APP.view___main_body = view;
+    if (cf && cf.ok) {
+        ___APP.view___main_body = view;
+    } else console.error('VIEW___LOAD: ERROR -> ' + view + ': ok is false Or Config is null', JSON.stringify(cf));
 };
 
-view___init((m) => {
-    console.log('VIEW_INIT = ', m);
-    if (m.ok == false) return;
+var ___login = (user) => {
+    console.log('___login: user = ', user);
+    localStorage['USER_TOKEN'] = user.str_token;
+    localStorage['USER'] = JSON.stringify(user);
+    ___APP.$data.objUser = user;
+    ___APP.reload();
+};
 
-    //___DATA.view___main_body = 'table___table_basic';
+var ___logout = () => {
 
-    ___APP = new Vue({
-        el: '#app',
-        data: function () { return ___DATA; }
-    });
-});
+    if (___V_LOGOUT && ___V_LOGOUT.logout)
+        ___V_LOGOUT.logout((ok) => {
+            localStorage.removeItem('USER_TOKEN');
+            localStorage.removeItem('USER');
+
+            Object.keys(___DATA).forEach(key => {
+                if (key.indexOf('view___') == 0) {
+                    ___APP.$data[key] = null;
+                }
+            });
+
+            view___load('user___login');
+
+        });
+};
