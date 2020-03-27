@@ -1,0 +1,66 @@
+﻿
+.sidebar___test {
+    position: fixed;
+    height: 100vh;
+    right: 0;
+}
+
+    .sidebar___test.show {
+        background-color: dodgerblue;
+        width: 200px;
+    }
+
+    .sidebar___test.hide {
+        width: 50px;
+        height: 20px;
+    }
+
+    .sidebar___test button {
+        margin-left: 100px;
+    }
+
+    .sidebar___test.hide button {
+        margin-left: 0px;
+    }
+
+    .sidebar___test ul {
+        height: 100%;
+        list-style: none;
+        padding: 0;
+    }
+
+        .sidebar___test ul li ol li,
+        .sidebar___test ul li {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .sidebar___test ul li {
+            margin: 0;
+            border-bottom: 1px solid #ccc;
+            padding: 0 0 0 9px;
+        }
+
+            .sidebar___test ul li ol {
+                padding: 0;
+                list-style: none;
+            }
+
+                .sidebar___test ul li ol li {
+                    padding: 0 0 0 20px;
+                    height: 27px;
+                    font-weight: bold;
+                }
+
+                    .sidebar___test ul li ol li:hover {
+                        color: orangered;
+                        cursor: pointer;
+                    }
+
+                    .sidebar___test ul li ol li:last-of-type {
+                        border-bottom: none;
+                    }

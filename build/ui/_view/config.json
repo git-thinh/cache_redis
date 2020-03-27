@@ -3,7 +3,22 @@
     "title": "Loading",
     "views": [
       {
+        "title": "Loading",
         "name": "loading",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      }
+    ]
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "views": [
+      {
+        "title": "Test module",
+        "name": "test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "sidebar_right",
         "enable": true
       }
     ]
@@ -12,7 +27,23 @@
     "title": "User",
     "views": [
       {
+        "title": "Login",
         "name": "login",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "main_body",
+        "enable": true
+      }
+    ]
+  },
+  "table": {
+    "title": "Table",
+    "views": [
+      {
+        "title": "Table basic",
+        "name": "table_basic",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "requiresAuth": true,
         "enable": true
       }
     ]

@@ -18,12 +18,44 @@
     <link href="/_lib/bootstrap/bootstrap.min.css" rel="stylesheet" />
 
     <script src="/_lib/vue/vue.min.js"></script>
-    <script src="/_lib/vue/vue-router.min.js"></script>
     <script src="/_app/init.js"></script>
 </head>
 <body>
     <div id="app" class="d-flex flex-column fixed-top h-100">
-        <router-view></router-view>
+        <component v-bind:is="view___sidebar_left"></component>
+        <component v-bind:is="view___sidebar_right"></component>
+
+        <div class="w-100 d-none d-md-block">
+            <div class="w-100 d-flex flex-column">
+                <div class="w-100 bg-danger">
+                    <component v-bind:is="view___header_nav"></component>
+                </div>
+                <div class="w-100">
+                    <component v-bind:is="view___header_breadcrumb"></component>
+                </div>
+                <div class="w-100">
+                    <component v-bind:is="view___header_tab"></component>
+                </div>
+                <div class="w-100">
+                    <component v-bind:is="view___header_filter"></component>
+                </div>
+            </div>
+        </div>
+        <div class="w-100 flex-fill">
+
+            <div class="d-flex w-100 h-100">
+                <div :class="['h-100 w-25 d-none bg-success', view___main_left ? 'd-md-block' : '']">
+                    <component v-bind:is="view___main_left"></component>
+                </div>
+                <div role="main" class="flex-fill h-100 bg-warning">
+                    <component v-bind:is="view___main_body"></component>
+                </div>
+            </div>
+
+        </div>
+        <div class="w-100 bg-danger">
+            <component v-bind:is="view___footer"></component>
+        </div>
     </div>
 </body>
 </html>
