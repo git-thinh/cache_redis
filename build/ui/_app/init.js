@@ -1,7 +1,10 @@
-﻿var ___APP, ___VIEW = {}, ___COM = {}, ___HTML = {}, ___V_LOGOUT, ___V_MAIN;
+﻿var ___APP, ___VIEW = {}, ___COM = {}, ___HTML = {},
+    ___DL_CURRENT_EVENT = null, ___DL_CURRENT_ID = null,
+    ___V_LOGOUT, ___V_MAIN;
 var ___DATA = {
     view___sidebar_left: null,
     view___sidebar_right: null,
+
     view___header_top: null,
     view___header_breadcrumb: null,
     view___header_tab: null,
@@ -9,14 +12,26 @@ var ___DATA = {
     view___main_left: null,
     view___main_body: null,
     view___footer: null,
+
+    view___dialog_1: null,
+    view___dialog_2: null,
+    view___dialog_3: null,
+
     objUser: {}
 };
 
 var ___MIXIN = {
-    props: ['obj-user'],
+    props: [
+        'is-dialog',
+        'obj-user'
+    ],
     data: function () {
         return {
-            role___: null
+            role___: null,
+            dialog___: {
+                top: '0px',
+                left: '0px'
+            }
         }
     },
     computed: {
@@ -34,11 +49,22 @@ var ___MIXIN = {
             var _self = this;
             var el = _self.$el;
             classie.add(el, '___com').add(el, _self.view_id);
+
+            //console.log('MIXIN: ___init_class ' + _self.view_id + ', role = ', el.parentElement.getAttribute('role'));
+            //console.log('MIXIN: ___init_class ' + _self.view_id + ', is-dialog = ', _self.isDialog);
+
             var pa = el.parentElement;
             if (pa && pa.hasAttribute('role')) {
                 var role = pa.getAttribute('role');
-                //console.log('MIXIN: ___init_class ' + _self.view_id + ', role = ', role);
                 _self.role___ = role;
+            } else if (_self.isDialog == true) {
+                _self.role___ = 'dialog';
+                classie.add(el, ___DL_CURRENT_ID);
+
+                var rec = ___DL_CURRENT_EVENT.target.getBoundingClientRect();
+                //console.log('MIXIN: ___init_class ' + _self.view_id + ', rec = ', rec);
+                _self.dialog___.top = rec.bottom + 'px';
+                _self.dialog___.left = rec.x + 'px';
             }
         }
     },
@@ -46,10 +72,10 @@ var ___MIXIN = {
         $data: {
             handler: function (val, oldVal) {
                 var _self = this;
-                console.log('WATCH: ' + _self.view_id);
-                Vue.nextTick(function () {
-                    _self.___init_class();
-                });
+                //console.log('MIXIN_WATCH: ' + _self.view_id);
+                console.log('MIXIN_WATCH: ___init_class ' + _self.view_id + ', is-dialog = ', _self.isDialog);
+                if (_self.isDialog != true)
+                    Vue.nextTick(function () { _self.___init_class(); });
             },
             deep: true
         }
@@ -145,6 +171,8 @@ var view___init = (callback) => {
             if (index != -1) {
                 var it = ___VIEW[r.scope].views[index];
                 it.ok = true;
+                console.log('VIEW___INIT: ' + it.key + ' = true');
+
                 //if (it.ok && it.area_init != null && it.area_init.length > 0) {
                 //    ___DATA['view___' + it.area_init] = r.key;
                 //    console.log('VIEW___INIT: ' + it.area_init + ' ----> ' + r.key);
@@ -210,8 +238,26 @@ window.addEventListener("hashchange", function (h) {
     console.log('HASH_CHANGE: ' + old_hash + ' -> ', new_hash);
     view___load(new_hash, old_hash);
 }, false);
+window.addEventListener('DOMContentLoaded', (e) => {
+    document.onclick = function (event) {
+        var event_id = event.target.getAttribute('id');
+        //console.log('DOC_CLICK: CURRENT_ID = ' + ___DL_CURRENT_ID + ', event_id = ' + event_id);
+        if (___DL_CURRENT_ID && ___DL_CURRENT_ID != event_id) {
+            var dl = event.target.closest('.' + ___DL_CURRENT_ID);
+            //console.log('DOC_CLICK: dl = ', dl == null ? '' : ' dialog_current -> close it');
+            if (dl == null) {
+                // Click out of DIALOG -> close it
+                ___APP.$data.view___dialog_1 = null;
+                ___DL_CURRENT_ID = null;
+                ___DL_CURRENT_EVENT.target.removeAttribute('id');
+                ___DL_CURRENT_EVENT = null;
+            }
+        }
+    };
+});
 
-const view___load = (view, view_called) => {
+
+var view___load = (view, view_called) => {
     if (view == null || view.length == 0) return;
 
     if (___HTML[view] == null)
@@ -236,6 +282,36 @@ const view___load = (view, view_called) => {
     if (cf && cf.ok) {
         ___APP.view___main_body = view;
     } else console.error('VIEW___LOAD: ERROR -> ' + view + ': ok is false Or Config is null', JSON.stringify(cf));
+};
+
+var view___dialog = (event, view) => {
+    var event_id = event.target.getAttribute('id');
+    console.log('DIALOG: ' + view + ', CURRENT_ID = ' + ___DL_CURRENT_ID + ', event_id = ' + event_id);
+
+    if (___DL_CURRENT_ID && event_id == null) {
+        // Close dialog current is not itself, after open other dialog
+        console.log('DIALOG: ' + view + ' -> [1] ');
+        ___APP.$data.view___dialog_1 = null;
+        ___DL_CURRENT_ID = null;
+        ___DL_CURRENT_EVENT.target.removeAttribute('id');
+        ___DL_CURRENT_EVENT = null;
+    } else if (___DL_CURRENT_ID && ___DL_CURRENT_ID == event_id) {
+        // Close dialog current is itself
+        console.log('DIALOG: ' + view + ' -> [2] ');
+        ___APP.$data.view___dialog_1 = null;
+        ___DL_CURRENT_ID = null;
+        ___DL_CURRENT_EVENT.target.removeAttribute('id');
+        ___DL_CURRENT_EVENT = null;
+        return;
+    }
+
+    setTimeout(function (ev) {
+        ___DL_CURRENT_EVENT = ev;
+        ___DL_CURRENT_ID = 'dl-' + (new Date()).getTime();
+        ev.target.setAttribute('id', ___DL_CURRENT_ID);
+        // Open dialog
+        ___APP.$data.view___dialog_1 = view;
+    }, 1, event);
 };
 
 var ___login = (user) => {

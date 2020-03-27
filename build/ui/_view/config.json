@@ -1,16 +1,4 @@
 {
-  "loading": {
-    "title": "Loading",
-    "views": [
-      {
-        "title": "Loading",
-        "name": "loading",
-        "area_allow": [ "url", "menu" ],
-        "area_init": "",
-        "enable": true
-      }
-    ]
-  },
   "_debug": {
     "title": "Debug",
     "views": [
@@ -19,6 +7,18 @@
         "name": "test",
         "area_allow": [ "url", "menu" ],
         "area_init": "sidebar_right",
+        "enable": true
+      }
+    ]
+  },
+  "loading": {
+    "title": "Loading",
+    "views": [
+      {
+        "title": "Loading",
+        "name": "loading",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
         "enable": true
       }
     ]
@@ -64,6 +64,14 @@
         "area_init": "header_top",
         "requiresAuth": true,
         "enable": true
+      },
+      {
+        "title": "Search",
+        "name": "search_test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "header_filter",
+        "requiresAuth": true,
+        "enable": true
       }
     ]
   },
@@ -84,6 +92,16 @@
     "title": "Form",
     "views": [
       { "name": "form01" }
+    ]
+  },
+  "dialog": {
+    "title": "dialog",
+    "views": [
+      {
+        "title": "test",
+        "name": "test",
+        "enable": true
+      }
     ]
   }
 }

@@ -21,7 +21,7 @@
     <script src="/_app/init.js"></script>
 </head>
 <body>
-    <div id="app" class="d-flex flex-column fixed-top h-100">
+    <div id="app" class="d-flex flex-column fixed-top h-100" style="z-index:0;">
         <component v-bind:is="view___sidebar_left"></component>
         <component v-bind:is="view___sidebar_right"></component>
 
@@ -57,6 +57,7 @@
             <component v-bind:is="view___footer"></component>
         </div>
         <user___logout></user___logout>
+        <component v-bind:is="view___dialog_1" :is-dialog="true" :obj-user="objUser"></component>
     </div>
 </body>
 </html>
