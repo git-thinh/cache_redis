@@ -6,3 +6,6 @@
 /studio-redis/bin
 /studio-redis/obj
 *.conf
+/cache_redis/bin
+/cachekv/obj
+/cachekv/bin

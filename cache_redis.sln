@@ -91,6 +91,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "demos", "..\Projects\themes
 		SlnRelativePath = "..\Projects\themes\w2ui-master\demos\"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cachekv", "cachekv\cachekv.csproj", "{C2CDF473-BFC2-4C84-94A1-141D60041BCA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,10 @@ Global
 		{9162C0F1-186B-4D71-9B00-9DD3AC97320F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9162C0F1-186B-4D71-9B00-9DD3AC97320F}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{9162C0F1-186B-4D71-9B00-9DD3AC97320F}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

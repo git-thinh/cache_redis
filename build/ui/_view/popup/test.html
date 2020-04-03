@@ -1,0 +1,12 @@
+﻿
+<div :class="[visible ? 'show' : 'hide']">
+    <button @click="visible=!visible;">Menu</button>
+    <ul v-show="visible">
+        <li v-for="(cf,scope) in config">
+        {{scope}}
+            <ol>
+                <li v-for="it in cf.views" @click="view___load(scope + '___' + it.name)">{{it.name}}</li>
+            </ol>
+        </li>
+    </ul>
+</div>
