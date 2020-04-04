@@ -9,3 +9,4 @@
 /cache_redis/bin
 /cachekv/obj
 /cachekv/bin
+/debug/*.pdb

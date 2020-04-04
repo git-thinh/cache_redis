@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\build\</OutputPath>
+    <OutputPath>..\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="Common.Logging">
       <HintPath>DLL\Common.Logging.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HangFire">
       <HintPath>DLL\HangFire.dll</HintPath>
@@ -113,10 +114,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\CustomContentTypeProvider.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="test\hangfire\OldJob.cs" />
-    <Compile Include="test\hangfire\Program.cs" />
-    <Compile Include="test\hangfire\Services.cs" />
+    <Compile Include="Api\Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\Microsoft.Owin.Diagnostics.dll" />
@@ -146,5 +147,6 @@
     <EmbeddedResource Include="DLL\ServiceStack.Redis.dll" />
     <EmbeddedResource Include="DLL\ServiceStack.Text.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
