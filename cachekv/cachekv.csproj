@@ -32,6 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>DLL\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="HangFire">
+      <HintPath>DLL\HangFire.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="jose-jwt">
       <HintPath>DLL\jose-jwt.dll</HintPath>
       <Private>False</Private>
@@ -60,6 +67,10 @@
       <HintPath>DLL\Microsoft.Owin.StaticFiles.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NCrontab">
+      <HintPath>DLL\NCrontab.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
@@ -67,6 +78,22 @@
     </Reference>
     <Reference Include="Owin">
       <HintPath>DLL\Owin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>DLL\ServiceStack.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>DLL\ServiceStack.Interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>DLL\ServiceStack.Redis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>DLL\ServiceStack.Text.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -86,8 +113,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="test\hangfire\OldJob.cs" />
+    <Compile Include="test\hangfire\Program.cs" />
+    <Compile Include="test\hangfire\Services.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\Microsoft.Owin.Diagnostics.dll" />
@@ -107,6 +136,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\jose-jwt.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Common.Logging.dll" />
+    <EmbeddedResource Include="DLL\HangFire.dll" />
+    <EmbeddedResource Include="DLL\NCrontab.dll" />
+    <EmbeddedResource Include="DLL\ServiceStack.Common.dll" />
+    <EmbeddedResource Include="DLL\ServiceStack.Interfaces.dll" />
+    <EmbeddedResource Include="DLL\ServiceStack.Redis.dll" />
+    <EmbeddedResource Include="DLL\ServiceStack.Text.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
