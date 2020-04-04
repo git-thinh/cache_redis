@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="jose-jwt">
+      <HintPath>DLL\jose-jwt.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin">
       <HintPath>DLL\Microsoft.Owin.dll</HintPath>
       <Private>False</Private>
@@ -40,12 +44,20 @@
       <HintPath>DLL\Microsoft.Owin.Diagnostics.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.Owin.FileSystems">
+      <HintPath>DLL\Microsoft.Owin.FileSystems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin.Host.HttpListener">
       <HintPath>DLL\Microsoft.Owin.Host.HttpListener.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Owin.Hosting">
       <HintPath>DLL\Microsoft.Owin.Hosting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.StaticFiles">
+      <HintPath>DLL\Microsoft.Owin.StaticFiles.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -88,6 +100,13 @@
   <ItemGroup>
     <EmbeddedResource Include="DLL\System.Net.Http.dll" />
     <EmbeddedResource Include="DLL\System.Net.Http.WebRequest.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Microsoft.Owin.FileSystems.dll" />
+    <EmbeddedResource Include="DLL\Microsoft.Owin.StaticFiles.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\jose-jwt.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
