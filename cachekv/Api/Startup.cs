@@ -4,14 +4,90 @@ using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
 using Owin;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace cachekv
 {
 
     public class Startup
     {
+        static string readFileFromManifestResourceStream(string fileName)
+        { 
+            string comName = fileName.Split(',')[0];
+            string resourceName = @"DLL\" + comName + ".dll";
+            var assembly = Assembly.GetExecutingAssembly();
+            resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream != null)
+                {
+                    byte[] buffer = new byte[stream.Length];
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        int read;
+                        while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            ms.Write(buffer, 0, read);
+                        buffer = ms.ToArray();
+                    }
+                    string s = System.Text.Encoding.UTF8.GetString(buffer).Trim();
+                    return s;
+                }
+            }
+            return string.Empty;
+        }
+
         public void Configuration(IAppBuilder app)
         {
+            #region [ UI ]
+
+            app.Map("/index.html", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            app.Map("/w2ui.min.css", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            app.Map("/w2ui.min.js", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            app.Map("/style.css", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            app.Map("/index.js", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            #endregion
+
             app.Map("/token", (iab) =>
             {
                 iab.Run(context =>
@@ -42,36 +118,36 @@ namespace cachekv
             //});
 
             //app.UseFileServer(true);
-            var options = new FileServerOptions
-            {
-                EnableDirectoryBrowsing = true,
-                EnableDefaultFiles = true,
-                DefaultFilesOptions = { DefaultFileNames = { "index.html" } },
-                FileSystem = new PhysicalFileSystem("ui"),
-                StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
-            };
-            app.UseFileServer(options);
-            app.UseFileServer(new FileServerOptions()
-            {
-                EnableDirectoryBrowsing = true,
-                RequestPath = new PathString("/valid_add"),
-                FileSystem = new PhysicalFileSystem("valid_add"),
-                StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
-            });
-            app.UseFileServer(new FileServerOptions()
-            {
-                EnableDirectoryBrowsing = true,
-                RequestPath = new PathString("/schema"),
-                FileSystem = new PhysicalFileSystem("schema"),
-                StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
-            });
-            app.UseFileServer(new FileServerOptions()
-            {
-                EnableDirectoryBrowsing = true,
-                RequestPath = new PathString("/sql"),
-                FileSystem = new PhysicalFileSystem(@"config\sql"),
-                StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
-            });
+            //var options = new FileServerOptions
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    EnableDefaultFiles = true,
+            //    DefaultFilesOptions = { DefaultFileNames = { "index.html" } },
+            //    FileSystem = new PhysicalFileSystem("ui"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //};
+            //app.UseFileServer(options);
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/valid_add"),
+            //    FileSystem = new PhysicalFileSystem("valid_add"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/schema"),
+            //    FileSystem = new PhysicalFileSystem("schema"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/sql"),
+            //    FileSystem = new PhysicalFileSystem(@"config\sql"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
         }
 
     }

@@ -6,9 +6,9 @@ using System.Reflection;
 
 namespace cachekv
 {
-    class Program
+    class App
     {
-        static Program()
+        static App()
         {
             AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
             {
@@ -16,7 +16,7 @@ namespace cachekv
                 string comName = ev.Name.Split(',')[0];
                 string resourceName = @"DLL\" + comName + ".dll";
                 var assembly = Assembly.GetExecutingAssembly();
-                resourceName = typeof(Program).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
+                resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
                 using (Stream stream = assembly.GetManifestResourceStream(resourceName))
                 {
                     if (stream != null)

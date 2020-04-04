@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CustomContentTypeProvider.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="App.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Api\Startup.cs" />
   </ItemGroup>
@@ -147,6 +147,12 @@
     <EmbeddedResource Include="DLL\ServiceStack.Redis.dll" />
     <EmbeddedResource Include="DLL\ServiceStack.Text.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="UI\index.html" />
+    <EmbeddedResource Include="UI\index.js" />
+    <EmbeddedResource Include="UI\style.css" />
+    <EmbeddedResource Include="UI\w2ui.min.css" />
+    <EmbeddedResource Include="UI\w2ui.min.js" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
