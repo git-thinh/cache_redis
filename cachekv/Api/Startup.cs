@@ -15,7 +15,7 @@ namespace cachekv
         static string readFileFromManifestResourceStream(string fileName)
         { 
             string comName = fileName.Split(',')[0];
-            string resourceName = @"DLL\" + comName + ".dll";
+            string resourceName = @"UI\" + comName + ".dll";
             var assembly = Assembly.GetExecutingAssembly();
             resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
