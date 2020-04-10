@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("jobs_sql")]
+[assembly: AssemblyTitle("ckv")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("jobs_sql")]
+[assembly: AssemblyProduct("ckv")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2ee6306e-b7e7-4a33-99c4-7b60e1d8b1ea")]
+[assembly: Guid("9e477d2f-2334-4689-b841-031b2a782e8b")]
 
 // Version information for an assembly consists of the following four values:
 //

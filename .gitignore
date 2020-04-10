@@ -14,3 +14,9 @@
 /jobs_sql/bin
 /jobs_sql/obj
 /job_build/jobs_sql.pdb
+/job/bin
+/job/obj
+/job_build/*.pdb
+/ckv/bin
+/ckv/obj
+/ckv_build/*.pdb
