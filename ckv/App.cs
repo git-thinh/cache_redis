@@ -1,17 +1,36 @@
-﻿using System;
+﻿using Fleck;
+using log4net;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 
 namespace ckv
 {
-    class App
+    public interface IApp { 
+    
+    }
+
+    public class App: IApp
     {
+        #region [ IAPP ]
+
+        #endregion
+
+        #region [ STATIC MAIN ]
+
         static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static Process process_redis;
         static System.Threading.Timer timer;
+        
+        static List<IWebSocketConnection> ws_sockets;
+        static WebSocketServer ws_server;
+        static void ws_broadcast(string input) { foreach (var socket in ws_sockets.ToList()) socket.Send(input); }
+        static void ws_stop() { ws_sockets.Clear(); ws_server.Dispose(); }
 
         static App()
         {
@@ -46,8 +65,8 @@ namespace ckv
             Console.WriteLine(DateTime.Now.ToString());
         }
 
-        static void Main(string[] args)
-        {
+        static void start(IApp app) {
+
             int port_redis_job = 0;
             string name = "JOB";
 
@@ -98,14 +117,85 @@ namespace ckv
 
             #endregion
 
+            #region [ WEBSOCKET ]
+
+            ws_sockets = new List<IWebSocketConnection>();
+
+            FleckLog.Level = LogLevel.Debug;
+            ILog logger = LogManager.GetLogger(typeof(FleckLog));
+            FleckLog.LogAction = (level, message, ex) => {
+                switch (level)
+                {
+                    case LogLevel.Debug:
+                        logger.Debug(message, ex);
+                        break;
+                    case LogLevel.Error:
+                        logger.Error(message, ex);
+                        break;
+                    case LogLevel.Warn:
+                        logger.Warn(message, ex);
+                        break;
+                    default:
+                        logger.Info(message, ex);
+                        break;
+                }
+            };
+
+            //var ws_server = new WebSocketServer("wss://0.0.0.0:8431");
+            //ws_server.Certificate = new X509Certificate2("MyCert.pfx");
+            ws_server = new WebSocketServer("ws://0.0.0.0:8181");
+            ws_server.RestartAfterListenError = true; // Auto Restart After Listen Error
+            ws_server.ListenerSocket.NoDelay = true; // Disable Nagle's Algorithm
+            ws_server.SupportedSubProtocols = new[] { "superchat", "chat" };
+            ws_server.Start(socket =>
+            {
+                socket.OnOpen = () =>
+                {
+                    Console.WriteLine("Open...");
+                    ws_sockets.Add(socket);
+                };
+                socket.OnClose = () =>
+                {
+                    Console.WriteLine("Close...");
+                    ws_sockets.Remove(socket);
+                };
+                socket.OnMessage = message =>
+                {
+                    Console.WriteLine(message);
+                    ws_sockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                };
+            });
+
+            #endregion
+
             timer = new System.Threading.Timer(e => db_sync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
 
-            Console.WriteLine("[ Enter ] to exit ...");
-            Console.ReadLine();
-            timer.Dispose();
+        }
 
+        static void stop() {
+            ws_stop();
+            timer.Dispose();
             process_redis.Kill();
             process_redis.Dispose();
         }
+
+        static void Main(string[] args)
+        {
+            start(new App());
+
+            var input = Console.ReadLine();
+            while (input != "exit")
+            {
+                ws_broadcast(input);
+                input = Console.ReadLine();
+            }
+
+            //Console.WriteLine("[ Enter ] to exit ...");
+            //Console.ReadLine();
+
+            stop();
+        }
+
+        #endregion
     }
 }

@@ -36,6 +36,10 @@
       <HintPath>DLL\jose-jwt.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>DLL\log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin">
       <HintPath>DLL\Microsoft.Owin.dll</HintPath>
       <Private>False</Private>
@@ -60,6 +64,11 @@
       <HintPath>DLL\Microsoft.Owin.StaticFiles.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Owin">
       <HintPath>DLL\Owin.dll</HintPath>
       <Private>False</Private>
@@ -82,7 +91,83 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Fleck\ConnectionNotAvailableException.cs" />
+    <Compile Include="Fleck\FleckLog.cs" />
+    <Compile Include="Fleck\FrameType.cs" />
+    <Compile Include="Fleck\HandlerFactory.cs" />
+    <Compile Include="Fleck\Handlers\ComposableHandler.cs" />
+    <Compile Include="Fleck\Handlers\Draft76Handler.cs" />
+    <Compile Include="Fleck\Handlers\FlashSocketPolicyRequestHandler.cs" />
+    <Compile Include="Fleck\Handlers\Hybi13Handler.cs" />
+    <Compile Include="Fleck\Helpers\FleckRuntime.cs" />
+    <Compile Include="Fleck\Interfaces\IHandler.cs" />
+    <Compile Include="Fleck\Interfaces\ISocket.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketConnection.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketConnectionInfo.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketServer.cs" />
+    <Compile Include="Fleck\IntExtensions.cs" />
+    <Compile Include="Fleck\QueuedStream.cs" />
+    <Compile Include="Fleck\ReadState.cs" />
+    <Compile Include="Fleck\RequestParser.cs" />
+    <Compile Include="Fleck\SocketWrapper.cs" />
+    <Compile Include="Fleck\SubProtocolNegotiationFailureException.cs" />
+    <Compile Include="Fleck\SubProtocolNegotiator.cs" />
+    <Compile Include="Fleck\WebSocketConnection.cs" />
+    <Compile Include="Fleck\WebSocketConnectionInfo.cs" />
+    <Compile Include="Fleck\WebSocketException.cs" />
+    <Compile Include="Fleck\WebSocketHttpRequest.cs" />
+    <Compile Include="Fleck\WebSocketServer.cs" />
+    <Compile Include="Fleck\WebSocketStatusCodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Redis\Sider\src\Aggregate.cs" />
+    <Compile Include="Redis\Sider\src\AutoActivatingPool.cs" />
+    <Compile Include="Redis\Sider\src\Exceptions.cs" />
+    <Compile Include="Redis\Sider\src\Executors\ExecutorBase.cs" />
+    <Compile Include="Redis\Sider\src\Executors\IExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\ImmediateExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\IocpExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\MonitorExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\PipelinedExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\PubSubExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\TransactedExecutor.cs" />
+    <Compile Include="Redis\Sider\src\IClientsPool.cs" />
+    <Compile Include="Redis\Sider\src\Invocation.cs" />
+    <Compile Include="Redis\Sider\src\IRedisClient.cs" />
+    <Compile Include="Redis\Sider\src\LimitingStream.cs" />
+    <Compile Include="Redis\Sider\src\Message.cs" />
+    <Compile Include="Redis\Sider\src\MessageType.cs" />
+    <Compile Include="Redis\Sider\src\Mode.cs" />
+    <Compile Include="Redis\Sider\src\Observable.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolEncoder.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolReader.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolWriter.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.API.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.IO.core.cs" />
+    <Compile Include="Redis\Sider\src\RedisClientBase.cs" />
+    <Compile Include="Redis\Sider\src\RedisClientPipeliningExtensions.cs">
+      <DependentUpon>RedisClientPipeliningExtensions.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Redis\Sider\src\RedisReader.cs" />
+    <Compile Include="Redis\Sider\src\RedisSettings.cs" />
+    <Compile Include="Redis\Sider\src\RedisType.cs" />
+    <Compile Include="Redis\Sider\src\RedisVersionAttribute.cs" />
+    <Compile Include="Redis\Sider\src\RedisWriter.cs" />
+    <Compile Include="Redis\Sider\src\ResponseType.cs" />
+    <Compile Include="Redis\Sider\src\RoundRobinPool.cs" />
+    <Compile Include="Redis\Sider\src\SAssert.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\BufferSerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\ISerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\ObjectSerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\SerializerBase.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\Serializers.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\StringSerializer.cs" />
+    <Compile Include="Redis\Sider\src\SettingsWrapper.cs" />
+    <Compile Include="Redis\Sider\src\StringExtensions.cs" />
+    <Compile Include="Redis\Sider\src\ThreadwisePool.cs" />
+    <Compile Include="Redis\Sider\src\TrackedThreadwisePool.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\jose-jwt.dll" />
@@ -113,6 +198,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\System.Net.Http.WebRequest.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Redis\Sider\src\RedisClientPipeliningExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RedisClientPipeliningExtensions.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Newtonsoft.Json.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\log4net.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
