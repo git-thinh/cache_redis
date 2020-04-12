@@ -122,7 +122,6 @@ namespace ckv
                 });
             });
 
-
             app.Run(context =>
             {
                 context.Response.ContentType = "text/plain";

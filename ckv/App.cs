@@ -1,9 +1,14 @@
 ﻿using ChakraHost.Hosting;
 using Fleck;
+using Jose;
 using log4net;
 using Microsoft.Owin.Hosting;
+using Newtonsoft.Json;
+using Owin;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,15 +16,20 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 
 namespace ckv
 {
-    public interface IApp { 
-    
+    public interface IApp
+    {
+
     }
 
-    public class App: IApp
+    public class App : IApp
     {
+        static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        static IApp app = new App();
+
         #region [ IAPP ]
 
         #endregion
@@ -28,18 +38,21 @@ namespace ckv
 
         static List<IWebSocketConnection> ws_sockets;
         static WebSocketServer ws_server;
-        
-        static void ws_broadcast(string input) { 
-            foreach (var socket in ws_sockets.ToList()) 
-                socket.Send(input); 
+
+        static void ws_broadcast(string input)
+        {
+            foreach (var socket in ws_sockets.ToList())
+                socket.Send(input);
         }
 
-        static void ws_stop() { 
-            ws_sockets.Clear(); 
-            ws_server.Dispose(); 
+        static void ws_stop()
+        {
+            ws_sockets.Clear();
+            ws_server.Dispose();
         }
 
-        static void ws_init() {
+        static void ws_init()
+        {
             ws_sockets = new List<IWebSocketConnection>();
 
             //var ws_server = new WebSocketServer("wss://0.0.0.0:8431");
@@ -51,7 +64,8 @@ namespace ckv
 
             FleckLog.Level = LogLevel.Debug;
             ILog logger = LogManager.GetLogger(typeof(FleckLog));
-            FleckLog.LogAction = (level, message, ex) => {
+            FleckLog.LogAction = (level, message, ex) =>
+            {
                 switch (level)
                 {
                     case LogLevel.Debug:
@@ -110,7 +124,7 @@ namespace ckv
         static string js_run(string body_function)
         {
             //string script = "(()=>{return \'Hello world!\';})()";
-            string script = "(()=>{ try{ "+body_function+" }catch(e){ return 'ERR:'+e.message; } })()";
+            string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
             var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
             string v = result.ConvertToString().ToString();
             return v;
@@ -118,68 +132,14 @@ namespace ckv
 
         #endregion
 
-        #region [ OWIN HTTP ]
-        
-        static IDisposable http_server;
+        #region [ REDIS ]
 
-        static void http_init()
-        {
-            string baseAddress = "http://localhost:12345/";
-            baseAddress = "http://*:12345/";
-            http_server = WebApp.Start<Startup>(baseAddress); 
-        }
-
-        static void http_stop() {
-            http_server.Dispose();
-        }
-
-        #endregion
-
-        #region [ STATIC MAIN ]
-
-        static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static Process process_redis;
-        static System.Threading.Timer timer;
 
-        static App()
+        static void redis_init()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
-            {
-                Assembly asm = null;
-                string comName = ev.Name.Split(',')[0];
-                string resourceName = @"DLL\" + comName + ".dll";
-                var assembly = Assembly.GetExecutingAssembly();
-                resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                {
-                    if (stream != null)
-                    {
-                        byte[] buffer = new byte[stream.Length];
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            int read;
-                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                ms.Write(buffer, 0, read);
-                            buffer = ms.ToArray();
-                        }
-                        asm = Assembly.Load(buffer);
-                    }
-                }
-                return asm;
-            };
-        }
-
-        static void db_sync()
-        {
-            Console.WriteLine(DateTime.Now.ToString());
-        }
-
-        static void start(IApp app) {
-
             int port_redis_job = 0;
             string name = "JOB";
-
-            #region [ JOB REDIS SETTING ]
 
             string file_redis = Path.Combine(ROOT_PATH, "redis-server.exe");
             if (File.Exists(file_redis) == false)
@@ -223,8 +183,256 @@ namespace ckv
             string argument = @" """ + file_conf + @"""";
             process_redis.StartInfo.Arguments = argument;
             process_redis.Start();
+        }
+
+        #endregion
+
+        #region [ OWIN HTTP ]
+
+        static IDisposable http_server;
+        static void http_init()
+        {
+            StartOptions startOptions = new StartOptions();
+            startOptions.Urls.Add("http://*:12345/");
+            Action<IAppBuilder> startup = http_router;
+            http_server = WebApp.Start(startOptions, startup);
+        }
+
+        static void http_router(IAppBuilder app)
+        {
+            //app.Map("/", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("OK: " + DateTime.Now.ToString());
+            //    });
+            //});
+
+            #region [ UI ]
+
+            //app.Map("/index.html", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
+
+            //app.Map("/w2ui.min.css", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
+
+            //app.Map("/w2ui.min.js", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
+
+            //app.Map("/style.css", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
+
+            //app.Map("/index.js", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
 
             #endregion
+
+            app.Map("/token", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    var payload = new Dictionary<string, object>()
+                    {
+                        { "sub", "mr.thinh@iot.vn" },
+                        { "exp", 1300819380 }
+                    };
+                    var secretKey = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
+                    string token = Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
+                    return context.Response.WriteAsync(token);
+                });
+            });
+            app.Map("/admin", (iab) =>
+            {
+                iab.Run(context =>
+                {
+                    context.Response.ContentType = "text/plain";
+                    return context.Response.WriteAsync("This is admin page");
+                });
+            });
+
+            app.Run(context =>
+            {
+                context.Response.ContentType = "text/plain";
+                return context.Response.WriteAsync("OK: " + DateTime.Now.ToString());
+            });
+
+            //app.UseFileServer(true);
+            //var options = new FileServerOptions
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    EnableDefaultFiles = true,
+            //    DefaultFilesOptions = { DefaultFileNames = { "index.html" } },
+            //    FileSystem = new PhysicalFileSystem("ui"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //};
+            //app.UseFileServer(options);
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/valid_add"),
+            //    FileSystem = new PhysicalFileSystem("valid_add"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/schema"),
+            //    FileSystem = new PhysicalFileSystem("schema"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    EnableDirectoryBrowsing = true,
+            //    RequestPath = new PathString("/sql"),
+            //    FileSystem = new PhysicalFileSystem(@"config\sql"),
+            //    StaticFileOptions = { ContentTypeProvider = new CustomContentTypeProvider() }
+            //});
+        }
+
+        static void http_stop()
+        {
+            http_server.Dispose();
+        }
+
+        #endregion
+
+        #region [ CACHE MEMORY ]
+
+        const int MEM_SIZE_INDEX = 3000000;
+        static ConcurrentDictionary<string, string> mem_store = new ConcurrentDictionary<string, string>();
+        static string[] mem_ascii = new string[MEM_SIZE_INDEX];
+        static string[] mem_utf8 = new string[MEM_SIZE_INDEX];
+
+        static string mem_cache_db()
+        {
+            string[] fs = Directory.GetFiles(ROOT_PATH, "*.sql");
+            if (fs.Length == 0) return "ERR: Cannot find *.sql";
+            
+            string[] a = File.ReadAllLines(fs[0]);
+            if (a.Length < 2) return "ERR: Cannot find connect string and SQL command at file " + fs[0];
+
+            string con_str = a[0].Trim(),
+                query = string.Join(Environment.NewLine, a.Where((x, i) => i > 0).ToArray());
+
+            if (con_str.StartsWith("--")) con_str = con_str.Substring(2);
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(con_str))
+                {
+                    conn.Open();
+
+                    SqlCommand command = new SqlCommand(query, conn);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        var columns = new List<string>();
+                        for (var i = 0; i < reader.FieldCount; i++)
+                            columns.Add(reader.GetName(i));
+
+                        while (reader.Read())
+                        {
+                            var dic = new Dictionary<string, object>();
+
+                            for (var i = 0; i < reader.FieldCount; i++)
+                                dic.Add(columns[i], reader.GetValue(i));
+
+                            string json = JsonConvert.SerializeObject(dic, Formatting.Indented);
+                            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(json);
+                        }
+
+
+
+                        //while (reader.Read())
+                        //{ 
+                        //    string json = subfix + JsonConvert.SerializeObject(reader.GetValue(0).ToString(), Formatting.Indented);
+                        //    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(json);
+                        //    stream.Write(buffer, 0, buffer.Length); //sends bytes to server
+                        //}
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return string.Format("#ERR: {0}", ex.Message);
+            }
+
+            return "OK";
+        }
+
+        #endregion
+
+        #region [ STATIC MAIN ]
+
+        static System.Threading.Timer timer;
+
+        static App()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
+            {
+                Assembly asm = null;
+                string comName = ev.Name.Split(',')[0];
+                string resourceName = @"DLL\" + comName + ".dll";
+                var assembly = Assembly.GetExecutingAssembly();
+                resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream != null)
+                    {
+                        byte[] buffer = new byte[stream.Length];
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                ms.Write(buffer, 0, read);
+                            buffer = ms.ToArray();
+                        }
+                        asm = Assembly.Load(buffer);
+                    }
+                }
+                return asm;
+            };
+        }
+
+        static void db_sync()
+        {
+            Console.WriteLine(DateTime.Now.ToString());
+        }
+
+        static void start()
+        {
+            //redis_init();
 
             ws_init();
             js_init();
@@ -233,7 +441,8 @@ namespace ckv
             timer = new System.Threading.Timer(e => db_sync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
         }
 
-        static void stop() {
+        static void stop()
+        {
             http_stop();
             js_stop();
             ws_stop();
@@ -244,7 +453,7 @@ namespace ckv
 
         static void Main(string[] args)
         {
-            start(new App());
+            start();
 
             var input = Console.ReadLine();
             while (input != "exit")

@@ -32,6 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>DLL\Common.Logging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>DLL\Common.Logging.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="jose-jwt">
       <HintPath>DLL\jose-jwt.dll</HintPath>
       <Private>False</Private>
@@ -73,6 +81,10 @@
       <HintPath>DLL\Owin.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Quartz">
+      <HintPath>DLL\Quartz.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http">
@@ -91,7 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CustomContentTypeProvider.cs" />
-    <Compile Include="Api\Startup.cs" />
     <Compile Include="App.cs" />
     <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
     <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
@@ -240,6 +251,13 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DLL\log4net.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Quartz.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Common.Logging.Core.dll" />
+    <EmbeddedResource Include="DLL\Common.Logging.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
