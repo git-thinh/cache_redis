@@ -90,7 +90,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\CustomContentTypeProvider.cs" />
+    <Compile Include="Api\Startup.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValue.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="ChakraCore\Hosting\Native.cs" />
     <Compile Include="Fleck\ConnectionNotAvailableException.cs" />
     <Compile Include="Fleck\FleckLog.cs" />
     <Compile Include="Fleck\FrameType.cs" />

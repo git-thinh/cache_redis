@@ -1,11 +1,14 @@
-﻿using Fleck;
+﻿using ChakraHost.Hosting;
+using Fleck;
 using log4net;
+using Microsoft.Owin.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
 
@@ -21,16 +24,122 @@ namespace ckv
 
         #endregion
 
+        #region [ WS ]
+
+        static List<IWebSocketConnection> ws_sockets;
+        static WebSocketServer ws_server;
+        
+        static void ws_broadcast(string input) { 
+            foreach (var socket in ws_sockets.ToList()) 
+                socket.Send(input); 
+        }
+
+        static void ws_stop() { 
+            ws_sockets.Clear(); 
+            ws_server.Dispose(); 
+        }
+
+        static void ws_init() {
+            ws_sockets = new List<IWebSocketConnection>();
+
+            //var ws_server = new WebSocketServer("wss://0.0.0.0:8431");
+            //ws_server.Certificate = new X509Certificate2("MyCert.pfx");
+            ws_server = new WebSocketServer("ws://0.0.0.0:8181");
+            ws_server.RestartAfterListenError = true; // Auto Restart After Listen Error
+            ws_server.ListenerSocket.NoDelay = true; // Disable Nagle's Algorithm
+            ws_server.SupportedSubProtocols = new[] { "superchat", "chat" };
+
+            FleckLog.Level = LogLevel.Debug;
+            ILog logger = LogManager.GetLogger(typeof(FleckLog));
+            FleckLog.LogAction = (level, message, ex) => {
+                switch (level)
+                {
+                    case LogLevel.Debug:
+                        logger.Debug(message, ex);
+                        break;
+                    case LogLevel.Error:
+                        logger.Error(message, ex);
+                        break;
+                    case LogLevel.Warn:
+                        logger.Warn(message, ex);
+                        break;
+                    default:
+                        logger.Info(message, ex);
+                        break;
+                }
+            };
+
+            ws_server.Start(socket =>
+            {
+                socket.OnOpen = () =>
+                {
+                    Console.WriteLine("Open...");
+                    ws_sockets.Add(socket);
+                };
+                socket.OnClose = () =>
+                {
+                    Console.WriteLine("Close...");
+                    ws_sockets.Remove(socket);
+                };
+                socket.OnMessage = message =>
+                {
+                    Console.WriteLine(message);
+                    ws_sockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                };
+            });
+        }
+
+        #endregion
+
+        #region [ JS ENGINE ]
+
+        static JavaScriptRuntime js_runtime;
+        static JavaScriptContext js_context;
+        static JavaScriptSourceContext js_currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
+        static void js_init()
+        {
+            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out js_runtime);
+            Native.JsCreateContext(js_runtime, out js_context);
+            Native.JsSetCurrentContext(js_context);
+        }
+        static void js_stop()
+        {
+            Native.JsSetCurrentContext(JavaScriptContext.Invalid);
+            Native.JsDisposeRuntime(js_runtime);
+        }
+        static string js_run(string body_function)
+        {
+            //string script = "(()=>{return \'Hello world!\';})()";
+            string script = "(()=>{ try{ "+body_function+" }catch(e){ return 'ERR:'+e.message; } })()";
+            var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
+            string v = result.ConvertToString().ToString();
+            return v;
+        }
+
+        #endregion
+
+        #region [ OWIN HTTP ]
+        
+        static IDisposable http_server;
+
+        static void http_init()
+        {
+            string baseAddress = "http://localhost:12345/";
+            baseAddress = "http://*:12345/";
+            http_server = WebApp.Start<Startup>(baseAddress); 
+        }
+
+        static void http_stop() {
+            http_server.Dispose();
+        }
+
+        #endregion
+
         #region [ STATIC MAIN ]
 
         static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static Process process_redis;
         static System.Threading.Timer timer;
-        
-        static List<IWebSocketConnection> ws_sockets;
-        static WebSocketServer ws_server;
-        static void ws_broadcast(string input) { foreach (var socket in ws_sockets.ToList()) socket.Send(input); }
-        static void ws_stop() { ws_sockets.Clear(); ws_server.Dispose(); }
 
         static App()
         {
@@ -117,62 +226,16 @@ namespace ckv
 
             #endregion
 
-            #region [ WEBSOCKET ]
-
-            ws_sockets = new List<IWebSocketConnection>();
-
-            FleckLog.Level = LogLevel.Debug;
-            ILog logger = LogManager.GetLogger(typeof(FleckLog));
-            FleckLog.LogAction = (level, message, ex) => {
-                switch (level)
-                {
-                    case LogLevel.Debug:
-                        logger.Debug(message, ex);
-                        break;
-                    case LogLevel.Error:
-                        logger.Error(message, ex);
-                        break;
-                    case LogLevel.Warn:
-                        logger.Warn(message, ex);
-                        break;
-                    default:
-                        logger.Info(message, ex);
-                        break;
-                }
-            };
-
-            //var ws_server = new WebSocketServer("wss://0.0.0.0:8431");
-            //ws_server.Certificate = new X509Certificate2("MyCert.pfx");
-            ws_server = new WebSocketServer("ws://0.0.0.0:8181");
-            ws_server.RestartAfterListenError = true; // Auto Restart After Listen Error
-            ws_server.ListenerSocket.NoDelay = true; // Disable Nagle's Algorithm
-            ws_server.SupportedSubProtocols = new[] { "superchat", "chat" };
-            ws_server.Start(socket =>
-            {
-                socket.OnOpen = () =>
-                {
-                    Console.WriteLine("Open...");
-                    ws_sockets.Add(socket);
-                };
-                socket.OnClose = () =>
-                {
-                    Console.WriteLine("Close...");
-                    ws_sockets.Remove(socket);
-                };
-                socket.OnMessage = message =>
-                {
-                    Console.WriteLine(message);
-                    ws_sockets.ToList().ForEach(s => s.Send("Echo: " + message));
-                };
-            });
-
-            #endregion
+            ws_init();
+            js_init();
+            http_init();
 
             timer = new System.Threading.Timer(e => db_sync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
-
         }
 
         static void stop() {
+            http_stop();
+            js_stop();
             ws_stop();
             timer.Dispose();
             process_redis.Kill();
