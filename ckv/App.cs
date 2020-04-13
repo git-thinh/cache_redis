@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -64,6 +65,13 @@ namespace ckv
         static void fn_init()
         {
             FN.TryAdd("config", new Func<object, string>((o) => { return JsonConvert.SerializeObject(CF); }));
+            FN.TryAdd("pipe", new Func<object, string>((o) =>
+            {
+                var client = new NamedPipeClientStream("ckv." + CF.name);
+                client.Connect();
+                string p = new StreamReader(client).ReadToEnd().Trim();
+                return JsonConvert.SerializeObject(new { port = p });
+            }));
             FN.TryAdd("file_reset", new Func<object, string>((o) => { file_load(); return JsonConvert.SerializeObject(file_data.Keys); }));
             FN.TryAdd("clear", new Func<object, string>((o) => { mem_cache_clear(); return "OK"; }));
             FN.TryAdd("load_db", new Func<object, string>(mem_cache_db));
@@ -406,6 +414,41 @@ namespace ckv
 
         #endregion
 
+        #region [ UTF8 -> ASCCI ]
+
+        static string[] arr1 = new string[] {
+            "á", "à", "ả", "ã", "ạ", "â", "ấ", "ầ", "ẩ", "ẫ", "ậ", "ă", "ắ", "ằ", "ẳ", "ẵ", "ặ",
+            "đ",
+            "é","è","ẻ","ẽ","ẹ","ê","ế","ề","ể","ễ","ệ",
+            "í","ì","ỉ","ĩ","ị",
+            "ó","ò","ỏ","õ","ọ","ô","ố","ồ","ổ","ỗ","ộ","ơ","ớ","ờ","ở","ỡ","ợ",
+            "ú","ù","ủ","ũ","ụ","ư","ứ","ừ","ử","ữ","ự",
+            "ý","ỳ","ỷ","ỹ","ỵ"
+        };
+        static string[] arr2 = new string[] {
+            "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a",
+            "d",
+            "e","e","e","e","e","e","e","e","e","e","e",
+            "i","i","i","i","i",
+            "o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o",
+            "u","u","u","u","u","u","u","u","u","u","u",
+            "y","y","y","y","y"
+        };
+
+        static string convert_unicode_2_ascii(string str)
+        {
+            if (string.IsNullOrWhiteSpace(str)) return str;
+
+            for (int i = 0; i < arr1.Length; i++)
+                str = str.Replace(arr1[i], arr2[i]);
+
+            str = str.Replace("ẻ", "e").Replace("ó", "o").Replace("à", "o");
+
+            return str;
+        }
+
+        #endregion
+
         #region [ FILE: JSON, SQL ]
 
         static ConcurrentDictionary<string, string> file_data = new ConcurrentDictionary<string, string>();
@@ -640,7 +683,6 @@ namespace ckv
                 return JsonConvert.SerializeObject(new { ok = false, message = "Convert json file " + file + " . " + e.Message });
             }
 
-
             Dictionary<string, object> dic = null;
             try
             {
@@ -681,16 +723,19 @@ namespace ckv
                     if (dic.ContainsKey(key))
                         shema[key] = dic[key];
                 }
-                catch(Exception e) {
+                catch (Exception e)
+                {
                     return JsonConvert.SerializeObject(new { ok = false, message = "Set value from para into data shema: " + file + " . " + e.Message });
                 }
             }
 
             List<string> ascii = new List<string>() { id.ToString() };
             List<string> utf8 = new List<string>();
-            foreach(var key in keys) {
+            foreach (var key in keys)
+            {
                 object v = shema[key];
-                if (v != null && key != "id") {
+                if (v != null && key != "id")
+                {
                     if (v.GetType().Name.Contains("String"))
                     {
                         if (!string.IsNullOrWhiteSpace(v.ToString()))
@@ -703,9 +748,13 @@ namespace ckv
                     else ascii.Add(v.ToString());
                 }
             }
-            
-            shema.Add("#ascii", string.Join(" ", ascii));
-            shema.Add("#utf8", string.Join(" ", utf8));
+
+            string s1 = string.Join(" ", ascii),
+                s2 = string.Join(" ", utf8).ToLower();
+            s1 = s1 + " " + convert_unicode_2_ascii(s2);
+
+            shema.Add("#ascii", s1);
+            shema.Add("#utf8", s2);
 
             return JsonConvert.SerializeObject(new { ok = true, id = id, item = shema });
         }
@@ -730,7 +779,7 @@ namespace ckv
                     try
                     {
                         o = JsonConvert.DeserializeObject<oConfig>(File.ReadAllText(cf));
-                        if(!string.IsNullOrEmpty(o.name)) o.name = o.name.ToLower();
+                        if (!string.IsNullOrEmpty(o.name)) o.name = o.name.ToLower();
                     }
                     catch { ok = false; }
                 }
@@ -782,11 +831,18 @@ namespace ckv
             http_stop();
             js_stop();
             ws_stop();
-            timer.Dispose();
-            process_redis.Kill();
-            process_redis.Dispose();
+
+            if (timer != null) timer.Dispose();
+            if (process_redis != null)
+            {
+                process_redis.Kill();
+                process_redis.Dispose();
+            }
         }
 
+        static NamedPipeServerStream pipe_server;
+        static Thread pipe_thread;
+        static bool pipe_stop = false;
         static void Main(string[] args)
         {
             cf_load();
@@ -799,6 +855,34 @@ namespace ckv
                 return;
             }
             file_load();
+
+            pipe_thread = new Thread(new ParameterizedThreadStart((p_) =>
+            {
+                while (pipe_stop)
+                {
+                    pipe_server = new NamedPipeServerStream("ckv." + CF.name);
+                    pipe_server.WaitForConnection();
+                    var writer = new StreamWriter(pipe_server);
+                    writer.WriteLine(p_.ToString());
+                    writer.Flush();
+                    pipe_server.Close();
+                    pipe_server.Dispose();
+                    Thread.Sleep(100);
+                }
+            }));
+            pipe_thread.Start(CF.port);
+
+            //var reader = new StreamReader(server);
+            //var writer = new StreamWriter(server);
+
+            //var received = reader.ReadLine();
+            //Console.WriteLine("Received from client: " + received);
+
+            //var toSend = "Hello, client.";
+            //writer.WriteLine(toSend);
+            //writer.Flush();
+
+
             mem_cache_db(null);
 
             start();
@@ -812,6 +896,11 @@ namespace ckv
 
             //Console.WriteLine("[ Enter ] to exit ...");
             //Console.ReadLine();
+
+            Console.WriteLine("Program to closing ...");
+            pipe_stop = true;
+            if (pipe_server != null) pipe_server.Close();
+            if (pipe_thread != null) pipe_thread.Abort();
 
             stop();
         }
