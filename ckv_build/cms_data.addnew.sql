@@ -1,6 +1,7 @@
 ﻿--server=THINHNUC\MSSQL;database=phuquy;UId=sa; Password=dev@123;Connection Timeout=180
 
-set @___ckv = 'cms_data';
+create table @ckv___(id bigint, api varchar(255));
+insert into @ckv___ values(@id,'cms_data');
 
 INSERT INTO [cms_data]
 (
@@ -57,5 +58,5 @@ INSERT INTO [cms_data]
 ,@int_pub_create_time
 );
 
-
+select * from @ckv___;
 

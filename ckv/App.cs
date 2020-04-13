@@ -4,6 +4,7 @@ using log4net;
 using Microsoft.Owin.Hosting;
 using Newtonsoft.Json;
 using Owin;
+using SeasideResearch.LibCurlNet;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -73,21 +74,71 @@ namespace ckv
                 string p = new StreamReader(client).ReadToEnd().Trim();
                 return JsonConvert.SerializeObject(new { port = p });
             }));
+
             FN.TryAdd("file_reset", new Func<object, string>((o) => { file_load(); return JsonConvert.SerializeObject(file_data.Keys); }));
+
             FN.TryAdd("clear", new Func<object, string>((o) => { mem_cache_clear(); return "OK"; }));
             FN.TryAdd("load_db", new Func<object, string>(mem_cache_db));
+
             FN.TryAdd("keys", new Func<object, string>((o) => { return JsonConvert.SerializeObject(mem_store.Keys); }));
             FN.TryAdd("item", new Func<object, string>(mem_cache_item));
             FN.TryAdd("all", new Func<object, string>(mem_cache_all));
+
             FN.TryAdd("remove", new Func<object, string>(mem_cache_remove));
             FN.TryAdd("update", new Func<object, string>(mem_cache_update));
             FN.TryAdd("addnew", new Func<object, string>(mem_cache_addnew));
+
+            FN.TryAdd("url_get", new Func<object, string>(curl_get));
 
             FN.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(FN.Keys)));
         }
 
 
         #region [ IAPP ]
+
+        #endregion
+
+        #region [ CURL ]
+
+        static string curl_get(object p)
+        {
+            string url = p.ToString();
+            try
+            {
+                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
+
+                Easy easy = new Easy();
+
+                StringBuilder bi = new StringBuilder();
+                Easy.WriteFunction wf = new Easy.WriteFunction((buf, size, nmemb, extraData) =>
+                {
+                    //Console.Write(System.Text.Encoding.UTF8.GetString(buf));
+                    string si = System.Text.Encoding.UTF8.GetString(buf);
+                    //Console.Write(s);
+                    bi.Append(si);
+                    return size * nmemb;
+                });
+                easy.SetOpt(CURLoption.CURLOPT_WRITEFUNCTION, wf);
+
+                Easy.SSLContextFunction sf = new Easy.SSLContextFunction((ctx, extraData) => CURLcode.CURLE_OK);
+                easy.SetOpt(CURLoption.CURLOPT_SSL_CTX_FUNCTION, sf);
+
+                easy.SetOpt(CURLoption.CURLOPT_URL, url);
+                easy.SetOpt(CURLoption.CURLOPT_CAINFO, "ca-bundle.crt");
+
+                easy.Perform();
+                easy.Dispose();
+
+                Curl.GlobalCleanup();
+
+                string s = bi.ToString();
+                return s;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
 
         #endregion
 
@@ -450,13 +501,15 @@ namespace ckv
 
         #endregion
 
-        #region [ FILE: JSON, SQL ]
+        #region [ FILE: JSON, SQL, JS, VALID ]
 
         static ConcurrentDictionary<string, string> file_data = new ConcurrentDictionary<string, string>();
         static string file_load()
         {
             var fs = Directory.GetFiles(ROOT_PATH, "*.json").Select(x => Path.GetFileName(x)).ToList();
             fs.AddRange(Directory.GetFiles(ROOT_PATH, "*.sql").Select(x => Path.GetFileName(x)));
+            fs.AddRange(Directory.GetFiles(ROOT_PATH, "*.js").Select(x => Path.GetFileName(x)));
+            fs.AddRange(Directory.GetFiles(ROOT_PATH, "*.valid").Select(x => Path.GetFileName(x)));
 
             file_data.Clear();
             foreach (var f in fs)
@@ -498,11 +551,11 @@ namespace ckv
 
             using (SqlConnection conn = new SqlConnection(con_str))
             {
-                SqlCommand command = new SqlCommand(query, conn);
+                var cmd = new SqlCommand(query, conn);
                 try
                 {
                     conn.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         var columns = new List<string>();
                         for (var i = 0; i < reader.FieldCount; i++)
@@ -666,6 +719,40 @@ namespace ckv
             return JsonConvert.SerializeObject(new { ok = true, id = id, action = update ? "UPDATE" : "ADDNEW" });
         }
 
+        static object mem_cache___bind_value(object v)
+        {
+            switch (v)
+            {
+                case "yyMMdd":
+                case "yyyyMMdd":
+                case "HHmmss":
+                case "yyMMddhhmmss":
+                    v = int.Parse(DateTime.Now.ToString(v.ToString()));
+                    break;
+                case "yyyyMMddhhmmss":
+                    v = long.Parse(DateTime.Now.ToString(v.ToString()));
+                    break;
+                case "-1|yyMMdd":
+                case "-1|yyyyMMdd":
+                case "-1|HHmmss":
+                case "-1|yyyyMMddhhmmss":
+                case "-1|yyMMddhhmmss":
+                    v = -1;
+                    break;
+                case "UUID":
+                    v = Guid.NewGuid().ToString();
+                    break;
+                case "UUID_WORD":
+                    v = Guid.NewGuid().ToString().Replace('-', ' ');
+                    break;
+                case "UUID_URL":
+                    v = "http://" + Guid.NewGuid().ToString();
+                    break;
+            }
+
+            return v;
+        }
+
         static string mem_cache_addnew(object pr = null)
         {
             #region [ PARA ]
@@ -703,25 +790,7 @@ namespace ckv
             string[] keys = shema.Keys.ToArray();
             foreach (var key in keys)
             {
-                switch (shema[key])
-                {
-                    case "yyMMdd":
-                    case "yyyyMMdd":
-                    case "HHmmss":
-                    case "yyMMddhhmmss":
-                        shema[key] = int.Parse(DateTime.Now.ToString(shema[key].ToString()));
-                        break;
-                    case "yyyyMMddhhmmss":
-                        shema[key] = long.Parse(DateTime.Now.ToString(shema[key].ToString()));
-                        break;
-                    case "-1|yyMMdd":
-                    case "-1|yyyyMMdd":
-                    case "-1|HHmmss":
-                    case "-1|yyyyMMddhhmmss":
-                    case "-1|yyMMddhhmmss":
-                        shema[key] = -1;
-                        break;
-                }
+                shema[key] = mem_cache___bind_value(shema[key]);
                 try
                 {
                     if (dic.ContainsKey(key))
@@ -764,8 +833,9 @@ namespace ckv
 
             #endregion
 
-            #region [ SQL ]
             string json = "";
+
+            #region [ SQL EXECUTE ]
 
             string file_sql = CF.name + ".addnew.sql";
             if (!file_data.ContainsKey(file_sql))
@@ -784,76 +854,100 @@ namespace ckv
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(query, conn);
+                    var cmd = new SqlCommand(query, conn);
                     foreach (var kv in para)
                         cmd.Parameters.AddWithValue("@" + kv.Key, kv.Value);
 
-                    SqlParameter ___ckv = new SqlParameter();
-                    ___ckv.ParameterName = "@___ckv";
-                    ___ckv.DbType = DbType.String;
-                    ___ckv.Size = 1000;
-                    ___ckv.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(___ckv);
+                    var reader = cmd.ExecuteReader();
+                    var dic_ckv = new Dictionary<string, List<long>>();
+                    long id_;
+                    string api_;
 
-                    int sqlRows = cmd.ExecuteNonQuery();
-                    if (sqlRows > 0)
+                    while (reader.Read())
                     {
-                        string caches = cmd.Parameters["@___ckv"].Value.ToString();
-                        if (!string.IsNullOrWhiteSpace(caches))
+                        id_ = reader.GetInt64(0);
+                        api_ = reader.GetString(1).ToLower().Trim();
+                        if (dic_ckv.ContainsKey(api_)) dic_ckv[api_].Add(id_);
+                        else dic_ckv.Add(api_, new List<long>() { id_ });
+                    }
+                    reader.Close();
+
+                    if (dic_ckv.Count > 0)
+                    {
+                        foreach (var kv_ in dic_ckv)
                         {
-                            a = caches.Split(',').Select(x => x.Trim().ToLower()).Where(x => x.Length > 0).ToArray();
-                            if (a.Length == 1 && a[0] == CF.name)
+                            api_ = kv_.Key;
+                            long[] ids_ = kv_.Value.ToArray();
+                            bool it_self = api_ == CF.name;
+                            string file_ = (it_self ? "_" : "../" + api_ + "/_") + api_ + ".select.sql";
+
+                            if (it_self) query = file_data[file_];
+                            else
                             {
-                                query = file_data["_" + a[0] + ".select.sql"];
-                                query = string.Join(Environment.NewLine,
-                                    query.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).Where((x, i) => i > 0));
-                                
-                                query = query.Replace("--///", string.Empty).Replace("<ID>", id.ToString());
+                                if (File.Exists(file_) == false)
+                                    return JsonConvert.SerializeObject(new { ok = false, message = "#ERR_SET_CACHE: Cannot found file: " + file_ });
+                                query = File.ReadAllText(file_);
+                            }
 
-                                cmd = new SqlCommand(query, conn);
-                                using (SqlDataReader reader = cmd.ExecuteReader())
+                            query = string.Join(Environment.NewLine,
+                                query.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
+                                .Where((x, i) => i > 0));
+
+                            if (ids_.Length == 1)
+                                query = query.Replace("--<1>", string.Empty).Replace("<ID>", id.ToString());
+                            else if (ids_.Length > 1)
+                            {
+                                string strw = " ( m___.id = " + string.Join(" or m___.id = ", ids_) + " ) ";
+                                query = query.Replace("--<2>", string.Empty).Replace("<IDS>", strw);
+                            }
+
+                            cmd = new SqlCommand(query, conn);
+                            reader = cmd.ExecuteReader();
+
+                            var columns = new List<string>();
+                            for (var i = 0; i < reader.FieldCount; i++)
+                                columns.Add(reader.GetName(i));
+
+                            var ls_jsons = new List<string>();
+                            while (reader.Read())
+                            {
+                                var dt_ = new Dictionary<string, object>();
+
+                                for (var i = 0; i < reader.FieldCount; i++)
+                                    dt_.Add(columns[i], reader.GetValue(i));
+
+                                string it = JsonConvert.SerializeObject(dt_, Formatting.Indented);
+                                if (dt_.ContainsKey("id"))
                                 {
-                                    var columns = new List<string>();
-                                    for (var i = 0; i < reader.FieldCount; i++)
-                                        columns.Add(reader.GetName(i));
-
-                                    var ls = new List<string>();
-                                    while (reader.Read())
+                                    long idc;
+                                    if (long.TryParse(dt_["id"].ToString(), out idc))
                                     {
-                                        var dt = new Dictionary<string, object>();
-
-                                        for (var i = 0; i < reader.FieldCount; i++)
-                                            dt.Add(columns[i], reader.GetValue(i));
-
-                                        string it = JsonConvert.SerializeObject(dt, Formatting.Indented);
-                                        if (dt.ContainsKey("id"))
-                                        {
-                                            long idc;
-                                            if (long.TryParse(dt["id"].ToString(), out idc))
-                                            {
-                                                mem_store.TryAdd(idc, it);
-                                                ls.Add(it);
-                                            }
-                                        }
-                                        //reader.Close();
+                                        mem_store.TryAdd(idc, it);
+                                        ls_jsons.Add(it);
                                     }
-
-                                    json = @"{""ok"": true, ""data"": [" + string.Join(",", ls.ToArray()) + "]}";
                                 }
                             }
-                        }
+                            reader.Close();
+
+                            if (it_self)
+                                json = @"{""ok"": true, ""data"": [" + string.Join(",", ls_jsons.ToArray()) + "]}";
+                            else
+                            {
+                                // POST URL to set cache
+                            }
+                        } //end foreach set caches
                     }
                 }
                 catch (Exception ex)
                 {
-                    json = JsonConvert.SerializeObject(new { ok = false, message = string.Format("#ERR_EXE: {0}", ex.Message) });
+                    return JsonConvert.SerializeObject(new { ok = false, message = string.Format("#ERR_EXE: {0}", ex.Message) });
                 }
             }
 
             #endregion
 
-            shema.Add("#ascii", s1);
-            shema.Add("#utf8", s2);
+            //shema.Add("#ascii", s1);
+            //shema.Add("#utf8", s2);
             //return JsonConvert.SerializeObject(new { ok = true, id = id, item = shema, para = para });
             return json;
         }
