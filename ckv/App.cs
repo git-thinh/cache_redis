@@ -14,8 +14,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace ckv
@@ -27,18 +27,52 @@ namespace ckv
 
     public class App : IApp
     {
+        static App()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
+            {
+                Assembly asm = null;
+                string comName = ev.Name.Split(',')[0];
+                string resourceName = @"DLL\" + comName + ".dll";
+                var assembly = Assembly.GetExecutingAssembly();
+                resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream != null)
+                    {
+                        byte[] buffer = new byte[stream.Length];
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                ms.Write(buffer, 0, read);
+                            buffer = ms.ToArray();
+                        }
+                        asm = Assembly.Load(buffer);
+                    }
+                }
+                return asm;
+            };
+        }
+
+        static oConfig CF;
+        static string MSG_ERR = string.Empty;
         static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static IApp app = new App();
         static ConcurrentDictionary<string, object> FN = new ConcurrentDictionary<string, object>();
+        public static string getJson(object o) => JsonConvert.SerializeObject(o, Formatting.Indented);
         static void fn_init()
         {
+            FN.TryAdd("config", new Func<object, string>((o) => { return JsonConvert.SerializeObject(CF); }));
+            FN.TryAdd("file_reset", new Func<object, string>((o) => { file_load(); return JsonConvert.SerializeObject(file_data.Keys); }));
             FN.TryAdd("clear", new Func<object, string>((o) => { mem_cache_clear(); return "OK"; }));
             FN.TryAdd("load_db", new Func<object, string>(mem_cache_db));
-            FN.TryAdd("keys", new Func<object, string>(mem_cache_keys));
+            FN.TryAdd("keys", new Func<object, string>((o) => { return JsonConvert.SerializeObject(mem_store.Keys); }));
             FN.TryAdd("item", new Func<object, string>(mem_cache_item));
             FN.TryAdd("all", new Func<object, string>(mem_cache_all));
             FN.TryAdd("remove", new Func<object, string>(mem_cache_remove));
             FN.TryAdd("update", new Func<object, string>(mem_cache_update));
+            FN.TryAdd("addnew", new Func<object, string>(mem_cache_addnew));
 
             FN.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(FN.Keys)));
         }
@@ -207,7 +241,7 @@ namespace ckv
         static void http_init()
         {
             StartOptions startOptions = new StartOptions();
-            startOptions.Urls.Add("http://*:12345/");
+            startOptions.Urls.Add("http://*:" + CF.port.ToString() + "/");
             Action<IAppBuilder> startup = http_router;
             http_server = WebApp.Start(startOptions, startup);
         }
@@ -372,6 +406,23 @@ namespace ckv
 
         #endregion
 
+        #region [ FILE: JSON, SQL ]
+
+        static ConcurrentDictionary<string, string> file_data = new ConcurrentDictionary<string, string>();
+        static string file_load()
+        {
+            var fs = Directory.GetFiles(ROOT_PATH, "*.json").Select(x => Path.GetFileName(x)).ToList();
+            fs.AddRange(Directory.GetFiles(ROOT_PATH, "*.sql").Select(x => Path.GetFileName(x)));
+
+            file_data.Clear();
+            foreach (var f in fs)
+                file_data.TryAdd(f.ToLower(), File.ReadAllText(f));
+
+            return JsonConvert.SerializeObject(new { ok = true, files = file_data.Keys });
+        }
+
+        #endregion
+
         #region [ CACHE MEMORY ]
 
         const int MEM_SIZE_INDEX = 3000000;
@@ -389,11 +440,12 @@ namespace ckv
 
         static string mem_cache_db(object pr = null)
         {
-            string[] fs = Directory.GetFiles(ROOT_PATH, "*.sql");
-            if (fs.Length == 0) return JsonConvert.SerializeObject(new { ok = true, message = "ERR: Cannot find *.sql" });
+            string file = "_" + CF.name + ".select.sql";
+            if (string.IsNullOrEmpty(CF.name) || File.Exists(file) == false)
+                return JsonConvert.SerializeObject(new { ok = true, message = "Cannot found file: _" + CF.name + ".select.sql" });
 
-            string[] a = File.ReadAllLines(fs[0]);
-            if (a.Length < 2) return JsonConvert.SerializeObject(new { ok = true, message = "ERR: Cannot find connect string and SQL command at file " + fs[0] });
+            string[] a = File.ReadAllLines(file);
+            if (a.Length < 2) return JsonConvert.SerializeObject(new { ok = true, message = "ERR: Cannot find connect string and SQL command at file " + file });
 
             string con_str = a[0].Trim(),
                 query = string.Join(Environment.NewLine, a.Where((x, i) => i > 0).ToArray());
@@ -438,11 +490,6 @@ namespace ckv
             {
                 return JsonConvert.SerializeObject(new { ok = true, message = string.Format("#ERR: {0}", ex.Message) });
             }
-        }
-
-        static string mem_cache_keys(object pr = null)
-        {
-            return JsonConvert.SerializeObject(mem_store.Keys);
         }
 
         static string mem_cache_all(object pr = null)
@@ -575,38 +622,142 @@ namespace ckv
             return JsonConvert.SerializeObject(new { ok = true, id = id, action = update ? "UPDATE" : "ADDNEW" });
         }
 
+        static string mem_cache_addnew(object pr = null)
+        {
+            if (pr == null)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Method of request is POST and Body is not null or empty" });
+
+            string file = CF.name + ".addnew.json";
+            if (!file_data.ContainsKey(file))
+                return JsonConvert.SerializeObject(new { ok = false, message = "Cannot found file: " + file });
+            Dictionary<string, object> shema;
+            try
+            {
+                shema = JsonConvert.DeserializeObject<Dictionary<string, object>>(file_data[file]);
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new { ok = false, message = "Convert json file " + file + " . " + e.Message });
+            }
+
+
+            Dictionary<string, object> dic = null;
+            try
+            {
+                dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(pr.ToString());
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new { ok = false, message = "Convert json paramenter: " + e.Message });
+            }
+            Interlocked.Increment(ref ID_INCREMENT);
+            long id = long.Parse(DateTime.Now.ToString("yyMMddHHmmssfff")) + ID_INCREMENT;
+            if (dic.ContainsKey("id")) dic["id"] = id; else dic.Add("id", id);
+
+            string[] keys = shema.Keys.ToArray();
+            foreach (var key in keys)
+            {
+                switch (shema[key])
+                {
+                    case "yyMMdd":
+                    case "yyyyMMdd":
+                    case "hhmmss":
+                    case "yyMMddhhmmss":
+                        shema[key] = int.Parse(DateTime.Now.ToString(shema[key].ToString()));
+                        break;
+                    case "yyyyMMddhhmmss":
+                        shema[key] = long.Parse(DateTime.Now.ToString(shema[key].ToString()));
+                        break;
+                    case "-1|yyMMdd":
+                    case "-1|yyyyMMdd":
+                    case "-1|hhmmss":
+                    case "-1|yyyyMMddhhmmss":
+                    case "-1|yyMMddhhmmss":
+                        shema[key] = -1;
+                        break;
+                }
+                try
+                {
+                    if (dic.ContainsKey(key))
+                        shema[key] = dic[key];
+                }
+                catch(Exception e) {
+                    return JsonConvert.SerializeObject(new { ok = false, message = "Set value from para into data shema: " + file + " . " + e.Message });
+                }
+            }
+
+            List<string> ascii = new List<string>() { id.ToString() };
+            List<string> utf8 = new List<string>();
+            foreach(var key in keys) {
+                object v = shema[key];
+                if (v != null && key != "id") {
+                    if (v.GetType().Name.Contains("String"))
+                    {
+                        if (!string.IsNullOrWhiteSpace(v.ToString()))
+                        {
+                            if (new Regex(@"^-?[0-9][0-9,\.]+$").IsMatch(v.ToString()))
+                                ascii.Add(v.ToString());
+                            else utf8.Add(v.ToString());
+                        }
+                    }
+                    else ascii.Add(v.ToString());
+                }
+            }
+            
+            shema.Add("#ascii", string.Join(" ", ascii));
+            shema.Add("#utf8", string.Join(" ", utf8));
+
+            return JsonConvert.SerializeObject(new { ok = true, id = id, item = shema });
+        }
+
         #endregion
 
         #region [ STATIC MAIN ]
 
         static System.Threading.Timer timer;
 
-        static App()
+        static void cf_load()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (se, ev) =>
+            oConfig o = null;
+
+            try
             {
-                Assembly asm = null;
-                string comName = ev.Name.Split(',')[0];
-                string resourceName = @"DLL\" + comName + ".dll";
-                var assembly = Assembly.GetExecutingAssembly();
-                resourceName = typeof(App).Namespace + "." + resourceName.Replace(" ", "_").Replace("\\", ".").Replace("/", ".");
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string cf = Path.Combine(dir, "config.json");
+                bool ok = true;
+                if (File.Exists(cf))
                 {
-                    if (stream != null)
+                    try
                     {
-                        byte[] buffer = new byte[stream.Length];
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            int read;
-                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                ms.Write(buffer, 0, read);
-                            buffer = ms.ToArray();
-                        }
-                        asm = Assembly.Load(buffer);
+                        o = JsonConvert.DeserializeObject<oConfig>(File.ReadAllText(cf));
+                        if(!string.IsNullOrEmpty(o.name)) o.name = o.name.ToLower();
                     }
+                    catch { ok = false; }
                 }
-                return asm;
-            };
+
+                if (!ok)
+                {
+                    o = new oConfig();
+
+                    string name = Path.GetFileName(dir);
+                    string file = Path.Combine(dir, "_" + name + ".select.sql");
+                    if (File.Exists(file) == false)
+                    {
+                        name = Directory.GetFiles(dir, "*.sql").Select(x => Path.GetFileName(x)).Where(x => x[0] == '_').Take(1).SingleOrDefault();
+                        if (!string.IsNullOrEmpty(name)) name = name.Substring(1).Split('.')[0];
+                        name = name.ToLower();
+                    }
+                    o.name = name;
+                    TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+                    l.Start();
+                    o.port = ((IPEndPoint)l.LocalEndpoint).Port;
+                    l.Stop();
+                    File.WriteAllText(cf, JsonConvert.SerializeObject(o, Formatting.Indented));
+                }
+            }
+            catch { }
+
+            CF = o;
         }
 
         static void db_sync()
@@ -638,6 +789,18 @@ namespace ckv
 
         static void Main(string[] args)
         {
+            cf_load();
+            if (string.IsNullOrEmpty(CF.name) || File.Exists("_" + CF.name + ".select.sql") == false)
+            {
+                MSG_ERR = "Cannot found file: _" + CF.name + ".select.sql";
+                Console.WriteLine(MSG_ERR);
+                Console.WriteLine("[ Enter ] to exit ...");
+                Console.ReadLine();
+                return;
+            }
+            file_load();
+            mem_cache_db(null);
+
             start();
 
             var input = Console.ReadLine();

@@ -159,6 +159,7 @@
     <Compile Include="Fleck\WebSocketHttpRequest.cs" />
     <Compile Include="Fleck\WebSocketServer.cs" />
     <Compile Include="Fleck\WebSocketStatusCodes.cs" />
+    <Compile Include="Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Redis\Sider\src\Aggregate.cs" />
     <Compile Include="Redis\Sider\src\AutoActivatingPool.cs" />
