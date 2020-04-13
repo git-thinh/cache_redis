@@ -41,4 +41,6 @@
 FROM [pos].[User]  u
 	left JOIN pos.[UserGroup] ug ON ug.UserID = u.UserID
 	left JOIN pos.[Group] g ON ug.GroupID = g.GroupID  AND g.STATUS = 1
-where u.Status =1  order by u.UserID asc
+where 
+	u.Status =1 and u.UserName like '%tam%' and g.GroupID = 44
+order by u.UserID asc

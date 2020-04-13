@@ -7,6 +7,7 @@ using Owin;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
@@ -495,13 +496,12 @@ namespace ckv
 
             if (con_str.StartsWith("--")) con_str = con_str.Substring(2);
 
-            try
+            using (SqlConnection conn = new SqlConnection(con_str))
             {
-                using (SqlConnection conn = new SqlConnection(con_str))
+                SqlCommand command = new SqlCommand(query, conn);
+                try
                 {
                     conn.Open();
-
-                    SqlCommand command = new SqlCommand(query, conn);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         var columns = new List<string>();
@@ -525,14 +525,15 @@ namespace ckv
                                     mem_store.TryAdd(id, json);
                             }
                         }
-                        return JsonConvert.SerializeObject(new { ok = true, total = mem_store.Count });
                     }
                 }
+                catch (Exception ex)
+                {
+                    return JsonConvert.SerializeObject(new { ok = false, message = string.Format("#ERR: {0}", ex.Message) });
+                }
             }
-            catch (Exception ex)
-            {
-                return JsonConvert.SerializeObject(new { ok = true, message = string.Format("#ERR: {0}", ex.Message) });
-            }
+
+            return JsonConvert.SerializeObject(new { ok = true, total = mem_store.Count });
         }
 
         static string mem_cache_all(object pr = null)
@@ -667,12 +668,15 @@ namespace ckv
 
         static string mem_cache_addnew(object pr = null)
         {
+            #region [ PARA ]
+
             if (pr == null)
                 return JsonConvert.SerializeObject(new { ok = false, message = "Method of request is POST and Body is not null or empty" });
 
             string file = CF.name + ".addnew.json";
             if (!file_data.ContainsKey(file))
                 return JsonConvert.SerializeObject(new { ok = false, message = "Cannot found file: " + file });
+
             Dictionary<string, object> shema;
             try
             {
@@ -703,7 +707,7 @@ namespace ckv
                 {
                     case "yyMMdd":
                     case "yyyyMMdd":
-                    case "hhmmss":
+                    case "HHmmss":
                     case "yyMMddhhmmss":
                         shema[key] = int.Parse(DateTime.Now.ToString(shema[key].ToString()));
                         break;
@@ -712,7 +716,7 @@ namespace ckv
                         break;
                     case "-1|yyMMdd":
                     case "-1|yyyyMMdd":
-                    case "-1|hhmmss":
+                    case "-1|HHmmss":
                     case "-1|yyyyMMddhhmmss":
                     case "-1|yyMMddhhmmss":
                         shema[key] = -1;
@@ -753,10 +757,105 @@ namespace ckv
                 s2 = string.Join(" ", utf8).ToLower();
             s1 = s1 + " " + convert_unicode_2_ascii(s2);
 
+            string j = JsonConvert.SerializeObject(shema);
+            var para = JsonConvert.DeserializeObject<Dictionary<string, object>>(j);
+            string[] key2 = dic.Keys.Where(x => keys.FirstOrDefault(o => o == x) == null).ToArray();
+            foreach (string key in key2) para.Add(key, dic[key]);
+
+            #endregion
+
+            #region [ SQL ]
+            string json = "";
+
+            string file_sql = CF.name + ".addnew.sql";
+            if (!file_data.ContainsKey(file_sql))
+                return JsonConvert.SerializeObject(new { ok = false, message = "Cannot found file: " + file_sql });
+
+            string[] a = file_data[file_sql].Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            string con_str = a[0].Trim(),
+                query = string.Join(Environment.NewLine, a.Where((x, i) => i > 0).ToArray());
+
+            if (con_str.StartsWith("--")) con_str = con_str.Substring(2);
+
+            using (SqlConnection conn = new SqlConnection(con_str))
+            {
+                try
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    foreach (var kv in para)
+                        cmd.Parameters.AddWithValue("@" + kv.Key, kv.Value);
+
+                    SqlParameter ___ckv = new SqlParameter();
+                    ___ckv.ParameterName = "@___ckv";
+                    ___ckv.DbType = DbType.String;
+                    ___ckv.Size = 1000;
+                    ___ckv.Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(___ckv);
+
+                    int sqlRows = cmd.ExecuteNonQuery();
+                    if (sqlRows > 0)
+                    {
+                        string caches = cmd.Parameters["@___ckv"].Value.ToString();
+                        if (!string.IsNullOrWhiteSpace(caches))
+                        {
+                            a = caches.Split(',').Select(x => x.Trim().ToLower()).Where(x => x.Length > 0).ToArray();
+                            if (a.Length == 1 && a[0] == CF.name)
+                            {
+                                query = file_data["_" + a[0] + ".select.sql"];
+                                query = string.Join(Environment.NewLine,
+                                    query.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).Where((x, i) => i > 0));
+                                
+                                query = query.Replace("--///", string.Empty).Replace("<ID>", id.ToString());
+
+                                cmd = new SqlCommand(query, conn);
+                                using (SqlDataReader reader = cmd.ExecuteReader())
+                                {
+                                    var columns = new List<string>();
+                                    for (var i = 0; i < reader.FieldCount; i++)
+                                        columns.Add(reader.GetName(i));
+
+                                    var ls = new List<string>();
+                                    while (reader.Read())
+                                    {
+                                        var dt = new Dictionary<string, object>();
+
+                                        for (var i = 0; i < reader.FieldCount; i++)
+                                            dt.Add(columns[i], reader.GetValue(i));
+
+                                        string it = JsonConvert.SerializeObject(dt, Formatting.Indented);
+                                        if (dt.ContainsKey("id"))
+                                        {
+                                            long idc;
+                                            if (long.TryParse(dt["id"].ToString(), out idc))
+                                            {
+                                                mem_store.TryAdd(idc, it);
+                                                ls.Add(it);
+                                            }
+                                        }
+                                        //reader.Close();
+                                    }
+
+                                    json = @"{""ok"": true, ""data"": [" + string.Join(",", ls.ToArray()) + "]}";
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    json = JsonConvert.SerializeObject(new { ok = false, message = string.Format("#ERR_EXE: {0}", ex.Message) });
+                }
+            }
+
+            #endregion
+
             shema.Add("#ascii", s1);
             shema.Add("#utf8", s2);
-
-            return JsonConvert.SerializeObject(new { ok = true, id = id, item = shema });
+            //return JsonConvert.SerializeObject(new { ok = true, id = id, item = shema, para = para });
+            return json;
         }
 
         #endregion
@@ -780,6 +879,13 @@ namespace ckv
                     {
                         o = JsonConvert.DeserializeObject<oConfig>(File.ReadAllText(cf));
                         if (!string.IsNullOrEmpty(o.name)) o.name = o.name.ToLower();
+                        if (o.port == 0)
+                        {
+                            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+                            l.Start();
+                            o.port = ((IPEndPoint)l.LocalEndpoint).Port;
+                            l.Stop();
+                        }
                     }
                     catch { ok = false; }
                 }
