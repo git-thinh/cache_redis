@@ -1,6 +1,5 @@
 ﻿using ChakraHost.Hosting;
 using Fleck;
-using Jose;
 using log4net;
 using Microsoft.Owin.Hosting;
 using Newtonsoft.Json;
@@ -13,10 +12,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace ckv
 {
@@ -29,6 +29,20 @@ namespace ckv
     {
         static readonly string ROOT_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static IApp app = new App();
+        static ConcurrentDictionary<string, object> FN = new ConcurrentDictionary<string, object>();
+        static void fn_init()
+        {
+            FN.TryAdd("clear", new Func<object, string>((o) => { mem_cache_clear(); return "OK"; }));
+            FN.TryAdd("load_db", new Func<object, string>(mem_cache_db));
+            FN.TryAdd("keys", new Func<object, string>(mem_cache_keys));
+            FN.TryAdd("item", new Func<object, string>(mem_cache_item));
+            FN.TryAdd("all", new Func<object, string>(mem_cache_all));
+            FN.TryAdd("remove", new Func<object, string>(mem_cache_remove));
+            FN.TryAdd("update", new Func<object, string>(mem_cache_update));
+
+            FN.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(FN.Keys)));
+        }
+
 
         #region [ IAPP ]
 
@@ -187,7 +201,7 @@ namespace ckv
 
         #endregion
 
-        #region [ OWIN HTTP ]
+        #region [ OWIN ]
 
         static IDisposable http_server;
         static void http_init()
@@ -200,14 +214,40 @@ namespace ckv
 
         static void http_router(IAppBuilder app)
         {
-            //app.Map("/", (iab) =>
-            //{
-            //    iab.Run(context =>
-            //    {
-            //        context.Response.ContentType = "text/plain";
-            //        return context.Response.WriteAsync("OK: " + DateTime.Now.ToString());
-            //    });
-            //});
+            foreach (string router in FN.Keys)
+                app.Map("/" + router, (iab) =>
+                 {
+                     iab.Run(context =>
+                     {
+                         string json = string.Empty;
+                         try
+                         {
+                             bool ok = true;
+                             object pr = null;
+                             if (context.Request.Method == "POST")
+                             {
+                                 string sbody = new StreamReader(context.Request.Body).ReadToEnd();
+                                 if (string.IsNullOrWhiteSpace(sbody))
+                                 {
+                                     json = JsonConvert.SerializeObject(new { ok = false, message = "Body of POST is not null or emtpy" });
+                                     ok = false;
+                                 }
+                                 else pr = sbody;
+                             }
+                             if (ok)
+                             {
+                                 var fn = (Func<object, string>)FN[router];
+                                 json = fn(pr);
+                             }
+                         }
+                         catch (Exception e)
+                         {
+                             json = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
+                         }
+                         context.Response.ContentType = "application/json";
+                         return context.Response.WriteAsync(json);
+                     });
+                 });
 
             #region [ UI ]
 
@@ -258,29 +298,33 @@ namespace ckv
 
             #endregion
 
-            app.Map("/token", (iab) =>
-            {
-                iab.Run(context =>
-                {
-                    context.Response.ContentType = "text/plain";
-                    var payload = new Dictionary<string, object>()
-                    {
-                        { "sub", "mr.thinh@iot.vn" },
-                        { "exp", 1300819380 }
-                    };
-                    var secretKey = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
-                    string token = Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
-                    return context.Response.WriteAsync(token);
-                });
-            });
-            app.Map("/admin", (iab) =>
-            {
-                iab.Run(context =>
-                {
-                    context.Response.ContentType = "text/plain";
-                    return context.Response.WriteAsync("This is admin page");
-                });
-            });
+            #region [ /token, /admin ]
+
+            //app.Map("/token", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        var payload = new Dictionary<string, object>()
+            //        {
+            //            { "sub", "mr.thinh@iot.vn" },
+            //            { "exp", 1300819380 }
+            //        };
+            //        var secretKey = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
+            //        string token = Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
+            //        return context.Response.WriteAsync(token);
+            //    });
+            //});
+            //app.Map("/admin", (iab) =>
+            //{
+            //    iab.Run(context =>
+            //    {
+            //        context.Response.ContentType = "text/plain";
+            //        return context.Response.WriteAsync("This is admin page");
+            //    });
+            //});
+
+            #endregion
 
             app.Run(context =>
             {
@@ -331,17 +375,25 @@ namespace ckv
         #region [ CACHE MEMORY ]
 
         const int MEM_SIZE_INDEX = 3000000;
-        static ConcurrentDictionary<string, string> mem_store = new ConcurrentDictionary<string, string>();
+        static ConcurrentDictionary<long, string> mem_store = new ConcurrentDictionary<long, string>();
         static string[] mem_ascii = new string[MEM_SIZE_INDEX];
         static string[] mem_utf8 = new string[MEM_SIZE_INDEX];
+        static long ID_INCREMENT = 0;
 
-        static string mem_cache_db()
+        static void mem_cache_clear(object pr = null)
+        {
+            mem_store.Clear();
+            mem_ascii = new string[MEM_SIZE_INDEX];
+            mem_utf8 = new string[MEM_SIZE_INDEX];
+        }
+
+        static string mem_cache_db(object pr = null)
         {
             string[] fs = Directory.GetFiles(ROOT_PATH, "*.sql");
-            if (fs.Length == 0) return "ERR: Cannot find *.sql";
-            
+            if (fs.Length == 0) return JsonConvert.SerializeObject(new { ok = true, message = "ERR: Cannot find *.sql" });
+
             string[] a = File.ReadAllLines(fs[0]);
-            if (a.Length < 2) return "ERR: Cannot find connect string and SQL command at file " + fs[0];
+            if (a.Length < 2) return JsonConvert.SerializeObject(new { ok = true, message = "ERR: Cannot find connect string and SQL command at file " + fs[0] });
 
             string con_str = a[0].Trim(),
                 query = string.Join(Environment.NewLine, a.Where((x, i) => i > 0).ToArray());
@@ -361,6 +413,8 @@ namespace ckv
                         for (var i = 0; i < reader.FieldCount; i++)
                             columns.Add(reader.GetName(i));
 
+                        mem_cache_clear();
+
                         while (reader.Read())
                         {
                             var dic = new Dictionary<string, object>();
@@ -369,26 +423,156 @@ namespace ckv
                                 dic.Add(columns[i], reader.GetValue(i));
 
                             string json = JsonConvert.SerializeObject(dic, Formatting.Indented);
-                            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(json);
+                            if (dic.ContainsKey("id"))
+                            {
+                                long id;
+                                if (long.TryParse(dic["id"].ToString(), out id))
+                                    mem_store.TryAdd(id, json);
+                            }
                         }
-
-
-
-                        //while (reader.Read())
-                        //{ 
-                        //    string json = subfix + JsonConvert.SerializeObject(reader.GetValue(0).ToString(), Formatting.Indented);
-                        //    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(json);
-                        //    stream.Write(buffer, 0, buffer.Length); //sends bytes to server
-                        //}
+                        return JsonConvert.SerializeObject(new { ok = true, total = mem_store.Count });
                     }
                 }
             }
             catch (Exception ex)
             {
-                return string.Format("#ERR: {0}", ex.Message);
+                return JsonConvert.SerializeObject(new { ok = true, message = string.Format("#ERR: {0}", ex.Message) });
+            }
+        }
+
+        static string mem_cache_keys(object pr = null)
+        {
+            return JsonConvert.SerializeObject(mem_store.Keys);
+        }
+
+        static string mem_cache_all(object pr = null)
+        {
+            StringBuilder bi = new StringBuilder("[");
+            long[] ids = mem_store.Keys.ToArray();
+            for (int i = 0; i < ids.Length; i++)
+            {
+                if (mem_store.ContainsKey(ids[i]))
+                {
+                    bi.Append(i == 0 ? string.Empty : ",");
+                    bi.Append(mem_store[ids[i]]);
+                }
+            }
+            bi.Append("]");
+            return bi.ToString();
+        }
+
+        static string mem_cache_item(object pr = null)
+        {
+            if (pr == null) return JsonConvert.SerializeObject(new { ok = false, message = "Method of request is POST and Body is not null or empty" });
+
+            long id;
+            if (long.TryParse(pr.ToString(), out id) == false)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Body must be number" });
+
+            if (mem_store.ContainsKey(id) == false)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Cannot found item has ID = " + id.ToString() });
+
+            return mem_store[id];
+        }
+
+        static string mem_cache_remove(object pr = null)
+        {
+            if (pr == null)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Method of request is POST and Body is not null or empty" });
+
+            Dictionary<string, object> dic = null;
+            try
+            {
+                dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(pr.ToString());
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new { ok = false, message = e.Message });
             }
 
-            return "OK";
+            if (dic.ContainsKey("id"))
+                return JsonConvert.SerializeObject(new { ok = false, message = "Body must be number" });
+
+            long id;
+            if (long.TryParse(pr.ToString(), out id) == false)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Body must be number" });
+
+            string key = id.ToString() + " ";
+            for (int i = 0; i < mem_store.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(mem_ascii[i])
+                    && mem_ascii[i].StartsWith(key))
+                {
+                    mem_ascii[i] = null;
+                    mem_utf8[i] = null;
+                    break;
+                }
+            }
+
+            mem_store.TryRemove(id, out string v);
+
+            return JsonConvert.SerializeObject(new { ok = true });
+        }
+
+        static string mem_cache_update(object pr = null)
+        {
+            bool update = false;
+            long id;
+
+            #region [ VALID ]
+
+            if (pr == null)
+                return JsonConvert.SerializeObject(new { ok = false, message = "Method of request is POST and Body is not null or empty" });
+
+            Dictionary<string, object> dic = null;
+            try
+            {
+                dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(pr.ToString());
+            }
+            catch (Exception e)
+            {
+                return JsonConvert.SerializeObject(new { ok = false, message = e.Message });
+            }
+
+            if (dic.ContainsKey("id"))
+            {
+                if (long.TryParse(dic["id"].ToString(), out id) == false)
+                    return JsonConvert.SerializeObject(new { ok = false, message = "Body must be number" });
+
+                if (mem_store.ContainsKey(id) == false)
+                    return JsonConvert.SerializeObject(new { ok = false, message = "Cannot found item has ID " + id.ToString() + " to update it." });
+                update = true;
+            }
+            else
+            {
+                Interlocked.Increment(ref ID_INCREMENT);
+                id = long.Parse(DateTime.Now.ToString("yyMMddHHmmss")) + ID_INCREMENT;
+            }
+
+            #endregion
+
+            if (update)
+            {
+                //UPDATE
+                string key = id.ToString() + " ";
+                for (int i = 0; i < mem_store.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(mem_ascii[i])
+                        && mem_ascii[i].StartsWith(key))
+                    {
+                        mem_ascii[i] = null;
+                        mem_utf8[i] = null;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //ADD_NEW
+
+            }
+
+            return JsonConvert.SerializeObject(new { ok = true, id = id, action = update ? "UPDATE" : "ADDNEW" });
         }
 
         #endregion
@@ -432,6 +616,7 @@ namespace ckv
 
         static void start()
         {
+            fn_init();
             //redis_init();
 
             ws_init();
