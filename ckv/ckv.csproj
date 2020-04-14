@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9E477D2F-2334-4689-B841-031B2A782E8B}</ProjectGuid>
+    <ProjectGuid>{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>ckv</RootNamespace>
     <AssemblyName>ckv</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,261 +33,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\ckv_build\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging">
-      <HintPath>DLL\Common.Logging.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Common.Logging.Core">
-      <HintPath>DLL\Common.Logging.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="jose-jwt">
-      <HintPath>DLL\jose-jwt.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>DLL\log4net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>DLL\Microsoft.Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Diagnostics">
-      <HintPath>DLL\Microsoft.Owin.Diagnostics.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.FileSystems">
-      <HintPath>DLL\Microsoft.Owin.FileSystems.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.HttpListener">
-      <HintPath>DLL\Microsoft.Owin.Host.HttpListener.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Hosting">
-      <HintPath>DLL\Microsoft.Owin.Hosting.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.StaticFiles">
-      <HintPath>DLL\Microsoft.Owin.StaticFiles.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Owin">
-      <HintPath>DLL\Owin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Quartz">
-      <HintPath>DLL\Quartz.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SeasideResearch.LibCurlNet">
-      <HintPath>DLL\SeasideResearch.LibCurlNet.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http">
-      <HintPath>DLL\System.Net.Http.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-      <HintPath>DLL\System.Net.Http.WebRequest.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\CustomContentTypeProvider.cs" />
-    <Compile Include="App.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptContext.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptEngineException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptErrorCode.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptFatalException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryAllocationCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryEventType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptNativeFunction.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptObjectFinalizeCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPromiseContinuationCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyId.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyIdType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntime.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeAttributes.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeVersion.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptScriptException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSourceContext.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptThreadServiceCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptTypedArrayType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptUsageException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptValue.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptValueType.cs" />
-    <Compile Include="ChakraCore\Hosting\Native.cs" />
-    <Compile Include="Fleck\ConnectionNotAvailableException.cs" />
-    <Compile Include="Fleck\FleckLog.cs" />
-    <Compile Include="Fleck\FrameType.cs" />
-    <Compile Include="Fleck\HandlerFactory.cs" />
-    <Compile Include="Fleck\Handlers\ComposableHandler.cs" />
-    <Compile Include="Fleck\Handlers\Draft76Handler.cs" />
-    <Compile Include="Fleck\Handlers\FlashSocketPolicyRequestHandler.cs" />
-    <Compile Include="Fleck\Handlers\Hybi13Handler.cs" />
-    <Compile Include="Fleck\Helpers\FleckRuntime.cs" />
-    <Compile Include="Fleck\Interfaces\IHandler.cs" />
-    <Compile Include="Fleck\Interfaces\ISocket.cs" />
-    <Compile Include="Fleck\Interfaces\IWebSocketConnection.cs" />
-    <Compile Include="Fleck\Interfaces\IWebSocketConnectionInfo.cs" />
-    <Compile Include="Fleck\Interfaces\IWebSocketServer.cs" />
-    <Compile Include="Fleck\IntExtensions.cs" />
-    <Compile Include="Fleck\QueuedStream.cs" />
-    <Compile Include="Fleck\ReadState.cs" />
-    <Compile Include="Fleck\RequestParser.cs" />
-    <Compile Include="Fleck\SocketWrapper.cs" />
-    <Compile Include="Fleck\SubProtocolNegotiationFailureException.cs" />
-    <Compile Include="Fleck\SubProtocolNegotiator.cs" />
-    <Compile Include="Fleck\WebSocketConnection.cs" />
-    <Compile Include="Fleck\WebSocketConnectionInfo.cs" />
-    <Compile Include="Fleck\WebSocketException.cs" />
-    <Compile Include="Fleck\WebSocketHttpRequest.cs" />
-    <Compile Include="Fleck\WebSocketServer.cs" />
-    <Compile Include="Fleck\WebSocketStatusCodes.cs" />
-    <Compile Include="Model.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Redis\Sider\src\Aggregate.cs" />
-    <Compile Include="Redis\Sider\src\AutoActivatingPool.cs" />
-    <Compile Include="Redis\Sider\src\Exceptions.cs" />
-    <Compile Include="Redis\Sider\src\Executors\ExecutorBase.cs" />
-    <Compile Include="Redis\Sider\src\Executors\IExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\ImmediateExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\IocpExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\MonitorExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\PipelinedExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\PubSubExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\TransactedExecutor.cs" />
-    <Compile Include="Redis\Sider\src\IClientsPool.cs" />
-    <Compile Include="Redis\Sider\src\Invocation.cs" />
-    <Compile Include="Redis\Sider\src\IRedisClient.cs" />
-    <Compile Include="Redis\Sider\src\LimitingStream.cs" />
-    <Compile Include="Redis\Sider\src\Message.cs" />
-    <Compile Include="Redis\Sider\src\MessageType.cs" />
-    <Compile Include="Redis\Sider\src\Mode.cs" />
-    <Compile Include="Redis\Sider\src\Observable.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolEncoder.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolReader.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolWriter.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.API.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.IO.core.cs" />
-    <Compile Include="Redis\Sider\src\RedisClientBase.cs" />
-    <Compile Include="Redis\Sider\src\RedisClientPipeliningExtensions.cs">
-      <DependentUpon>RedisClientPipeliningExtensions.tt</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Redis\Sider\src\RedisReader.cs" />
-    <Compile Include="Redis\Sider\src\RedisSettings.cs" />
-    <Compile Include="Redis\Sider\src\RedisType.cs" />
-    <Compile Include="Redis\Sider\src\RedisVersionAttribute.cs" />
-    <Compile Include="Redis\Sider\src\RedisWriter.cs" />
-    <Compile Include="Redis\Sider\src\ResponseType.cs" />
-    <Compile Include="Redis\Sider\src\RoundRobinPool.cs" />
-    <Compile Include="Redis\Sider\src\SAssert.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\BufferSerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\ISerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\ObjectSerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\SerializerBase.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\Serializers.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\StringSerializer.cs" />
-    <Compile Include="Redis\Sider\src\SettingsWrapper.cs" />
-    <Compile Include="Redis\Sider\src\StringExtensions.cs" />
-    <Compile Include="Redis\Sider\src\ThreadwisePool.cs" />
-    <Compile Include="Redis\Sider\src\TrackedThreadwisePool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DLL\jose-jwt.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.Diagnostics.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.FileSystems.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.Host.HttpListener.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.Hosting.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Microsoft.Owin.StaticFiles.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Owin.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\System.Net.Http.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\System.Net.Http.WebRequest.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Redis\Sider\src\RedisClientPipeliningExtensions.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>RedisClientPipeliningExtensions.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Newtonsoft.Json.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\log4net.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Quartz.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\Common.Logging.Core.dll" />
-    <EmbeddedResource Include="DLL\Common.Logging.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DLL\SeasideResearch.LibCurlNet.dll" />
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

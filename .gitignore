@@ -20,3 +20,5 @@
 /ckv/bin
 /ckv/obj
 /ckv_build/*.pdb
+/ckv4/obj
+/ckv4/bin

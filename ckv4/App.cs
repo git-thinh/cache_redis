@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -89,6 +90,7 @@ namespace ckv
             FN.TryAdd("addnew", new Func<object, string>(mem_cache_addnew));
 
             FN.TryAdd("url_get_raw", new Func<object, string>(curl_get_raw));
+            FN.TryAdd("url_get_raw_by_js", new Func<object, string>(curl_get_raw_by_js));
             FN.TryAdd("url_get_text", new Func<object, string>(curl_get_text));
 
             FN.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(FN.Keys)));
@@ -100,7 +102,7 @@ namespace ckv
         #endregion
 
         #region [ CURL ]
-         
+
         static string curl_get_text(object p)
         {
             string html = curl_get_raw(p);
@@ -124,7 +126,7 @@ namespace ckv
             //### Remove any tags but not there content "<p>bob<span> johnson</span></p>" -> "bob johnson"
             // Regex.Replace(input, @"<(.|\n)*?>", string.Empty);
             s = Regex.Replace(s, @"</?\w+((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>", string.Empty, RegexOptions.Singleline);
-            
+
             //### Remove multi break lines
             //s = Regex.Replace(s, @"[\r\n]+", "<br />");
             //s = Regex.Replace(s, @"[\r\n]{2,}", "<br />");
@@ -193,7 +195,28 @@ namespace ckv
             }
         }
 
-        static void curl_stop() {
+        static string curl_get_raw_by_js(object p)
+        {
+            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            string url = p.ToString();
+
+            string js = @"
+var request = new XMLHttpRequest();
+request.open('GET', '" + url + @"', false);
+request.send(null);
+
+if (request.status === 200) {
+    //console.log(request.responseText);
+    return request.responseText;
+}else return '#ERR';
+
+";
+            string s = js_run(js);
+            return s;
+        }
+
+        static void curl_stop()
+        {
             Curl.GlobalCleanup();
         }
 
@@ -290,8 +313,46 @@ namespace ckv
         {
             //string script = "(()=>{return \'Hello world!\';})()";
             string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
-            var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
-            string v = result.ConvertToString().ToString();
+            //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
+            //string v = result.ConvertToString().ToString();
+
+            JavaScriptRuntime runtime;
+            JavaScriptContext context;
+            JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
+            JavaScriptValue result;
+
+            // Create a runtime. 
+            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
+
+            // Create an execution context. 
+            Native.JsCreateContext(runtime, out context);
+
+            // Now set the execution context as being the current one on this thread.
+            Native.JsSetCurrentContext(context);
+
+            Native.js ("ChakraBridge");
+
+            // Run the script.
+            Native.JsRunScript(script, currentSourceContext++, "", out result);
+
+            // Convert your script result to String in JavaScript; redundant if your script returns a String
+            JavaScriptValue resultJSString;
+            Native.JsConvertValueToString(result, out resultJSString);
+
+            // Project script result in JS back to C#.
+            IntPtr resultPtr;
+            UIntPtr stringLength;
+            Native.JsStringToPointer(resultJSString, out resultPtr, out stringLength);
+
+            string v = Marshal.PtrToStringUni(resultPtr);
+
+            // Dispose runtime
+            Native.JsSetCurrentContext(JavaScriptContext.Invalid);
+            Native.JsDisposeRuntime(runtime);
+
+            //JavaScriptValue result;
+            //Native.JsRunScript(script, js_currentSourceContext++, "", out result);
+            //string v = result.ConvertToString().ToString();
             return v;
         }
 
