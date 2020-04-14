@@ -51,30 +51,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "valid_add", "valid_add", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cachekv", "cachekv\cachekv.csproj", "{C2CDF473-BFC2-4C84-94A1-141D60041BCA}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ui(1)", "ui\", "{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv", "ckv\ckv.csproj", "{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv4", "ckv4\ckv4.csproj", "{9E477D2F-2334-4689-B841-031B2A782E8B}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ckv_build", "ckv_build\", "{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_62513"
-		Debug.AspNetCompiler.PhysicalPath = "ui\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62513\"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_64774"
+		Debug.AspNetCompiler.PhysicalPath = "ckv_build\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64774\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_62513"
-		Release.AspNetCompiler.PhysicalPath = "ui\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62513\"
+		Release.AspNetCompiler.VirtualPath = "/localhost_64774"
+		Release.AspNetCompiler.PhysicalPath = "ckv_build\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_64774\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "62513"
-		SlnRelativePath = "ui\"
+		VWDPort = "64774"
+		SlnRelativePath = "ckv_build\"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv", "ckv\ckv.csproj", "{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv4", "ckv4\ckv4.csproj", "{9E477D2F-2334-4689-B841-031B2A782E8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv_aspnet", "ckv_aspnet\ckv_aspnet.csproj", "{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,14 +110,6 @@ Global
 		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Release|x64.ActiveCfg = Release|x64
 		{C2CDF473-BFC2-4C84-94A1-141D60041BCA}.Release|x64.Build.0 = Release|x64
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Debug|x64.Build.0 = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Release|x64.ActiveCfg = Debug|Any CPU
-		{8E78CFC4-7892-4A46-A0A1-1D57586BD2A1}.Release|x64.Build.0 = Debug|Any CPU
 		{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A1630AC-4ACD-40F0-8714-EC45D1734EC9}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -132,6 +126,22 @@ Global
 		{9E477D2F-2334-4689-B841-031B2A782E8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9E477D2F-2334-4689-B841-031B2A782E8B}.Release|x64.ActiveCfg = Release|x64
 		{9E477D2F-2334-4689-B841-031B2A782E8B}.Release|x64.Build.0 = Release|x64
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Debug|x64.Build.0 = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Release|x64.ActiveCfg = Debug|Any CPU
+		{640F2AF3-BD8E-4A2C-A3D0-E3224374DBF8}.Release|x64.Build.0 = Debug|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Debug|x64.Build.0 = Debug|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|x64.ActiveCfg = Release|Any CPU
+		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

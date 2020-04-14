@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClearScript">
+      <HintPath>DLL\ClearScript.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin">
       <HintPath>DLL\Microsoft.Owin.dll</HintPath>
       <Private>False</Private>
@@ -174,6 +178,9 @@
   <ItemGroup>
     <EmbeddedResource Include="DLL\Microsoft.Owin.FileSystems.dll" />
     <EmbeddedResource Include="DLL\Microsoft.Owin.StaticFiles.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\ClearScript.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

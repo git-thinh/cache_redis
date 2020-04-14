@@ -1,5 +1,6 @@
 ﻿using ChakraHost.Hosting;
-using Fleck; 
+using Fleck;
+using Microsoft.ClearScript.V8;
 using Microsoft.Owin.Hosting;
 using Newtonsoft.Json;
 using Owin;
@@ -91,6 +92,9 @@ namespace ckv
             FN.TryAdd("url_get_raw", new Func<object, string>(curl_get_raw));
             FN.TryAdd("url_get_raw_by_js", new Func<object, string>(curl_get_raw_by_js));
             FN.TryAdd("url_get_text", new Func<object, string>(curl_get_text));
+
+            FN.TryAdd("v8_get_raw", new Func<object, string>(v8_get_raw));
+
 
             FN.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(FN.Keys)));
         }
@@ -272,7 +276,38 @@ if (request.status === 200) {
 
         #endregion
 
-        #region [ JS ENGINE ]
+        #region [ JS engine: V8 ]
+
+        static string v8_get_raw(object p)
+        {
+            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            string url = p.ToString();
+
+            V8ScriptEngine engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging, 9393);
+
+            //engine.Execute(Script_Text);
+            //engine.AddCOMType("XMLHttpRequest", "MSXML2.XMLHTTP");
+            //object returnedVal = _v8Engine.Script.Execute();
+
+            engine.AddCOMType("XMLHttpRequest", "MSXML2.XMLHTTP");
+            engine.Execute(@"
+    function get(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, false);
+        xhr.send();
+
+        if (xhr.status == 200) return xhr.responseText;
+        else return 'ERR: Request failed: ' + xhr.status;
+    }
+");
+
+            string v = engine.Script.get(url);
+            return v;
+        }
+
+        #endregion
+
+        #region [ JS engine: Chakra ]
 
         static JavaScriptRuntime js_runtime;
         static JavaScriptContext js_context;
@@ -1150,15 +1185,15 @@ if (request.status === 200) {
         static void Main(string[] args)
         {
             cf_load();
-            if (string.IsNullOrEmpty(CF.name) || File.Exists("_" + CF.name + ".select.sql") == false)
-            {
-                MSG_ERR = "Cannot found file: _" + CF.name + ".select.sql";
-                Console.WriteLine(MSG_ERR);
-                Console.WriteLine("[ Enter ] to exit ...");
-                Console.ReadLine();
-                return;
-            }
-            file_load();
+            //if (string.IsNullOrEmpty(CF.name) || File.Exists("_" + CF.name + ".select.sql") == false)
+            //{
+            //    MSG_ERR = "Cannot found file: _" + CF.name + ".select.sql";
+            //    Console.WriteLine(MSG_ERR);
+            //    Console.WriteLine("[ Enter ] to exit ...");
+            //    Console.ReadLine();
+            //    return;
+            //}
+            //file_load();
 
             pipe_thread = new Thread(new ParameterizedThreadStart((p_) =>
             {
