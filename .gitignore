@@ -25,3 +25,4 @@
 /ckv_aspnet/bin/roslyn
 /ckv_aspnet/aspnet_client
 /ckv_aspnet/obj
+/ckv_aspnet/bin/*.pdb
