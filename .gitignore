@@ -22,3 +22,4 @@
 /ckv_build/*.pdb
 /ckv4/obj
 /ckv4/bin
+/ckv_aspnet/bin/roslyn
