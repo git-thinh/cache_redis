@@ -10,16 +10,6 @@ namespace ckv_aspnet
     public class Global : System.Web.HttpApplication
     {
 
-        protected void Application_Start(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Session_Start(object sender, EventArgs e)
-        {
-
-        }
-
         #region [ CURL ]
 
         static string curl_get_raw(object p)
@@ -98,11 +88,11 @@ namespace ckv_aspnet
             string url = p.ToString();
             try
             {
-                if (curl_inited == false)
-                {
-                    Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
-                    curl_inited = true;
-                }
+                //if (curl_inited == false)
+                //{
+                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
+                //    curl_inited = true;
+                //}
 
                 Easy easy = new Easy();
 
@@ -158,6 +148,8 @@ namespace ckv_aspnet
 
         #endregion
 
+        #region [ js_chakra ]
+
         static string js_chakra_run(string body_function)
         {
             string script = "(()=>{return \'Hello world!\';})()";
@@ -205,8 +197,57 @@ namespace ckv_aspnet
             return v;
         }
 
-        protected void Application_BeginRequest(object sender, EventArgs e)
+        static string js_chakra_run_2(string body_function)
         {
+            string script = "(()=>{return \'Hello world!\';})()";
+            //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
+            //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
+            //string v = result.ConvertToString().ToString();
+
+            JavaScriptRuntime runtime;
+            JavaScriptContext context;
+            JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
+            JavaScriptValue result;
+
+            // Create a runtime. 
+            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
+
+            // Create an execution context. 
+            Native.JsCreateContext(runtime, out context);
+
+            // Now set the execution context as being the current one on this thread.
+            Native.JsSetCurrentContext(context);
+
+            //Native.js ("ChakraBridge");
+
+            // Run the script.
+            Native.JsRunScript(script, currentSourceContext++, "", out result);
+
+            // Convert your script result to String in JavaScript; redundant if your script returns a String
+            JavaScriptValue resultJSString;
+            Native.JsConvertValueToString(result, out resultJSString);
+
+            // Project script result in JS back to C#.
+            IntPtr resultPtr;
+            UIntPtr stringLength;
+            Native.JsStringToPointer(resultJSString, out resultPtr, out stringLength);
+
+            string v = Marshal.PtrToStringUni(resultPtr);
+
+            // Dispose runtime
+            Native.JsSetCurrentContext(JavaScriptContext.Invalid);
+            Native.JsDisposeRuntime(runtime);
+
+            //JavaScriptValue result;
+            //Native.JsRunScript(script, js_currentSourceContext++, "", out result);
+            //string v = result.ConvertToString().ToString();
+            return v;
+        }
+        
+        #endregion
+
+        void app_router() {
+
             string s = "";
             if (Request.Url.AbsolutePath == "/api")
             {
@@ -214,9 +255,16 @@ namespace ckv_aspnet
                 Response.Write(DateTime.Now.ToString());
                 Response.End();
             }
-            else if (Request.Url.AbsolutePath == "/js_chakra")
+            else if (Request.Url.AbsolutePath == "/js_chakra-1")
             {
                 s = js_chakra_run("https://vnexpress.net/trump-noi-gian-voi-truyen-thong-my-4084322.html");
+                Response.Clear();
+                Response.Write(s);
+                Response.End();
+            }
+            else if (Request.Url.AbsolutePath == "/js_chakra-2")
+            {
+                s = js_chakra_run_2("https://vnexpress.net/trump-noi-gian-voi-truyen-thong-my-4084322.html");
                 Response.Clear();
                 Response.Write(s);
                 Response.End();
@@ -235,6 +283,24 @@ namespace ckv_aspnet
                 Response.Write(s);
                 Response.End();
             }
+        }
+        
+        #region [ APPLICATION ]
+
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            app_router();
+        }
+
+
+        protected void Application_Start(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Session_Start(object sender, EventArgs e)
+        {
+
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
@@ -256,5 +322,7 @@ namespace ckv_aspnet
         {
 
         }
+
+        #endregion
     }
 }
