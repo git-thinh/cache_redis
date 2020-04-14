@@ -23,3 +23,5 @@
 /ckv4/obj
 /ckv4/bin
 /ckv_aspnet/bin/roslyn
+/ckv_aspnet/aspnet_client
+/ckv_aspnet/obj
