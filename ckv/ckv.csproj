@@ -34,8 +34,57 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>DLL\Microsoft.Owin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.FileSystems">
+      <HintPath>DLL\Microsoft.Owin.FileSystems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.HttpListener">
+      <HintPath>DLL\Microsoft.Owin.Host.HttpListener.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Hosting">
+      <HintPath>DLL\Microsoft.Owin.Hosting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.StaticFiles">
+      <HintPath>DLL\Microsoft.Owin.StaticFiles.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>DLL\Owin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Quartz">
+      <HintPath>DLL\Quartz.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SeasideResearch.LibCurlNet">
+      <HintPath>DLL\SeasideResearch.LibCurlNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>DLL\System.Net.Http.Formatting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Http">
+      <HintPath>DLL\System.Web.Http.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.Owin">
+      <HintPath>DLL\System.Web.Http.Owin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,11 +93,87 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Api\CustomContentTypeProvider.cs" />
+    <Compile Include="App.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValue.cs" />
+    <Compile Include="ChakraCore\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="ChakraCore\Hosting\Native.cs" />
+    <Compile Include="ChakraCore\XmlHttpRequest.cs" />
+    <Compile Include="Fleck\ConnectionNotAvailableException.cs" />
+    <Compile Include="Fleck\FleckLog.cs" />
+    <Compile Include="Fleck\FrameType.cs" />
+    <Compile Include="Fleck\HandlerFactory.cs" />
+    <Compile Include="Fleck\Handlers\ComposableHandler.cs" />
+    <Compile Include="Fleck\Handlers\Draft76Handler.cs" />
+    <Compile Include="Fleck\Handlers\FlashSocketPolicyRequestHandler.cs" />
+    <Compile Include="Fleck\Handlers\Hybi13Handler.cs" />
+    <Compile Include="Fleck\Helpers\FleckRuntime.cs" />
+    <Compile Include="Fleck\Interfaces\IHandler.cs" />
+    <Compile Include="Fleck\Interfaces\ISocket.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketConnection.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketConnectionInfo.cs" />
+    <Compile Include="Fleck\Interfaces\IWebSocketServer.cs" />
+    <Compile Include="Fleck\IntExtensions.cs" />
+    <Compile Include="Fleck\QueuedStream.cs" />
+    <Compile Include="Fleck\ReadState.cs" />
+    <Compile Include="Fleck\RequestParser.cs" />
+    <Compile Include="Fleck\SocketWrapper.cs" />
+    <Compile Include="Fleck\SubProtocolNegotiationFailureException.cs" />
+    <Compile Include="Fleck\SubProtocolNegotiator.cs" />
+    <Compile Include="Fleck\WebSocketConnection.cs" />
+    <Compile Include="Fleck\WebSocketConnectionInfo.cs" />
+    <Compile Include="Fleck\WebSocketException.cs" />
+    <Compile Include="Fleck\WebSocketHttpRequest.cs" />
+    <Compile Include="Fleck\WebSocketServer.cs" />
+    <Compile Include="Fleck\WebSocketStatusCodes.cs" />
+    <Compile Include="Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Microsoft.Owin.dll" />
+    <EmbeddedResource Include="DLL\Microsoft.Owin.Host.HttpListener.dll" />
+    <EmbeddedResource Include="DLL\Microsoft.Owin.Hosting.dll" />
+    <EmbeddedResource Include="DLL\Newtonsoft.Json.dll" />
+    <EmbeddedResource Include="DLL\Owin.dll" />
+    <EmbeddedResource Include="DLL\System.Net.Http.Formatting.dll" />
+    <EmbeddedResource Include="DLL\System.Web.Http.dll" />
+    <EmbeddedResource Include="DLL\System.Web.Http.Owin.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Quartz.dll" />
+    <EmbeddedResource Include="DLL\SeasideResearch.LibCurlNet.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DLL\Microsoft.Owin.FileSystems.dll" />
+    <EmbeddedResource Include="DLL\Microsoft.Owin.StaticFiles.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
