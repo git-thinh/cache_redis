@@ -320,6 +320,7 @@
   <ItemGroup>
     <Compile Include="src\App\clsApi.cs" />
     <Compile Include="src\App\clsApp.cs" />
+    <Compile Include="src\App\clsExtObject.cs" />
     <Compile Include="src\App\clsRouter.cs" />
     <Compile Include="src\App\clsGlobal.cs" />
     <Compile Include="src\Chakra\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />

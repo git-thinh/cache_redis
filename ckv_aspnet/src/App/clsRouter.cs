@@ -11,10 +11,55 @@ namespace ckv_aspnet
 {
     public class clsRouter
     {
-        static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
+        public static void _init()
+        {
+            _add("api/router", () => m_functions.Keys);
+
+            _add("api", clsApi.api_names);
+            _add("api/all", clsApi.api_list);
+
+            _add("api/curl/test-http", clsCURL.get_raw_http);
+            _add("api/curl/test-https", clsCURL.get_raw_https);
+
+            _add("api/chakra/test-1", clsChakra.js_chakra_run);
+            _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
+        }
+
+        public static bool execute_api(HttpRequest Request, HttpResponse Response)
+        {
+            string path = Request.Url.AbsolutePath.Substring(1).ToLower();
+            if (m_functions.ContainsKey(path))
+            {
+                string json = string.Empty, content_type = "text/plain";
+                try
+                {
+                    if (Request.HttpMethod == "POST" || (Request.HttpMethod == "GET" && path.Contains('.') == false))
+                        content_type = "application/json";
+
+                    var rs = _exe(Request);
+                    if (rs.ok) json = rs.data;
+                    else json = JsonConvert.SerializeObject(rs);
+                }
+                catch (Exception e)
+                {
+                    content_type = "application/json";
+                    json = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
+                }
+
+                Response.Clear();
+                Response.ContentType = content_type;
+                Response.Write(json);
+                Response.End();
+
+                return true;
+            }
+
+            return false;
+        }
 
         #region [ _add | _exe ]
 
+        static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
         static void _add<T>(string name, Func<T> func)
         {
             if (func != null)
@@ -76,12 +121,13 @@ namespace ckv_aspnet
                             val = ((Func<object, object>)fn)(para);
                             break;
                     }
-                        
-                    if (val != null) {
+
+                    if (val != null)
+                    {
                         string type = val.GetType().Name;
                         if (type[0] == 'o' || type.Contains('[') || type.Contains('`'))
                             text = JsonConvert.SerializeObject(val);
-                        else 
+                        else
                             text = val.ToString();
                     }
 
@@ -96,52 +142,6 @@ namespace ckv_aspnet
         }
 
         #endregion
-
-        public static void _init()
-        {
-            _add("api/router", () => m_functions.Keys);
-
-            _add("api", clsApi.api_names);
-            _add("api/all", clsApi.api_list);
-
-            _add("api/curl/test-http", clsCURL.get_raw_http);
-            _add("api/curl/test-https", clsCURL.get_raw_https);
-
-            _add("api/chakra/test-1", clsChakra.js_chakra_run);
-            _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
-        }
-
-        public static bool execute_api(HttpRequest Request, HttpResponse Response)
-        {
-            string path = Request.Url.AbsolutePath.Substring(1).ToLower();
-            if (m_functions.ContainsKey(path))
-            {
-                string json = string.Empty, content_type = "text/plain";
-                try
-                {
-                    if (Request.HttpMethod == "POST" || (Request.HttpMethod == "GET" && path.Contains('.') == false))
-                        content_type = "application/json";
-
-                    var rs = _exe(Request);
-                    if (rs.ok) json = rs.data;
-                    else json = JsonConvert.SerializeObject(rs);
-                }
-                catch (Exception e)
-                {
-                    content_type = "application/json";
-                    json = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
-                }
-
-                Response.Clear();
-                Response.ContentType = content_type;
-                Response.Write(json);
-                Response.End();
-
-                return true;
-            }
-
-            return false;
-        }
     }
 
 }
