@@ -17,12 +17,21 @@ namespace ckv_aspnet
 
             _add("api", clsApi.api_names);
             _add("api/all", clsApi.api_list);
+            _add("api/reset", clsApi.api_reload);
+
+            _add("api/global", clsApi.api_global_names);
+            _add("api/global/reset", clsApi.api_global_reload);
 
             _add("api/curl/test-http", clsCURL.get_raw_http);
             _add("api/curl/test-https", clsCURL.get_raw_https);
 
             _add("api/chakra/test-1", clsChakra.js_chakra_run);
             _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
+
+            _add("api/job/test-1", clsJob.test_create_job_1);
+            _add("api/job/test-2", clsJob.test_create_job_2);
+            _add("api/job/test-3", clsJob.test_create_job_3);
+            _add("api/job/test-4", clsJob.test_create_job_4);
         }
 
         public static bool execute_api(HttpRequest Request, HttpResponse Response)
@@ -60,6 +69,15 @@ namespace ckv_aspnet
         #region [ _add | _exe ]
 
         static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
+
+        static void _add(string name, Action func)
+        {
+            if (func != null)
+            {
+                m_functions.TryAdd(name, func);
+            }
+        }
+
         static void _add<T>(string name, Func<T> func)
         {
             if (func != null)
@@ -114,6 +132,9 @@ namespace ckv_aspnet
                     string fn_type = fn.GetType().Name;
                     switch (fn_type)
                     {
+                        case "Action":
+                            ((Action)fn)();
+                            break;
                         case "Func`1":
                             val = ((Func<object>)fn)();
                             break;

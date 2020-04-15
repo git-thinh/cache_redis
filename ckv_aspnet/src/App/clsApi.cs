@@ -1109,25 +1109,26 @@ namespace ckv_aspnet
 
         #endregion
 
+        #region [ Api ]
+
         static ConcurrentDictionary<string, oApi> m_apis = new ConcurrentDictionary<string, oApi>();
+        static ConcurrentDictionary<string, string> m_api_global = new ConcurrentDictionary<string, string>();
+
+        public static string[] api_global_names() => m_api_global.Keys.ToArray();
         public static string[] api_names() => m_apis.Keys.ToArray();
         public static oApi[] api_list() => m_apis.Values.ToArray();
 
-        public static void _init(string path_root)
+        public static void api_reload()
         {
-            PATH_ROOT = path_root;
-
             string dir = Path.Combine(PATH_ROOT, "src\\Api");
             if (Directory.Exists(dir))
             {
+                m_apis.Clear();
+
                 string[] dirs = Directory.GetDirectories(dir);
                 foreach (var path in dirs)
                 {
-                    if (path.EndsWith("_"))
-                    {
-
-                    }
-                    else
+                    if (!path.EndsWith("_"))
                     {
                         oApi api = new oApi(path);
                         m_apis.TryAdd(api.name, api);
@@ -1136,5 +1137,30 @@ namespace ckv_aspnet
             }
         }
 
+        public static void api_global_reload()
+        {
+            string dir_ = Path.Combine(PATH_ROOT, "src\\Api\\_");
+            if (Directory.Exists(dir_))
+            {
+                m_api_global.Clear();
+
+                string[] fs = Directory.GetFiles(dir_, "*.js");
+                foreach (string f in fs)
+                {
+                    string key = Path.GetFileName(f);
+                    key = key.Substring(0, key.Length - 3).ToLower();
+                    m_api_global.TryAdd(key, File.ReadAllText(f));
+                }
+            }
+        }
+
+        #endregion
+
+        public static void _init(string path_root)
+        {
+            PATH_ROOT = path_root;
+            api_reload();
+            api_global_reload();
+        }
     }
 }
