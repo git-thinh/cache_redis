@@ -14,7 +14,7 @@
     <RootNamespace>ckv_aspnet</RootNamespace>
     <AssemblyName>ckv_aspnet</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -372,6 +372,7 @@
     <Content Include="src\Api\cms_data\addnew.json" />
     <Content Include="src\Api\cms_data\addnew.valid" />
     <Content Include="src\Api\cms_data\config.json" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -421,7 +422,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50257</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:50257/</IISUrl>
+          <IISUrl>http://localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

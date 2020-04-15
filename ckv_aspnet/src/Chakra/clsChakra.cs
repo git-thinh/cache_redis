@@ -14,59 +14,65 @@ namespace ckv_aspnet.src.Chakra
 
         public static string js_chakra_run(object p = null)
         {
-            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            try
+            {
+                //if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+                //string body_function = p.ToString();
 
-            string body_function = p.ToString();
+                string script = "(()=>{return \'Hello world!\';})()";
+                //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
+                //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
+                //string v = result.ConvertToString().ToString();
 
-            string script = "(()=>{return \'Hello world!\';})()";
-            //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
-            //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
-            //string v = result.ConvertToString().ToString();
+                JavaScriptRuntime runtime;
+                JavaScriptContext context;
+                JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
+                JavaScriptValue result;
 
-            JavaScriptRuntime runtime;
-            JavaScriptContext context;
-            JavaScriptSourceContext currentSourceContext = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
-            JavaScriptValue result;
+                // Create a runtime. 
+                Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
 
-            // Create a runtime. 
-            Native.JsCreateRuntime(JavaScriptRuntimeAttributes.None, null, out runtime);
+                // Create an execution context. 
+                Native.JsCreateContext(runtime, out context);
 
-            // Create an execution context. 
-            Native.JsCreateContext(runtime, out context);
+                // Now set the execution context as being the current one on this thread.
+                Native.JsSetCurrentContext(context);
 
-            // Now set the execution context as being the current one on this thread.
-            Native.JsSetCurrentContext(context);
+                //Native.js ("ChakraBridge");
 
-            //Native.js ("ChakraBridge");
+                // Run the script.
+                Native.JsRunScript(script, currentSourceContext++, "", out result);
 
-            // Run the script.
-            Native.JsRunScript(script, currentSourceContext++, "", out result);
+                // Convert your script result to String in JavaScript; redundant if your script returns a String
+                JavaScriptValue resultJSString;
+                Native.JsConvertValueToString(result, out resultJSString);
+                string v = resultJSString.ConvertToString().ToString();
 
-            // Convert your script result to String in JavaScript; redundant if your script returns a String
-            JavaScriptValue resultJSString;
-            Native.JsConvertValueToString(result, out resultJSString);
+                // Project script result in JS back to C#.
+                IntPtr resultPtr;
+                UIntPtr stringLength;
+                Native.JsStringToPointer(resultJSString, out resultPtr, out stringLength);
 
-            // Project script result in JS back to C#.
-            IntPtr resultPtr;
-            UIntPtr stringLength;
-            Native.JsStringToPointer(resultJSString, out resultPtr, out stringLength);
+                //string result = Marshal.PtrToStringUni(resultPtr);
 
-            string v = Marshal.PtrToStringUni(resultPtr);
+                // Dispose runtime
+                Native.JsSetCurrentContext(JavaScriptContext.Invalid);
+                Native.JsDisposeRuntime(runtime);
 
-            // Dispose runtime
-            Native.JsSetCurrentContext(JavaScriptContext.Invalid);
-            Native.JsDisposeRuntime(runtime);
-
-            //JavaScriptValue result;
-            //Native.JsRunScript(script, js_currentSourceContext++, "", out result);
-            //string v = result.ConvertToString().ToString();
-            return v;
+                //JavaScriptValue result;
+                //Native.JsRunScript(script, js_currentSourceContext++, "", out result);
+                //string v = result.ConvertToString().ToString();
+                return v;
+            }catch(Exception ex)
+            {
+                return "ERROR: " + ex.Message;
+            }
         }
 
         public static string js_chakra_run_1(object p = null)
         {
-            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
-            string body_function = p.ToString();
+            //if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            //string body_function = p.ToString();
 
             string script = "(()=>{return \'Hello world!\';})()";
             //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
@@ -95,13 +101,14 @@ namespace ckv_aspnet.src.Chakra
             // Convert your script result to String in JavaScript; redundant if your script returns a String
             JavaScriptValue resultJSString;
             Native.JsConvertValueToString(result, out resultJSString);
+            string v = resultJSString.ConvertToString().ToString();
 
             // Project script result in JS back to C#.
             IntPtr resultPtr;
             UIntPtr stringLength;
             Native.JsStringToPointer(resultJSString, out resultPtr, out stringLength);
 
-            string v = Marshal.PtrToStringUni(resultPtr);
+            //string v = Marshal.PtrToStringUni(resultPtr);
 
             // Dispose runtime
             Native.JsSetCurrentContext(JavaScriptContext.Invalid);
@@ -314,9 +321,8 @@ namespace ckv_aspnet.src.Chakra
 
         public static string js_chakra_run_2(object p = null)
         {
-            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
-
-            string body_function = p.ToString();
+            //if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            //string body_function = p.ToString();
 
             string v = "";
             //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
