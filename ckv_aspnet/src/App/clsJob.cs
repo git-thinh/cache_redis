@@ -31,12 +31,24 @@ using System.Threading.Tasks;
 0 11 11 11 11 ?		Fire every November 11th at 11:11am.
 
 */
+
 namespace ckv_aspnet
 {
     public class clsJob
     {
         static ISchedulerFactory factory;
         static IScheduler scheduler;
+
+        public static void _init()
+        {
+            factory = new StdSchedulerFactory(_config_2());
+            scheduler = factory.GetScheduler().GetAwaiter().GetResult();
+            scheduler.Start().Wait();
+
+            scheduler.Context.Put("context_ioc", clsApi.api_list());
+        }
+        
+        #region [ TEST ]
 
         static NameValueCollection _config_1()
         {
@@ -66,15 +78,6 @@ namespace ckv_aspnet
             };
 
             return configuration;
-        }
-
-        public static void _init()
-        {
-            factory = new StdSchedulerFactory(_config_2());
-            scheduler = factory.GetScheduler().GetAwaiter().GetResult();
-            scheduler.Start().Wait();
-
-            scheduler.Context.Put("context_ioc", clsApi.api_list());
         }
 
         public static void test_create_job_1()
@@ -160,7 +163,11 @@ namespace ckv_aspnet
 
             scheduler.ScheduleJob(job, trigger).Wait();
         }
+
+        #endregion
     }
+
+    #region [ TEST ]
 
     public class InviteRequestJob : IJob
     {
@@ -195,5 +202,7 @@ namespace ckv_aspnet
             await Task.FromResult(false);
         }
     }
+
+    #endregion
 }
 
