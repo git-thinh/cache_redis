@@ -10,9 +10,10 @@ namespace ckv_aspnet
 {
     public class clsCURL
     {
-        public static string get_raw(object p)
+        public static string get_raw_http(object p)
         {
-            if (p == null) return string.Empty;
+            if (p == null)
+                p = "http://localhost/";
 
             string url = p.ToString();
             StringBuilder bi = new StringBuilder();
@@ -80,7 +81,10 @@ namespace ckv_aspnet
         //static bool curl_inited = false;
         public static string get_raw_https(object p)
         {
-            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            //if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+
+            if (p == null)
+                p = "https://vnexpress.net/ha-noi-de-xuat-keo-dai-cach-ly-xa-hoi-den-30-4-4084947.html";
 
             string url = p.ToString();
             try

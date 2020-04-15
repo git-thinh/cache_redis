@@ -36,7 +36,7 @@ namespace ckv_aspnet
             //FN.TryAdd("update", new Func<object, string>(mem_cache_update));
             //FN.TryAdd("addnew", new Func<object, string>(mem_cache_addnew));
 
-            m_functions.TryAdd("url_get_raw", new Func<object, string>(clsCURL.get_raw));
+            m_functions.TryAdd("url_get_raw", new Func<object, string>(clsCURL.get_raw_http));
             m_functions.TryAdd("url_get_text", new Func<object, string>(clsCURL.get_text));
 
             //FN.TryAdd("v8_get_raw", new Func<object, string>(v8_get_raw));
@@ -47,7 +47,7 @@ namespace ckv_aspnet
             m_functions.TryAdd("js_chakra-1", new Func<object, string>(clsChakra.js_chakra_run));
             m_functions.TryAdd("js_chakra-2", new Func<object, string>(clsChakra.js_chakra_run_2));
             m_functions.TryAdd("curl-https", new Func<object, string>(clsCURL.get_raw_https));
-            m_functions.TryAdd("curl-http", new Func<object, string>(clsCURL.get_raw));
+            m_functions.TryAdd("curl-http", new Func<object, string>(clsCURL.get_raw_http));
         }
 
         public static void set_router(HttpRequest Request, HttpResponse Response)
