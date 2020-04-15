@@ -22,13 +22,15 @@ namespace ckv_aspnet
         public string[] apis { get { return apis_data.Keys.ToArray(); } }
         public void apis_reset()
         {
-            apis_data.Clear();
+            if (apis_data == null) apis_data = new ConcurrentDictionary<string, string>();
+            else apis_data.Clear();
+
             string[] fs = Directory.GetFiles(this.path, "*.js");
             foreach (string f in fs)
             {
                 string file = Path.GetFileName(f);
                 file = file.Substring(0, file.Length - 3).ToLower();
-                apis_data.TryAdd(file, File.ReadAllText(file));
+                apis_data.TryAdd(file, File.ReadAllText(f));
             }
         }
 
@@ -40,6 +42,7 @@ namespace ckv_aspnet
             this.error = string.Empty;
             this.sql_cache = string.Empty;
             this.path = string.Empty;
+            if (string.IsNullOrWhiteSpace(this.name)) this.name = Guid.NewGuid().ToString();
         }
 
         public oApi() => _init();

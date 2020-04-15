@@ -22,7 +22,7 @@ namespace ckv_aspnet
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
             clsApp._init(Server.MapPath("~/"));
-            clsRouter.set_router(Request, Response);
+            clsRouter.execute_api(Request, Response);
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)

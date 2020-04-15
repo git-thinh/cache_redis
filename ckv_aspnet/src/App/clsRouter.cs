@@ -12,85 +12,136 @@ namespace ckv_aspnet
     public class clsRouter
     {
         static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
-        public static void _init()
+
+        #region [ _add | _exe ]
+
+        static void _add<T>(string name, Func<T> func)
         {
-            //FN.TryAdd("config", new Func<object, string>((o) => { return JsonConvert.SerializeObject(CF); }));
-            //FN.TryAdd("pipe", new Func<object, string>((o) =>
-            //{
-            //    var client = new NamedPipeClientStream("ckv." + CF.name);
-            //    client.Connect();
-            //    string p = new StreamReader(client).ReadToEnd().Trim();
-            //    return JsonConvert.SerializeObject(new { port = p });
-            //}));
-
-            //FN.TryAdd("file_reset", new Func<object, string>((o) => { file_load(); return JsonConvert.SerializeObject(file_data.Keys); }));
-
-            //FN.TryAdd("clear", new Func<object, string>((o) => { mem_cache_clear(); return "OK"; }));
-            //FN.TryAdd("load_db", new Func<object, string>(mem_cache_db));
-
-            //FN.TryAdd("keys", new Func<object, string>((o) => { return JsonConvert.SerializeObject(mem_store.Keys); }));
-            //FN.TryAdd("item", new Func<object, string>(mem_cache_item));
-            //FN.TryAdd("all", new Func<object, string>(mem_cache_all));
-
-            //FN.TryAdd("remove", new Func<object, string>(mem_cache_remove));
-            //FN.TryAdd("update", new Func<object, string>(mem_cache_update));
-            //FN.TryAdd("addnew", new Func<object, string>(mem_cache_addnew));
-
-            m_functions.TryAdd("url_get_raw", new Func<object, string>(clsCURL.get_raw_http));
-            m_functions.TryAdd("url_get_text", new Func<object, string>(clsCURL.get_text));
-
-            //FN.TryAdd("v8_get_raw", new Func<object, string>(v8_get_raw));
-
-            m_functions.TryAdd("api", new Func<object, string>((o) => JsonConvert.SerializeObject(m_functions.Keys)));
-
-
-            m_functions.TryAdd("js_chakra-1", new Func<object, string>(clsChakra.js_chakra_run));
-            m_functions.TryAdd("js_chakra-2", new Func<object, string>(clsChakra.js_chakra_run_2));
-            m_functions.TryAdd("curl-https", new Func<object, string>(clsCURL.get_raw_https));
-            m_functions.TryAdd("curl-http", new Func<object, string>(clsCURL.get_raw_http));
+            if (func != null)
+            {
+                m_functions.TryAdd(name, new Func<T>(() =>
+                {
+                    var val = func();
+                    return val;
+                }));
+            }
         }
 
-        public static void set_router(HttpRequest Request, HttpResponse Response)
+        static void _add<T>(string name, Func<object, T> func)
         {
-            string url = Request.Url.ToString();
-            string path = Request.Url.AbsolutePath.Substring(1);
-
-            if (m_functions.ContainsKey(path)) {
-                string json = string.Empty;
-                try
+            if (func != null)
+            {
+                m_functions.TryAdd(name, new Func<object, T>((para_) =>
                 {
-                    bool ok = true;
-                    object pr = null;
+                    var val = func(para_);
+                    return val;
+                }));
+            }
+        }
+
+        static oRouterResult _exe(HttpRequest Request)
+        {
+            string path = Request.Url.AbsolutePath.Substring(1).ToLower();
+
+            try
+            {
+                if (m_functions.ContainsKey(path))
+                {
+                    object para = null;
+
                     if (Request.HttpMethod == "POST")
                     {
-                        string sbody = new StreamReader(Request.InputStream).ReadToEnd();
-                        if (string.IsNullOrWhiteSpace(sbody))
-                        {
-                            json = JsonConvert.SerializeObject(new { ok = false, message = "Body of POST is not null or emtpy" });
-                            ok = false;
-                        }
-                        else pr = sbody;
+                        para = new StreamReader(Request.InputStream).ReadToEnd();
+                        if (para == null || string.IsNullOrWhiteSpace(para.ToString()))
+                            return oRouterResult.Error("Body of POST is not null or emtpy");
                     }
-                    if (ok)
+
+                    string url = Request.Url.ToString();
+                    int pos = url.IndexOf('?');
+
+                    if (Request.HttpMethod == "GET" && pos != -1)
+                        para = Uri.UnescapeDataString(url.Substring(pos + 1));
+
+                    string text = string.Empty;
+                    object val = null;
+
+                    var fn = m_functions[path];
+                    string fn_type = fn.GetType().Name;
+                    switch (fn_type)
                     {
-                        var fn = (Func<object, string>)m_functions[path];
-                        int pos = url.IndexOf('?');
-
-                        if (Request.HttpMethod == "GET" && pos != -1)
-                            pr = Uri.UnescapeDataString(url.Substring(pos + 1));
-
-                        json = fn(pr);
+                        case "Func`1":
+                            val = ((Func<object>)fn)();
+                            break;
+                        case "Func`2":
+                            val = ((Func<object, object>)fn)(para);
+                            break;
                     }
+                        
+                    if (val != null) {
+                        string type = val.GetType().Name;
+                        if (type[0] == 'o' || type.Contains('[') || type.Contains('`'))
+                            text = JsonConvert.SerializeObject(val);
+                        else 
+                            text = val.ToString();
+                    }
+
+                    return oRouterResult.Ok(text);
+                }
+                else return oRouterResult.Error("Cannot found function: " + path);
+            }
+            catch (Exception e)
+            {
+                return oRouterResult.Error(e.Message);
+            }
+        }
+
+        #endregion
+
+        public static void _init()
+        {
+            _add("api/router", () => m_functions.Keys);
+
+            _add("api", clsApi.api_names);
+            _add("api/all", clsApi.api_list);
+
+            _add("api/curl/test-http", clsCURL.get_raw_http);
+            _add("api/curl/test-https", clsCURL.get_raw_https);
+
+            _add("api/chakra/test-1", clsChakra.js_chakra_run);
+            _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
+        }
+
+        public static bool execute_api(HttpRequest Request, HttpResponse Response)
+        {
+            string path = Request.Url.AbsolutePath.Substring(1).ToLower();
+            if (m_functions.ContainsKey(path))
+            {
+                string json = string.Empty, content_type = "text/plain";
+                try
+                {
+                    if (Request.HttpMethod == "POST" || (Request.HttpMethod == "GET" && path.Contains('.') == false))
+                        content_type = "application/json";
+
+                    var rs = _exe(Request);
+                    if (rs.ok) json = rs.data;
+                    else json = JsonConvert.SerializeObject(rs);
                 }
                 catch (Exception e)
                 {
+                    content_type = "application/json";
                     json = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
                 }
+
                 Response.Clear();
+                Response.ContentType = content_type;
                 Response.Write(json);
                 Response.End();
-                return;
-            }             
+
+                return true;
+            }
+
+            return false;
         }
     }
+
 }

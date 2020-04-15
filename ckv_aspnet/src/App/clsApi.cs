@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Web;
 
 namespace ckv_aspnet
@@ -1108,12 +1109,31 @@ namespace ckv_aspnet
 
         #endregion
 
-        public static void _init(string path_root) {
+        static ConcurrentDictionary<string, oApi> m_apis = new ConcurrentDictionary<string, oApi>();
+        public static string[] api_names() => m_apis.Keys.ToArray();
+        public static oApi[] api_list() => m_apis.Values.ToArray();
+
+        public static void _init(string path_root)
+        {
             PATH_ROOT = path_root;
 
             string dir = Path.Combine(PATH_ROOT, "src\\Api");
+            if (Directory.Exists(dir))
+            {
+                string[] dirs = Directory.GetDirectories(dir);
+                foreach (var path in dirs)
+                {
+                    if (path.EndsWith("_"))
+                    {
 
-
+                    }
+                    else
+                    {
+                        oApi api = new oApi(path);
+                        m_apis.TryAdd(api.name, api);
+                    }
+                }
+            }
         }
 
     }
