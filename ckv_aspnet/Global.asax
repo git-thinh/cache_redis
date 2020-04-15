@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="ckv_aspnet.Global" Language="C#" %>
+﻿<%@ Application Inherits="ckv_aspnet.clsGlobal" Language="C#" %>

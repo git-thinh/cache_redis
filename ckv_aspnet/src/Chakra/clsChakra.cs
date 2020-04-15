@@ -1,158 +1,23 @@
 ﻿using ChakraHost.Hosting;
-using SeasideResearch.LibCurlNet;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Web;
 
-namespace ckv_aspnet
+namespace ckv_aspnet.src.Chakra
 {
-    public class Global : System.Web.HttpApplication
+    public class clsChakra
     {
-
-        #region [ CURL ]
-
-        static string curl_get_raw(object p)
-        {
-            if (p == null) return string.Empty;
-
-            string url = p.ToString();
-
-            try
-            {
-                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
-
-                Easy easy = new Easy();
-                bi.Clear();
-                Easy.WriteFunction wf = new Easy.WriteFunction((buf, size, nmemb, extraData) =>
-                {
-                    string si = Encoding.UTF8.GetString(buf);
-                    bi.Append(si);
-                    return size * nmemb;
-                });
-
-                easy.SetOpt(CURLoption.CURLOPT_URL, url);
-                easy.SetOpt(CURLoption.CURLOPT_WRITEFUNCTION, wf);
-
-                easy.Perform();
-                //easy.Cleanup();
-                easy.Dispose();
-
-                Curl.GlobalCleanup();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            return bi.ToString();
-        }
-
-        static string curl_get_text(object p)
-        {
-            string html = curl_get_raw_https(p);
-            string s = html;
-
-            //s = new Regex(@"<script[^>]*>[\s\S]*?</script>").Replace(s, string.Empty);
-            //s = new Regex(@"<style[^>]*>[\s\S]*?</style>").Replace(s, string.Empty);
-            //s = new Regex(@"<noscript[^>]*>[\s\S]*?</noscript>").Replace(s, string.Empty);
-            //s = Regex.Replace(s, @"<meta(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-            //s = Regex.Replace(s, @"<link(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-            //s = Regex.Replace(s, @"<use(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-            //s = Regex.Replace(s, @"<figure(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-            //s = Regex.Replace(s, @"<!DOCTYPE(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-            //s = Regex.Replace(s, @"<!--(.|\n)*?-->", string.Empty, RegexOptions.Singleline);
-
-            string title = Regex.Match(html, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value.Trim();
-            s = Regex.Replace(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", "[TITLE] " + title, RegexOptions.Singleline);
-
-            s = Regex.Replace(s, @"<a(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-
-            //### Remove any tags but not there content "<p>bob<span> johnson</span></p>" -> "bob johnson"
-            // Regex.Replace(input, @"<(.|\n)*?>", string.Empty);
-            s = Regex.Replace(s, @"</?\w+((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>", string.Empty, RegexOptions.Singleline);
-
-            //### Remove multi break lines
-            //s = Regex.Replace(s, @"[\r\n]+", "<br />");
-            //s = Regex.Replace(s, @"[\r\n]{2,}", "<br />");
-            s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
-
-            return s.Trim();
-        }
-
-        static StringBuilder bi = new StringBuilder();
-        static bool curl_inited = false;
-        static string curl_get_raw_https(object p)
-        {
-            if (p == null) return string.Empty;
-
-            string url = p.ToString();
-            try
-            {
-                //if (curl_inited == false)
-                //{
-                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
-                //    curl_inited = true;
-                //}
-
-                Easy easy = new Easy();
-
-                bi.Clear();
-                Easy.WriteFunction wf = new Easy.WriteFunction((buf, size, nmemb, extraData) =>
-                {
-                    string si = Encoding.UTF8.GetString(buf);
-                    bi.Append(si);
-                    return size * nmemb;
-                });
-                easy.SetOpt(CURLoption.CURLOPT_WRITEFUNCTION, wf);
-
-                Easy.SSLContextFunction sf = new Easy.SSLContextFunction((ctx, extraData) => CURLcode.CURLE_OK);
-                easy.SetOpt(CURLoption.CURLOPT_SSL_CTX_FUNCTION, sf);
-
-                easy.SetOpt(CURLoption.CURLOPT_URL, url);
-                //easy.SetOpt(CURLoption.CURLOPT_CAINFO, "ca-bundle.crt");
-                easy.SetOpt(CURLoption.CURLOPT_CAINFO, @"D:\cache_redis\ckv_aspnet\bin\ca-bundle.crt");
-
-                easy.Perform();
-                easy.Dispose();
-
-                //Curl.GlobalCleanup();
-
-                string s = bi.ToString();
-
-                //string title = Regex.Match(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
-
-                s = new Regex(@"<script[^>]*>[\s\S]*?</script>").Replace(s, string.Empty);
-                s = new Regex(@"<style[^>]*>[\s\S]*?</style>").Replace(s, string.Empty);
-                s = new Regex(@"<noscript[^>]*>[\s\S]*?</noscript>").Replace(s, string.Empty);
-                s = Regex.Replace(s, @"<meta(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-                s = Regex.Replace(s, @"<link(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-                s = Regex.Replace(s, @"<use(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-                s = Regex.Replace(s, @"<figure(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-                s = Regex.Replace(s, @"<!DOCTYPE(.|\n)*?>", string.Empty, RegexOptions.Singleline);
-                s = Regex.Replace(s, @"<!--(.|\n)*?-->", string.Empty, RegexOptions.Singleline);
-
-                s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
-
-                return s;
-            }
-            catch (Exception ex)
-            {
-                return "ERR: " + ex.Message;
-            }
-        }
-
-        static void curl_stop()
-        {
-            Curl.GlobalCleanup();
-        }
-
-        #endregion
-
         #region [ js_chakra ]
 
-        static string js_chakra_run(string body_function)
+        public static string js_chakra_run(object p = null)
         {
+            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+
+            string body_function = p.ToString();
+
             string script = "(()=>{return \'Hello world!\';})()";
             //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
             //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
@@ -198,8 +63,11 @@ namespace ckv_aspnet
             return v;
         }
 
-        static string js_chakra_run_1(string body_function)
+        public static string js_chakra_run_1(object p = null)
         {
+            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+            string body_function = p.ToString();
+
             string script = "(()=>{return \'Hello world!\';})()";
             //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
             //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
@@ -444,15 +312,19 @@ namespace ckv_aspnet
             Console.Error.WriteLine("chakrahost: exception: {0}", message);
         }
 
-        static string js_chakra_run_2(string body_function)
+        public static string js_chakra_run_2(object p = null)
         {
+            if (p == null || string.IsNullOrWhiteSpace(p.ToString())) return string.Empty;
+
+            string body_function = p.ToString();
+
             string v = "";
             //string script = "(()=>{ try{ " + body_function + " }catch(e){ return 'ERR:'+e.message; } })()";
             //var result = JavaScriptContext.RunScript(script, js_currentSourceContext++, string.Empty);
             //string v = result.ConvertToString().ToString();
 
 
-            int returnValue = 1;
+            //int returnValue = 1;
             CommandLineArguments commandLineArguments;
             commandLineArguments.ArgumentsStart = 0;
             string[] arguments = new string[] { "chakrahost", "test.js", "12345" };
@@ -515,85 +387,5 @@ namespace ckv_aspnet
 
         #endregion
 
-
-        void app_router()
-        {
-
-            string s = "";
-            if (Request.Url.AbsolutePath == "/api")
-            {
-                Response.Clear();
-                Response.Write(DateTime.Now.ToString());
-                Response.End();
-            }
-            else if (Request.Url.AbsolutePath == "/js_chakra-1")
-            {
-                s = js_chakra_run("https://vnexpress.net/trump-noi-gian-voi-truyen-thong-my-4084322.html");
-                Response.Clear();
-                Response.Write(s);
-                Response.End();
-            }
-            else if (Request.Url.AbsolutePath == "/js_chakra-2")
-            {
-                s = js_chakra_run_2("https://vnexpress.net/trump-noi-gian-voi-truyen-thong-my-4084322.html");
-                Response.Clear();
-                Response.Write(s);
-                Response.End();
-            }
-            else if (Request.Url.AbsolutePath == "/curl-https")
-            {
-                s = curl_get_raw_https("https://vnexpress.net/trump-noi-gian-voi-truyen-thong-my-4084322.html");
-                Response.Clear();
-                Response.Write(s);
-                Response.End();
-            }
-            else if (Request.Url.AbsolutePath == "/curl-http")
-            {
-                s = curl_get_raw("http://localhost:8085/_cms/2000/");
-                Response.Clear();
-                Response.Write(s);
-                Response.End();
-            }
-        }
-
-        #region [ APPLICATION ]
-
-        protected void Application_BeginRequest(object sender, EventArgs e)
-        {
-            app_router();
-        }
-
-
-        protected void Application_Start(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Session_Start(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_AuthenticateRequest(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_Error(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Session_End(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_End(object sender, EventArgs e)
-        {
-
-        }
-
-        #endregion
     }
 }

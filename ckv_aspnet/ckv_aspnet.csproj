@@ -14,7 +14,7 @@
     <RootNamespace>ckv_aspnet</RootNamespace>
     <AssemblyName>ckv_aspnet</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -32,6 +32,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,8 +45,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="SeasideResearch.LibCurlNet">
-      <HintPath>DLL\SeasideResearch.LibCurlNet.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>src\DLL\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -66,11 +68,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="client.html" />
-    <EmbeddedResource Include="DLL\ClearScript.dll" />
-    <EmbeddedResource Include="DLL\SeasideResearch.LibCurlNet.dll" />
     <Content Include="Global.asax" />
     <Content Include="home.html" />
     <Content Include="index.html" />
+    <Content Include="src\Api\cms_data\get_domain.js" />
+    <Content Include="src\Api\cms_data\export_article_from_html.js" />
+    <Content Include="src\Api\_\build_url_from_text.js" />
+    <Content Include="src\Api\cms_data\addnew.sql" />
+    <Content Include="src\Api\cms_data\cache.sql" />
+    <Content Include="src\DLL\Newtonsoft.Json.dll" />
+    <Content Include="src\ReadMe.txt" />
     <Content Include="test\assets\images\avatar\nan.jpg" />
     <Content Include="test\assets\images\avatar\tom.jpg" />
     <Content Include="test\assets\images\bg.jpg" />
@@ -311,41 +318,60 @@
     <Content Include="_view\_debug\test.js" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChakraCore\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptBeforeCollectCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptContext.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptEngineException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptErrorCode.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptFatalException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryAllocationCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptMemoryEventType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptNativeFunction.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptObjectFinalizeCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPromiseContinuationCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyId.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptPropertyIdType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntime.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeAttributes.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptRuntimeVersion.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptScriptException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptSourceContext.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptThreadServiceCallback.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptTypedArrayType.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptUsageException.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptValue.cs" />
-    <Compile Include="ChakraCore\Hosting\JavaScriptValueType.cs" />
-    <Compile Include="ChakraCore\Hosting\Native.cs" />
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
+    <Compile Include="src\App\clsApi.cs" />
+    <Compile Include="src\App\clsApp.cs" />
+    <Compile Include="src\App\clsRouter.cs" />
+    <Compile Include="src\App\clsGlobal.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptContext.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptException.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptValue.cs" />
+    <Compile Include="src\Chakra\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="src\Chakra\Hosting\Native.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Chakra\clsChakra.cs" />
+    <Compile Include="src\CURL\clsCURL.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Curl.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Easy.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Enums.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\External.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Multi.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\MultiInfo.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\MultiPartForm.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Share.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\Slist.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\SSLContext.cs" />
+    <Compile Include="src\CURL\SeasideResearch.LibCurlNet\VersionInfoData.cs" />
+    <Compile Include="src\Model\oApiAddnew.cs" />
+    <Compile Include="src\Model\oApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="src\Api\cms_data\addnew.json" />
+    <Content Include="src\Api\cms_data\addnew.valid" />
+    <Content Include="src\Api\cms_data\config.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -377,6 +403,7 @@
     <Content Include="_view\config.json" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\Websocket\" />
     <Folder Include="_view\sidebar\" />
   </ItemGroup>
   <PropertyGroup>
@@ -394,7 +421,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50257</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/</IISUrl>
+          <IISUrl>http://localhost:50257/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
