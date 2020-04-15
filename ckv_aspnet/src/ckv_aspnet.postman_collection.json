@@ -1,0 +1,698 @@
+{
+	"info": {
+		"_postman_id": "fba361ad-b5af-41b3-b4e6-4698eb8feb7f",
+		"name": "ckv_aspnet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "router",
+			"item": [
+				{
+					"name": "router",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/router",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"router"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "api",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/reset",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/reset",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/global",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/global",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"global"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/global/reset",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/global/reset",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"global",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "cache",
+			"item": [],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "curl",
+			"item": [
+				{
+					"name": "test-http",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/curl/test-http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"curl",
+								"test-http"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-https",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/curl/test-https",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"curl",
+								"test-https"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "chakra",
+			"item": [
+				{
+					"name": "test-1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/chakra/test-1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chakra",
+								"test-1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/chakra/test-2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chakra",
+								"test-2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "other",
+			"item": [
+				{
+					"name": "config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/config",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"config"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/pipe",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"pipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "file_reset",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/file_reset",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"file_reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clear",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/clear",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"clear"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "load_db",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/load_db",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"load_db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "keys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/keys",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/all",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "1",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/item",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addnew",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"str_test\": \"tét\",\r\n  \"str_title\": \"tiêu đề\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/addnew",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"addnew"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "1",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/remove",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"remove"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_raw",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/url_get_raw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_raw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_raw = vnexpress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:12345/url_get_raw?https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_raw"
+							],
+							"query": [
+								{
+									"key": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_text = zing",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "https://zingnews.vn/thu-tuong-ngay-154-se-xem-xet-co-keo-dai-cach-ly-xa-hoi-hay-khong-post1072398.html",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/url_get_text",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_text"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_text = vnexpress",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:12345/url_get_text",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_text"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_text = vnexpress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:12345/url_get_text?https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_text"
+							],
+							"query": [
+								{
+									"key": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "url_get_raw_by_js = vnexpress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:12345/url_get_raw_by_js?https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"url_get_raw_by_js"
+							],
+							"query": [
+								{
+									"key": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "v8_get_raw = vnexpress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:12345/v8_get_raw?https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "12345",
+							"path": [
+								"v8_get_raw"
+							],
+							"query": [
+								{
+									"key": "https://vnexpress.net/so-ca-nhiem-ncov-len-265-4084138.html",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "job",
+			"item": [
+				{
+					"name": "test-1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/job/test-1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"job",
+								"test-1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/job/test-2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"job",
+								"test-2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-3",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/job/test-3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"job",
+								"test-3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test-4",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/job/test-4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"job",
+								"test-4"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
