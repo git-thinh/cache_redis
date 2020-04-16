@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>ckv_lib</RootNamespace>
+    <AssemblyName>ckv_lib</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Chakra\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptContext.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptException.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptValue.cs" />
+    <Compile Include="Chakra\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="Chakra\Hosting\Native.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Redis\Sider\src\Aggregate.cs" />
+    <Compile Include="Redis\Sider\src\AutoActivatingPool.cs" />
+    <Compile Include="Redis\Sider\src\Exceptions.cs" />
+    <Compile Include="Redis\Sider\src\Executors\ExecutorBase.cs" />
+    <Compile Include="Redis\Sider\src\Executors\IExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\ImmediateExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\IocpExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\MonitorExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\PipelinedExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\PubSubExecutor.cs" />
+    <Compile Include="Redis\Sider\src\Executors\TransactedExecutor.cs" />
+    <Compile Include="Redis\Sider\src\IClientsPool.cs" />
+    <Compile Include="Redis\Sider\src\Invocation.cs" />
+    <Compile Include="Redis\Sider\src\IRedisClient.cs" />
+    <Compile Include="Redis\Sider\src\LimitingStream.cs" />
+    <Compile Include="Redis\Sider\src\Message.cs" />
+    <Compile Include="Redis\Sider\src\MessageType.cs" />
+    <Compile Include="Redis\Sider\src\Mode.cs" />
+    <Compile Include="Redis\Sider\src\Observable.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolEncoder.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolReader.cs" />
+    <Compile Include="Redis\Sider\src\ProtocolWriter.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.API.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.cs" />
+    <Compile Include="Redis\Sider\src\RedisClient.IO.core.cs" />
+    <Compile Include="Redis\Sider\src\RedisClientBase.cs" />
+    <Compile Include="Redis\Sider\src\RedisClientPipeliningExtensions.cs">
+      <DependentUpon>RedisClientPipeliningExtensions.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Redis\Sider\src\RedisReader.cs" />
+    <Compile Include="Redis\Sider\src\RedisSettings.cs" />
+    <Compile Include="Redis\Sider\src\RedisType.cs" />
+    <Compile Include="Redis\Sider\src\RedisVersionAttribute.cs" />
+    <Compile Include="Redis\Sider\src\RedisWriter.cs" />
+    <Compile Include="Redis\Sider\src\ResponseType.cs" />
+    <Compile Include="Redis\Sider\src\RoundRobinPool.cs" />
+    <Compile Include="Redis\Sider\src\SAssert.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\BufferSerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\ISerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\ObjectSerializer.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\SerializerBase.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\Serializers.cs" />
+    <Compile Include="Redis\Sider\src\Serialization\StringSerializer.cs" />
+    <Compile Include="Redis\Sider\src\SettingsWrapper.cs" />
+    <Compile Include="Redis\Sider\src\StringExtensions.cs" />
+    <Compile Include="Redis\Sider\src\ThreadwisePool.cs" />
+    <Compile Include="Redis\Sider\src\TrackedThreadwisePool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Redis\Sider\src\RedisClientPipeliningExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RedisClientPipeliningExtensions.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

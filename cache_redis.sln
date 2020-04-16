@@ -78,6 +78,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ckv_build", "ckv_build\", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv_aspnet", "ckv_aspnet\ckv_aspnet.csproj", "{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv_lib", "ckv_lib\ckv_lib.csproj", "{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +144,14 @@ Global
 		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|x64.ActiveCfg = Release|Any CPU
 		{F4E9498D-ED1B-4CF4-9AA7-BD74307421BC}.Release|x64.Build.0 = Release|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Debug|x64.Build.0 = Debug|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|x64.ActiveCfg = Release|Any CPU
+		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

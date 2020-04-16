@@ -1,5 +1,4 @@
-﻿using ckv_aspnet.src.Chakra;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,6 +15,7 @@ namespace ckv_aspnet
             _add("api/router", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(m_functions.Keys, p); }));
 
             _add("api", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsApi.api_names(), p); }));
+            _add("api_js", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsChakra.js_apis(), p); }));
             _add("api/all", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsApi.api_list(), p); }));
             _add("api/reset", new Func<Dictionary<string, object>, oResult>((p) => { clsApi.api_reload(); return oResult.Ok(true, p); }));
 

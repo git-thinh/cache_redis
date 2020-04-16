@@ -1,6 +1,4 @@
-﻿using ckv_aspnet.src.Chakra;
-
-namespace ckv_aspnet
+﻿namespace ckv_aspnet
 {
     public class clsApp
     {
