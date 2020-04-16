@@ -13,26 +13,23 @@ namespace ckv_aspnet
     {
         public static void _init()
         {
-            _add("api/router", () => m_functions.Keys);
+            _add("api/router", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(m_functions.Keys, p); }));
 
-            _add("api", clsApi.api_names);
-            _add("api/all", clsApi.api_list);
-            _add("api/reset", clsApi.api_reload);
+            _add("api", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsApi.api_names(), p); }));
+            _add("api/all", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsApi.api_list(), p); }));
+            _add("api/reset", new Func<Dictionary<string, object>, oResult>((p) => { clsApi.api_reload(); return oResult.Ok(true, p); }));
 
-            _add("api/global", clsApi.api_global_names);
-            _add("api/global/reset", clsApi.api_global_reload);
+            _add("api/global", new Func<Dictionary<string, object>, oResult>((p) => { return oResult.Ok(clsApi.api_global_names(), p); }));
+            _add("api/global/reset", new Func<Dictionary<string, object>, oResult>((p) => { clsApi.api_global_reload(); return oResult.Ok(true, p); }));
 
-            _add("api/curl/test-http", clsCURL.get_raw_http);
-            _add("api/curl/test-https", clsCURL.get_raw_https);
+
+            _add("api/curl/test-http", clsCURL.test_http);
+            _add("api/curl/test-https", clsCURL.test_https);
 
             _add("api/chakra/test-1", clsChakra.test_1);
             _add("api/chakra/test-2", clsChakra.test_2);
 
-            //_add("api/job/test-1", clsJobTest.test_create_job_1);
-            //_add("api/job/test-2", clsJobTest.test_create_job_2);
-            //_add("api/job/test-3", clsJobTest.test_create_job_3);
-            //_add("api/job/test-4", clsJobTest.test_create_job_4);
-            _add("api/job/create", (p) => { if (p != null) clsJob.create_schedule(p.ToString()); });
+            _add("api/js/test", clsChakra.run_api);
         }
 
         public static bool execute_api(HttpRequest Request, HttpResponse Response)
@@ -40,25 +37,56 @@ namespace ckv_aspnet
             string path = Request.Url.AbsolutePath.Substring(1).ToLower();
             if (m_functions.ContainsKey(path))
             {
-                string json = string.Empty, content_type = "text/plain";
+                string text = string.Empty, content_type = "text/plain";
                 try
                 {
                     if (Request.HttpMethod == "POST" || (Request.HttpMethod == "GET" && path.Contains('.') == false))
                         content_type = "application/json";
 
-                    var rs = _exe(Request);
-                    if (rs.ok) json = rs.data;
-                    else json = JsonConvert.SerializeObject(rs);
+                    var v = _exe(Request);
+                    if (v.ok)
+                    {
+                        switch (v.type)
+                        {
+                            case DATA_TYPE.HTML_TEXT:
+                                content_type = "text/html";
+                                text = v.data.ToString();
+                                break;
+                            case DATA_TYPE.JSON_TEXT:
+                                content_type = "application/json";
+                                text = JsonConvert.SerializeObject(v);
+                                break;
+                            case DATA_TYPE.JSON_RESPONSE:
+                                content_type = "application/json";
+                                text = v.data.ToString();
+                                break;
+                            case DATA_TYPE.TEXT_PLAIN:
+                                content_type = "text/plain";
+                                text = v.data.ToString();
+                                break;
+                            case DATA_TYPE.OBJECT:
+                                break;
+                            case DATA_TYPE.ARRAY_LIST:
+                                break;
+                            case DATA_TYPE.BUFFER:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        content_type = "application/json";
+                        text = JsonConvert.SerializeObject(v);
+                    }
                 }
                 catch (Exception e)
                 {
                     content_type = "application/json";
-                    json = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
+                    text = JsonConvert.SerializeObject(new { ok = false, message = e.Message });
                 }
 
                 Response.Clear();
                 Response.ContentType = content_type;
-                Response.Write(json);
+                Response.Write(text);
                 Response.End();
 
                 return true;
@@ -67,115 +95,65 @@ namespace ckv_aspnet
             return false;
         }
 
-        #region [ _add ]
 
-        static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
+        static ConcurrentDictionary<string, Func<Dictionary<string, object>, oResult>> m_functions = new ConcurrentDictionary<string, Func<Dictionary<string, object>, oResult>>();
+        static void _add(string name, Func<Dictionary<string, object>, oResult> func) { if (func != null) m_functions.TryAdd(name, func); }
 
-        static void _add(string name, Action func)
-        {
-            if (func != null)
-            {
-                m_functions.TryAdd(name, func);
-            }
-        }
-
-        static void _add(string name, Action<object> func)
-        {
-            if (func != null)
-            {
-                m_functions.TryAdd(name, func);
-            }
-        }
-
-        static void _add<T>(string name, Func<T> func)
-        {
-            if (func != null)
-            {
-                m_functions.TryAdd(name, new Func<T>(() =>
-                {
-                    var val = func();
-                    return val;
-                }));
-            }
-        }
-
-        static void _add<T>(string name, Func<object, T> func)
-        {
-            if (func != null)
-            {
-                m_functions.TryAdd(name, new Func<object, T>((para_) =>
-                {
-                    var val = func(para_);
-                    return val;
-                }));
-            }
-        }
-
-        #endregion
-
-        static oRouterResult _exe(HttpRequest Request)
+        static oResult _exe(HttpRequest Request)
         {
             string path = Request.Url.AbsolutePath.Substring(1).ToLower();
+            Dictionary<string, object> para = new Dictionary<string, object>() {
+                { "___domain", Request.Url.Host },
+                { "___port", Request.Url.Port },
+                { "___url", path },
+                { "___method", Request.HttpMethod },
+                { "___token", string.Empty },
+            };
 
             try
             {
                 if (m_functions.ContainsKey(path))
                 {
-                    object para = null;
+                    var a = Request.QueryString.Keys.Cast<string>().ToArray();
+                    foreach (var key in a) if (!para.ContainsKey(key)) para.Add(key, Uri.UnescapeDataString(Request.QueryString[key]));
 
                     if (Request.HttpMethod == "POST")
                     {
-                        para = new StreamReader(Request.InputStream).ReadToEnd();
-                        if (para == null || string.IsNullOrWhiteSpace(para.ToString()))
-                            return oRouterResult.Error("Body of POST is not null or emtpy");
+                        string s = new StreamReader(Request.InputStream).ReadToEnd();
+                        if (s == null || string.IsNullOrWhiteSpace(s))
+                            return oResult.Error("Body of POST is not null or emtpy");
+                        else
+                        {
+                            s = s.Trim();
+                            if (s.Length > 1 && s[0] == '{' && s[s.Length - 1] == '}')
+                            {
+                                try
+                                {
+                                    var d = JsonConvert.DeserializeObject<Dictionary<string, object>>(s);
+                                    foreach (var kv in d) para.Add(kv.Key, kv.Value);
+                                }
+                                catch (Exception e)
+                                {
+                                    return oResult.Error("Convert to json of body error: " + e.Message);
+                                }
+                            }
+                            else
+                            {
+                                para.Add("___BODY", s);
+                            }
+                        }
                     }
-
-                    string url = Request.Url.ToString();
-                    int pos = url.IndexOf('?');
-
-                    if (Request.HttpMethod == "GET" && pos != -1)
-                        para = Uri.UnescapeDataString(url.Substring(pos + 1));
-
-                    string text = string.Empty;
-                    object val = null;
 
                     var fn = m_functions[path];
-                    string fn_type = fn.GetType().Name;
-                    switch (fn_type)
-                    {
-                        case "Action":
-                            ((Action)fn)();
-                            break;
-                        case "Action`1":
-                            ((Action<object>)fn)(para);
-                            break;
-                        case "Func`1":
-                            val = ((Func<object>)fn)();
-                            break;
-                        case "Func`2":
-                            val = ((Func<object, object>)fn)(para);
-                            break;
-                    }
-
-                    if (val != null)
-                    {
-                        string type = val.GetType().Name;
-                        if (type[0] == 'o' || type.Contains('[') || type.Contains('`'))
-                            text = JsonConvert.SerializeObject(val);
-                        else
-                            text = val.ToString();
-                    }
-
-                    return oRouterResult.Ok(text);
+                    var v = ((Func<Dictionary<string, object>, oResult>)fn)(para);
+                    return v;
                 }
-                else return oRouterResult.Error("Cannot found function: " + path);
+                else return oResult.Error("Cannot found function: " + path, para);
             }
             catch (Exception e)
             {
-                return oRouterResult.Error(e.Message);
+                return oResult.Error(e.Message, para);
             }
         }
-
     }
-
 }

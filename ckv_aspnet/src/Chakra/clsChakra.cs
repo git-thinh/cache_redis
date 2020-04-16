@@ -75,7 +75,8 @@ namespace ckv_aspnet.src.Chakra
                         vals[i - 1] = arguments[i].ConvertToString().ToString();
 
                     string scope_name = "_", key = "", text = "";
-                    switch (vals.Length) {
+                    switch (vals.Length)
+                    {
                         case 1:
                             key = DateTime.Now.ToString("yyMMdd-HHmmss-fff");
                             text = vals[0];
@@ -119,9 +120,10 @@ namespace ckv_aspnet.src.Chakra
 
         #region [ test_1; test_2 ]
 
-        public static string test_1(object p = null)
+        public static oResult test_1(Dictionary<string, object> request = null)
         {
-            string v = "";
+            oResult rs = new oResult() { ok = false, request = request };
+
             using (JavaScriptRuntime runtime = JavaScriptRuntime.Create())
             {
                 JavaScriptContext context = _create_context(runtime);
@@ -133,26 +135,26 @@ namespace ckv_aspnet.src.Chakra
                     try
                     {
                         JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
-                        v = result.ConvertToString().ToString();
+                        rs.data = result.ConvertToString().ToString();
+                        rs.ok = true;
                     }
                     catch (JavaScriptScriptException e)
                     {
                         var messageName = JavaScriptPropertyId.FromString("message");
-                        v = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
+                        rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
                     }
                     catch (Exception e)
                     {
-                        v = "ERROR_CHAKRA: failed to run script: " + e.Message;
+                        rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
                     }
                 }
             }
-
-            return v;
+            return rs;
         }
 
-        public static string test_2(object p = null)
+        public static oResult test_2(Dictionary<string, object> request = null)
         {
-            string v = "";
+            oResult rs = new oResult() { ok = false, request = request };
             using (new JavaScriptContext.Scope(js_context))
             {
                 string script = "(()=>{ var val = api.test('TEST_2: Hello world'); api.log('api-js.test-2', 'key-2', 'TEST_2: This log called by JS...'); return val; })()";
@@ -160,23 +162,111 @@ namespace ckv_aspnet.src.Chakra
                 try
                 {
                     JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
-                    v = result.ConvertToString().ToString();
+                    rs.data = result.ConvertToString().ToString();
+                    rs.ok = true;
                 }
                 catch (JavaScriptScriptException e)
                 {
                     var messageName = JavaScriptPropertyId.FromString("message");
-                    v = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
+                    rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
                 }
                 catch (Exception e)
                 {
-                    v = "ERROR_CHAKRA: failed to run script: " + e.Message;
+                    rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
                 }
             }
-            return v;
+            return rs;
         }
 
         #endregion
+
+        public static oResult run_api(Dictionary<string, object> request = null)
+        {
+            oResult rs = new oResult() { ok = false, request = request };
+
+            string scope = request.getValueByKey("___scope");
+            if (string.IsNullOrEmpty(scope))
+            {
+                rs.error = "[___scope] is null or empty";
+                return rs;
+            }
+
+            if (!clsApi.Exist(scope))
+            {
+                rs.error = "[___scope] = " + scope + " is not exist";
+                return rs;
+            }
+
+            string sapi = request.getValueByKey("___api");
+            if (string.IsNullOrEmpty(sapi))
+            {
+                rs.error = "[___api] is null or empty";
+                return rs;
+            }
+
+            oApi o = clsApi.Get(scope);
+            if (o.apis.Length == 0)
+            {
+                rs.error = "folder " + scope + " missing files api: " + sapi.Replace("|", ".js; ") + ".js";
+                return rs;
+            }
+
+            sapi = sapi.ToLower().Trim();
+            string[] a = sapi.Split('|');
+            StringBuilder bi = new StringBuilder();
+
+            bi.Append("(()=>{ ");
+            bi.Append(Environment.NewLine);
+            bi.Append("var ___scope = 'API-JS." + scope + "." + sapi + "'; ");
+            bi.Append(Environment.NewLine);
+            bi.Append("var ___log = function(key,text){ api.log(___scope, key, text); }; ");
+            bi.Append(Environment.NewLine);
+            bi.Append("var ___para = ");
+            bi.Append(JsonConvert.SerializeObject(request));
+            bi.Append(Environment.NewLine);
+            bi.Append(Environment.NewLine);
+
+            for (var i = 0; i < a.Length; i++)
+            {
+                if (o.apis_data.ContainsKey(a[i]) == false)
+                {
+                    rs.error = "folder " + scope + " missing files api: " + a[i] + ".js";
+                    return rs;
+                }
+                bi.Append(o.apis_data[a[i]]);
+                bi.Append(Environment.NewLine);
+                bi.Append(Environment.NewLine);
+            }
+
+            bi.Append(Environment.NewLine);
+            bi.Append(" })()");
+
+            string script = bi.ToString();
+
+            using (new JavaScriptContext.Scope(js_context))
+            {
+                try
+                {
+                    JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
+                    string v = result.ConvertToString().ToString();
+                    if (v == "undefined") rs.data = null;
+                    else rs.data = v;
+                    rs.ok = true;
+                }
+                catch (JavaScriptScriptException e)
+                {
+                    var messageName = JavaScriptPropertyId.FromString("message");
+                    rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
+                }
+                catch (Exception e)
+                {
+                    rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
+                }
+            }
+            return rs;
+        }
     }
+
 
     public interface ILogJS
     {

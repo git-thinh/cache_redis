@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
 
@@ -1153,6 +1154,15 @@ namespace ckv_aspnet
                 }
             }
         }
+
+        public static oApi Get(string name)
+        {
+            if (m_apis.ContainsKey(name)) return m_apis[name];
+            return null;
+        }
+
+        public static bool Exist(string name) => m_apis.ContainsKey(name);
+
 
         #endregion
 

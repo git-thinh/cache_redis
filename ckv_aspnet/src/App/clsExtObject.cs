@@ -203,5 +203,19 @@ namespace ckv_aspnet
             return v;
         }
 
+        public static string getValueByKey(this Dictionary<string, object> dic, string key)
+        {
+            if (dic != null && key != null && dic.ContainsKey(key))
+            {
+                try
+                {
+                    object val = dic[key];
+                    if (val != null) return val.ToString();
+                }
+                catch { }
+            }
+
+            return null;
+        }
     }
 }

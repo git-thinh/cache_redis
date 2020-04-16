@@ -77,6 +77,12 @@
     <Content Include="index.html" />
     <Content Include="src\Api\cms_data\get_domain.js" />
     <Content Include="src\Api\cms_data\export_article_from_html.js" />
+    <Content Include="src\Api\test\cache-update-1.js" />
+    <Content Include="src\Api\test\cache-search-1.js" />
+    <Content Include="src\Api\test\job-create-1.js" />
+    <Content Include="src\Api\test\file-write-1.js" />
+    <Content Include="src\Api\test\db-1.js" />
+    <Content Include="src\Api\test\log-1.js" />
     <Content Include="src\Api\_\build_url_from_text.js" />
     <Content Include="src\Api\cms_data\addnew.sql" />
     <Content Include="src\Api\cms_data\cache.sql" />
@@ -380,7 +386,7 @@
     <Compile Include="src\CURL\SeasideResearch.LibCurlNet\VersionInfoData.cs" />
     <Compile Include="src\Model\oApiAddnew.cs" />
     <Compile Include="src\Model\oApi.cs" />
-    <Compile Include="src\Model\oRouterResult.cs" />
+    <Compile Include="src\Model\oResult.cs" />
     <Compile Include="src\Redis\Sider\src\Aggregate.cs" />
     <Compile Include="src\Redis\Sider\src\AutoActivatingPool.cs" />
     <Compile Include="src\Redis\Sider\src\Exceptions.cs" />
@@ -438,6 +444,7 @@
     <Content Include="src\Api\cms_data\addnew.valid" />
     <Content Include="src\Api\cms_data\config.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="src\Api\test\config.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
