@@ -60,15 +60,15 @@
             this.panelEditor = new System.Windows.Forms.Panel();
             this.txtEditor = new System.Windows.Forms.RichTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lblKeySelected_Path = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.btnEditorFontBigger = new System.Windows.Forms.Button();
             this.btnEditorFontSmaller = new System.Windows.Forms.Button();
             this.btnEditorSearch = new System.Windows.Forms.Button();
             this.txtEditorSearch = new System.Windows.Forms.TextBox();
             this.btnLogItemSaveFile = new System.Windows.Forms.Button();
-            this.lblKeySelected_Path = new System.Windows.Forms.Label();
             this.lblKeySelected_Time = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelList.SuspendLayout();
@@ -109,7 +109,7 @@
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(527, 30);
             this.lblMessage.TabIndex = 8;
-            this.lblMessage.Text = "LOG Redis";
+            this.lblMessage.Text = "View LOG Redis";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnWriteFile
@@ -442,6 +442,17 @@
             this.panel1.Size = new System.Drawing.Size(776, 37);
             this.panel1.TabIndex = 0;
             // 
+            // lblKeySelected_Path
+            // 
+            this.lblKeySelected_Path.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKeySelected_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblKeySelected_Path.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.lblKeySelected_Path.Location = new System.Drawing.Point(5, 2);
+            this.lblKeySelected_Path.Name = "lblKeySelected_Path";
+            this.lblKeySelected_Path.Size = new System.Drawing.Size(510, 13);
+            this.lblKeySelected_Path.TabIndex = 0;
+            // 
             // label2
             // 
             this.label2.BackColor = System.Drawing.SystemColors.ActiveCaption;
@@ -450,17 +461,6 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(776, 1);
             this.label2.TabIndex = 8;
-            // 
-            // label1
-            // 
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Blue;
-            this.label1.Location = new System.Drawing.Point(3, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(19, 20);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "//";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnEditorFontBigger
             // 
@@ -530,17 +530,6 @@
             this.btnLogItemSaveFile.UseVisualStyleBackColor = false;
             this.btnLogItemSaveFile.Click += new System.EventHandler(this.btnLogItemSaveFile_Click);
             // 
-            // lblKeySelected_Path
-            // 
-            this.lblKeySelected_Path.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblKeySelected_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblKeySelected_Path.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lblKeySelected_Path.Location = new System.Drawing.Point(5, 2);
-            this.lblKeySelected_Path.Name = "lblKeySelected_Path";
-            this.lblKeySelected_Path.Size = new System.Drawing.Size(510, 13);
-            this.lblKeySelected_Path.TabIndex = 0;
-            // 
             // lblKeySelected_Time
             // 
             this.lblKeySelected_Time.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -549,6 +538,17 @@
             this.lblKeySelected_Time.Name = "lblKeySelected_Time";
             this.lblKeySelected_Time.Size = new System.Drawing.Size(488, 19);
             this.lblKeySelected_Time.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Blue;
+            this.label1.Location = new System.Drawing.Point(3, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(19, 20);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "//";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // fMainUI
             // 
@@ -563,7 +563,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "fMainUI";
-            this.Text = "LOG";
+            this.Text = "View LOG Redis";
             this.Load += new System.EventHandler(this.fMainUI_Load);
             this.panelHeader.ResumeLayout(false);
             this.panelHeader.PerformLayout();

@@ -274,7 +274,7 @@ namespace studio_redis
             treeKeys.Nodes.Clear();
             listKeys.Items.Clear();
             lblKeyID_Selected.Text = "";
-            lblKeyID_Counter.Text = "(0)";
+            lblKeyID_Counter.Text = "";
 
             string key_full_selected = "";
             if (cache_selected && m_key_selected != null) key_full_selected = m_key_selected.key_full;
@@ -332,7 +332,7 @@ namespace studio_redis
                     }
                 }
                 treeKeys.Nodes.AddRange(nodes_0);
-                f_message("OK");
+                //f_message("OK");
                 //Thread.Sleep(100);
                 treeKeys.ExpandAll();
                 //Thread.Sleep(100);
@@ -377,7 +377,7 @@ namespace studio_redis
             m_key_ids = new string[] { };
             listKeys.Items.Clear();
             lblKeyID_Selected.Text = "";
-            lblKeyID_Counter.Text = "(0)";
+            lblKeyID_Counter.Text = "";
             labelKey_Selected.Text = "";
 
             if (node != null)
