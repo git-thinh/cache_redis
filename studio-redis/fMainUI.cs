@@ -72,6 +72,7 @@ namespace studio_redis
             this.lblMessage.MouseDown += BoxUI_MouseDown;
         }
 
+
         #region [ Disable Expand Node After dblClick ]
 
         private bool isDoubleClick = false;

@@ -25,8 +25,8 @@ namespace ckv_aspnet
             _add("api/curl/test-http", clsCURL.get_raw_http);
             _add("api/curl/test-https", clsCURL.get_raw_https);
 
-            _add("api/chakra/test-1", clsChakra.js_chakra_run);
-            _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
+            _add("api/chakra/test-1", clsChakra.test_1);
+            _add("api/chakra/test-2", clsChakra.test_2);
 
             //_add("api/job/test-1", clsJobTest.test_create_job_1);
             //_add("api/job/test-2", clsJobTest.test_create_job_2);

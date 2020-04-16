@@ -11,7 +11,7 @@ namespace ckv_aspnet
 {
     public interface ILogJob
     {
-        void write(string group, string key, string text);
+        void write(string scope_name, string key, string text);
     }
 
     public class clsLogJob : ILogJob
@@ -20,7 +20,7 @@ namespace ckv_aspnet
         static RedisClient _redis;
         static bool _connected = false;
 
-        public clsLogJob(int port = 11111) => _init(port);
+        public clsLogJob(int port = _CONFIG.LOG_PORT_REDIS) => _init(port);
 
         void _init(int port)
         {
@@ -50,7 +50,7 @@ namespace ckv_aspnet
             }
         }
 
-        public void write1(string scope_name, string key, params object[] paras)
+        void write1(string scope_name, string key, params object[] paras)
         {
             Interlocked.Increment(ref ID_INCREMENT);
             if (ID_INCREMENT == int.MaxValue) ID_INCREMENT = 0;

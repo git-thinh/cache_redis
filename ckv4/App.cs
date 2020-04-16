@@ -330,7 +330,7 @@ if (request.status === 200) {
             // Now set the execution context as being the current one on this thread.
             Native.JsSetCurrentContext(context);
 
-            Native.js ("ChakraBridge");
+            //Native.js ("ChakraBridge");
 
             // Run the script.
             Native.JsRunScript(script, currentSourceContext++, "", out result);

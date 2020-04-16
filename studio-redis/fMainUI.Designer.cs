@@ -46,38 +46,38 @@
             this.lblKeyID_Counter = new System.Windows.Forms.Label();
             this.lblKeyID_Selected = new System.Windows.Forms.Label();
             this.panelListHeader = new System.Windows.Forms.Panel();
-            this.btnKeyDEL = new System.Windows.Forms.Button();
+            this.button_key_del_all = new System.Windows.Forms.Button();
+            this.btnLogItem_DEL = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnSearch = new System.Windows.Forms.Button();
             this.splitter2 = new System.Windows.Forms.Splitter();
+            this.panelTreeView = new System.Windows.Forms.Panel();
+            this.btnKeyDEL = new System.Windows.Forms.Button();
             this.treeKeys = new System.Windows.Forms.TreeView();
+            this.labelKey_Selected = new System.Windows.Forms.Label();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelEditor = new System.Windows.Forms.Panel();
             this.txtEditor = new System.Windows.Forms.RichTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.btnEditorFontBigger = new System.Windows.Forms.Button();
             this.btnEditorFontSmaller = new System.Windows.Forms.Button();
             this.btnEditorSearch = new System.Windows.Forms.Button();
             this.txtEditorSearch = new System.Windows.Forms.TextBox();
             this.btnLogItemSaveFile = new System.Windows.Forms.Button();
-            this.lblKeySelected_Time = new System.Windows.Forms.Label();
             this.lblKeySelected_Path = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.panelTreeView = new System.Windows.Forms.Panel();
-            this.labelKey_Selected = new System.Windows.Forms.Label();
-            this.btnLogItem_DEL = new System.Windows.Forms.Button();
-            this.button_key_del_all = new System.Windows.Forms.Button();
+            this.lblKeySelected_Time = new System.Windows.Forms.Label();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelList.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panelListHeader.SuspendLayout();
+            this.panelTreeView.SuspendLayout();
             this.panelMain.SuspendLayout();
             this.panelEditor.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.panelTreeView.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelHeader
@@ -250,7 +250,6 @@
             this.lblKeyID_Counter.Name = "lblKeyID_Counter";
             this.lblKeyID_Counter.Size = new System.Drawing.Size(125, 12);
             this.lblKeyID_Counter.TabIndex = 1;
-            this.lblKeyID_Counter.Text = "(0)";
             this.lblKeyID_Counter.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // lblKeyID_Selected
@@ -263,7 +262,6 @@
             this.lblKeyID_Selected.Name = "lblKeyID_Selected";
             this.lblKeyID_Selected.Size = new System.Drawing.Size(238, 15);
             this.lblKeyID_Selected.TabIndex = 0;
-            this.lblKeyID_Selected.Text = "key_name";
             // 
             // panelListHeader
             // 
@@ -277,16 +275,35 @@
             this.panelListHeader.Size = new System.Drawing.Size(243, 24);
             this.panelListHeader.TabIndex = 0;
             // 
-            // btnKeyDEL
+            // button_key_del_all
             // 
-            this.btnKeyDEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnKeyDEL.Location = new System.Drawing.Point(200, 0);
-            this.btnKeyDEL.Name = "btnKeyDEL";
-            this.btnKeyDEL.Size = new System.Drawing.Size(45, 21);
-            this.btnKeyDEL.TabIndex = 2;
-            this.btnKeyDEL.Text = "DEL";
-            this.btnKeyDEL.UseVisualStyleBackColor = true;
-            this.btnKeyDEL.Click += new System.EventHandler(this.btnKeyDEL_Click);
+            this.button_key_del_all.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_key_del_all.BackColor = System.Drawing.SystemColors.Control;
+            this.button_key_del_all.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.button_key_del_all.Location = new System.Drawing.Point(200, 2);
+            this.button_key_del_all.Margin = new System.Windows.Forms.Padding(0);
+            this.button_key_del_all.Name = "button_key_del_all";
+            this.button_key_del_all.Size = new System.Drawing.Size(42, 20);
+            this.button_key_del_all.TabIndex = 10;
+            this.button_key_del_all.Text = "del all";
+            this.button_key_del_all.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.button_key_del_all.UseVisualStyleBackColor = false;
+            this.button_key_del_all.Click += new System.EventHandler(this.button_key_del_all_Click);
+            // 
+            // btnLogItem_DEL
+            // 
+            this.btnLogItem_DEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLogItem_DEL.BackColor = System.Drawing.SystemColors.Control;
+            this.btnLogItem_DEL.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnLogItem_DEL.Location = new System.Drawing.Point(169, 2);
+            this.btnLogItem_DEL.Margin = new System.Windows.Forms.Padding(0);
+            this.btnLogItem_DEL.Name = "btnLogItem_DEL";
+            this.btnLogItem_DEL.Size = new System.Drawing.Size(33, 20);
+            this.btnLogItem_DEL.TabIndex = 9;
+            this.btnLogItem_DEL.Text = "del";
+            this.btnLogItem_DEL.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnLogItem_DEL.UseVisualStyleBackColor = false;
+            this.btnLogItem_DEL.Click += new System.EventHandler(this.btnLogItem_DEL_Click);
             // 
             // txtSearch
             // 
@@ -320,15 +337,50 @@
             this.splitter2.TabIndex = 1;
             this.splitter2.TabStop = false;
             // 
+            // panelTreeView
+            // 
+            this.panelTreeView.Controls.Add(this.btnKeyDEL);
+            this.panelTreeView.Controls.Add(this.treeKeys);
+            this.panelTreeView.Controls.Add(this.labelKey_Selected);
+            this.panelTreeView.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTreeView.Location = new System.Drawing.Point(0, 0);
+            this.panelTreeView.Name = "panelTreeView";
+            this.panelTreeView.Size = new System.Drawing.Size(243, 192);
+            this.panelTreeView.TabIndex = 3;
+            // 
+            // btnKeyDEL
+            // 
+            this.btnKeyDEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnKeyDEL.Location = new System.Drawing.Point(200, 0);
+            this.btnKeyDEL.Name = "btnKeyDEL";
+            this.btnKeyDEL.Size = new System.Drawing.Size(45, 20);
+            this.btnKeyDEL.TabIndex = 2;
+            this.btnKeyDEL.Text = "DEL";
+            this.btnKeyDEL.UseVisualStyleBackColor = true;
+            this.btnKeyDEL.Click += new System.EventHandler(this.btnKeyDEL_Click);
+            // 
             // treeKeys
             // 
             this.treeKeys.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.treeKeys.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.treeKeys.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeKeys.Location = new System.Drawing.Point(0, 16);
+            this.treeKeys.Location = new System.Drawing.Point(0, 19);
             this.treeKeys.Name = "treeKeys";
-            this.treeKeys.Size = new System.Drawing.Size(243, 176);
+            this.treeKeys.Size = new System.Drawing.Size(243, 173);
             this.treeKeys.TabIndex = 0;
+            // 
+            // labelKey_Selected
+            // 
+            this.labelKey_Selected.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.labelKey_Selected.Dock = System.Windows.Forms.DockStyle.Top;
+            this.labelKey_Selected.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelKey_Selected.ForeColor = System.Drawing.Color.Blue;
+            this.labelKey_Selected.Location = new System.Drawing.Point(0, 0);
+            this.labelKey_Selected.Name = "labelKey_Selected";
+            this.labelKey_Selected.Size = new System.Drawing.Size(243, 19);
+            this.labelKey_Selected.TabIndex = 1;
+            this.labelKey_Selected.Click += new System.EventHandler(this.labelKey_Selected_Click);
+            this.labelKey_Selected.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.labelKey_Selected_MouseDoubleClick);
             // 
             // splitter1
             // 
@@ -374,21 +426,41 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel1.Controls.Add(this.lblKeySelected_Path);
             this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.btnEditorFontBigger);
             this.panel1.Controls.Add(this.btnEditorFontSmaller);
             this.panel1.Controls.Add(this.btnEditorSearch);
             this.panel1.Controls.Add(this.txtEditorSearch);
             this.panel1.Controls.Add(this.btnLogItemSaveFile);
             this.panel1.Controls.Add(this.lblKeySelected_Time);
-            this.panel1.Controls.Add(this.lblKeySelected_Path);
+            this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(776, 37);
             this.panel1.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.label2.Location = new System.Drawing.Point(0, 36);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(776, 1);
+            this.label2.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Blue;
+            this.label1.Location = new System.Drawing.Point(3, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(19, 20);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "//";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnEditorFontBigger
             // 
@@ -458,101 +530,25 @@
             this.btnLogItemSaveFile.UseVisualStyleBackColor = false;
             this.btnLogItemSaveFile.Click += new System.EventHandler(this.btnLogItemSaveFile_Click);
             // 
-            // lblKeySelected_Time
-            // 
-            this.lblKeySelected_Time.AutoSize = true;
-            this.lblKeySelected_Time.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblKeySelected_Time.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.lblKeySelected_Time.Location = new System.Drawing.Point(15, 20);
-            this.lblKeySelected_Time.Name = "lblKeySelected_Time";
-            this.lblKeySelected_Time.Size = new System.Drawing.Size(0, 13);
-            this.lblKeySelected_Time.TabIndex = 1;
-            this.lblKeySelected_Time.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // lblKeySelected_Path
             // 
-            this.lblKeySelected_Path.AutoSize = true;
+            this.lblKeySelected_Path.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblKeySelected_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblKeySelected_Path.ForeColor = System.Drawing.SystemColors.ActiveCaption;
-            this.lblKeySelected_Path.Location = new System.Drawing.Point(3, 4);
+            this.lblKeySelected_Path.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.lblKeySelected_Path.Location = new System.Drawing.Point(5, 2);
             this.lblKeySelected_Path.Name = "lblKeySelected_Path";
-            this.lblKeySelected_Path.Size = new System.Drawing.Size(0, 13);
+            this.lblKeySelected_Path.Size = new System.Drawing.Size(510, 13);
             this.lblKeySelected_Path.TabIndex = 0;
             // 
-            // label1
+            // lblKeySelected_Time
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.label1.Location = new System.Drawing.Point(1, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(19, 13);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "//";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label2
-            // 
-            this.label2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.label2.Location = new System.Drawing.Point(0, 36);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(776, 1);
-            this.label2.TabIndex = 8;
-            // 
-            // panelTreeView
-            // 
-            this.panelTreeView.Controls.Add(this.btnKeyDEL);
-            this.panelTreeView.Controls.Add(this.treeKeys);
-            this.panelTreeView.Controls.Add(this.labelKey_Selected);
-            this.panelTreeView.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTreeView.Location = new System.Drawing.Point(0, 0);
-            this.panelTreeView.Name = "panelTreeView";
-            this.panelTreeView.Size = new System.Drawing.Size(243, 192);
-            this.panelTreeView.TabIndex = 3;
-            // 
-            // labelKey_Selected
-            // 
-            this.labelKey_Selected.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.labelKey_Selected.Dock = System.Windows.Forms.DockStyle.Top;
-            this.labelKey_Selected.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelKey_Selected.ForeColor = System.Drawing.Color.Blue;
-            this.labelKey_Selected.Location = new System.Drawing.Point(0, 0);
-            this.labelKey_Selected.Name = "labelKey_Selected";
-            this.labelKey_Selected.Size = new System.Drawing.Size(243, 16);
-            this.labelKey_Selected.TabIndex = 1;
-            this.labelKey_Selected.Click += new System.EventHandler(this.labelKey_Selected_Click);
-            this.labelKey_Selected.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.labelKey_Selected_MouseDoubleClick);
-            // 
-            // btnLogItem_DEL
-            // 
-            this.btnLogItem_DEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLogItem_DEL.BackColor = System.Drawing.SystemColors.Control;
-            this.btnLogItem_DEL.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnLogItem_DEL.Location = new System.Drawing.Point(169, 2);
-            this.btnLogItem_DEL.Margin = new System.Windows.Forms.Padding(0);
-            this.btnLogItem_DEL.Name = "btnLogItem_DEL";
-            this.btnLogItem_DEL.Size = new System.Drawing.Size(33, 20);
-            this.btnLogItem_DEL.TabIndex = 9;
-            this.btnLogItem_DEL.Text = "del";
-            this.btnLogItem_DEL.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnLogItem_DEL.UseVisualStyleBackColor = false;
-            this.btnLogItem_DEL.Click += new System.EventHandler(this.btnLogItem_DEL_Click);
-            // 
-            // button_key_del_all
-            // 
-            this.button_key_del_all.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_key_del_all.BackColor = System.Drawing.SystemColors.Control;
-            this.button_key_del_all.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.button_key_del_all.Location = new System.Drawing.Point(200, 2);
-            this.button_key_del_all.Margin = new System.Windows.Forms.Padding(0);
-            this.button_key_del_all.Name = "button_key_del_all";
-            this.button_key_del_all.Size = new System.Drawing.Size(42, 20);
-            this.button_key_del_all.TabIndex = 10;
-            this.button_key_del_all.Text = "del all";
-            this.button_key_del_all.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button_key_del_all.UseVisualStyleBackColor = false;
-            this.button_key_del_all.Click += new System.EventHandler(this.button_key_del_all_Click);
+            this.lblKeySelected_Time.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblKeySelected_Time.ForeColor = System.Drawing.Color.Blue;
+            this.lblKeySelected_Time.Location = new System.Drawing.Point(5, 15);
+            this.lblKeySelected_Time.Name = "lblKeySelected_Time";
+            this.lblKeySelected_Time.Size = new System.Drawing.Size(488, 19);
+            this.lblKeySelected_Time.TabIndex = 1;
             // 
             // fMainUI
             // 
@@ -576,11 +572,11 @@
             this.panel2.ResumeLayout(false);
             this.panelListHeader.ResumeLayout(false);
             this.panelListHeader.PerformLayout();
+            this.panelTreeView.ResumeLayout(false);
             this.panelMain.ResumeLayout(false);
             this.panelEditor.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panelTreeView.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
