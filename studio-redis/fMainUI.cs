@@ -9,6 +9,7 @@ using TeamDevRedis;
 using TeamDevRedis.LanguageItems;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace studio_redis
 {
@@ -212,6 +213,25 @@ namespace studio_redis
                                         MessageBoxButtons.YesNo);
             if (confirmResult == DialogResult.Yes)
                 f_key_item_del();
+        }
+
+        private void button_key_del_all_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Are you sure to delete this all items ??",
+                                        "Confirm Delete!!",
+                                        MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+                f_key_item_del_all();
+        }
+
+        private void txtSearch_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            txtSearch.Text = "";
+        }
+
+        private void txtSearch_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) f_search();
         }
 
         #endregion
@@ -435,6 +455,24 @@ namespace studio_redis
             else
             {
                 f_search();
+            }
+        }
+
+        void f_key_item_del_all()
+        {
+            if (txtSearch.Text.Trim().Length == 0)
+                f_key_del();
+            else
+            {
+                if (m_key_selected != null && m_key_ids.Length > 0)
+                {
+                    var ls = new List<string>();
+                    ls.Add(m_key_selected.key_full);
+                    ls.AddRange(listKeys.Items.Cast<string>().ToArray());
+                    m_redis.SendCommand(RedisCommand.HDEL, ls.ToArray());
+                    f_key_ids_selected(null);
+                    f_search();
+                }
             }
         }
 
