@@ -8,6 +8,7 @@ using System.Linq;
 using TeamDevRedis;
 using TeamDevRedis.LanguageItems;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace studio_redis
 {
@@ -69,7 +70,7 @@ namespace studio_redis
             this.panelHeader.MouseDown += BoxUI_MouseDown;
             this.lblMessage.MouseDown += BoxUI_MouseDown;
         }
-        
+
         #region [ Disable Expand Node After dblClick ]
 
         private bool isDoubleClick = false;
@@ -91,10 +92,11 @@ namespace studio_redis
             isDoubleClick = e.Clicks > 1;
         }
 
-        void f_treeKey_Disable_Expand_Nodes_After_dblClick() { 
+        void f_treeKey_Disable_Expand_Nodes_After_dblClick()
+        {
             treeKeys.BeforeCollapse += treeView1_BeforeCollapse;
             treeKeys.BeforeExpand += treeView1_BeforeExpand;
-            treeKeys.MouseDown += treeView1_MouseDown;        
+            treeKeys.MouseDown += treeView1_MouseDown;
         }
 
         #endregion
@@ -156,6 +158,14 @@ namespace studio_redis
             f_search();
         }
 
+        private void btnKeysReload_Click(object sender, EventArgs e)
+        {
+            f_load(true);
+            //f_key_selected(treeKeys.SelectedNode);
+            //if (!string.IsNullOrEmpty(txtSearch.Text.ToLower().Trim()))
+            f_search();
+        }
+
         private void btnLogItemSaveFile_Click(object sender, EventArgs e)
         {
             f_editor_save_file();
@@ -176,6 +186,34 @@ namespace studio_redis
             f_editor_font_smaller();
         }
 
+        private void labelKey_Selected_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            treeKeys.ExpandAll();
+        }
+
+        private void labelKey_Selected_Click(object sender, EventArgs e)
+        {
+            treeKeys.ExpandAll();
+        }
+
+        private void btnKeyDEL_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Are you sure to delete this item ??",
+                                        "Confirm Delete!!",
+                                        MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+                f_key_del();
+        }
+
+        private void btnLogItem_DEL_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Are you sure to delete this item ??",
+                                        "Confirm Delete!!",
+                                        MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+                f_key_item_del();
+        }
+
         #endregion
 
         #region [ Methods ]
@@ -183,13 +221,13 @@ namespace studio_redis
         void f_ui_init()
         {
             treeKeys.NodeMouseDoubleClick += (s1, e1) => f_key_selected(treeKeys.SelectedNode);
-            listKeys.SelectedIndexChanged += (s1, e1) => f_key_ids_selected(listKeys.SelectedIndex);
+            listKeys.SelectedIndexChanged += (s1, e1) => f_key_ids_selected(listKeys.SelectedIndex == -1 ? null : listKeys.Items[listKeys.SelectedIndex].ToString());
             this.Top = 0;
             this.Left = 0;
             this.Height = Screen.PrimaryScreen.WorkingArea.Height - BAR_HEIGHT;
             this.Width = Screen.PrimaryScreen.WorkingArea.Width;
 
-            txtEditor.Font = new Font("Consolas", 14f, FontStyle.Regular);                       
+            txtEditor.Font = new Font("Consolas", 14f, FontStyle.Regular);
 
             f_load();
         }
@@ -208,12 +246,17 @@ namespace studio_redis
         static oKey m_key_selected;
         static string[] m_key_ids = new string[] { };
 
-        void f_load()
+        void f_load(bool cache_selected = false)
         {
             f_message();
 
             treeKeys.Nodes.Clear();
             listKeys.Items.Clear();
+            lblKeyID_Selected.Text = "";
+            lblKeyID_Counter.Text = "(0)";
+
+            string key_full_selected = "";
+            if (cache_selected && m_key_selected != null) key_full_selected = m_key_selected.key_full;
 
             try
             {
@@ -267,9 +310,12 @@ namespace studio_redis
                         }
                     }
                 }
-                treeKeys.Nodes.AddRange(nodes_0);  
-                treeKeys.ExpandAll();
+                treeKeys.Nodes.AddRange(nodes_0);
                 f_message("OK");
+                //Thread.Sleep(100);
+                treeKeys.ExpandAll();
+                //Thread.Sleep(100);
+                if (key_full_selected.Length > 0) CallRecursive(key_full_selected);
             }
             catch (Exception err)
             {
@@ -277,38 +323,82 @@ namespace studio_redis
             }
         }
 
-        void f_key_selected(TreeNode node) {
-            if (node != null) {
-                txtEditor.Text = "";
-                listKeys.Items.Clear();
-                m_key_selected = null;
-                m_key_ids = new string[] { };
-                listKeys.Items.Clear();
+        void PrintRecursive(TreeNode treeNode, string key_full)
+        {
+            oKey key = treeNode.Tag as oKey;
+            if (key != null)
+            {
+                var ok = key.findKeys(m_keys).Where(x => x.key_full == key_full).Count() == 1;
+                if (ok)
+                {
+                    f_key_selected(treeNode);
+                    return;
+                }
+            }
 
-                if (node.Tag == null) {
+            foreach (TreeNode tn in treeNode.Nodes)
+            {
+                PrintRecursive(tn, key_full);
+            }
+        }
+
+        private void CallRecursive(string key_full)
+        {
+            foreach (TreeNode n in treeKeys.Nodes)
+                PrintRecursive(n, key_full);
+        }
+
+        void f_key_selected(TreeNode node)
+        {
+            txtEditor.Text = "";
+            listKeys.Items.Clear();
+            m_key_selected = null;
+            m_key_ids = new string[] { };
+            listKeys.Items.Clear();
+            lblKeyID_Selected.Text = "";
+            lblKeyID_Counter.Text = "(0)";
+            labelKey_Selected.Text = "";
+
+            if (node != null)
+            {
+                if (node.Tag == null)
+                {
                     string err = "ERR: " + node.Text;
                     f_message(err);
                     //MessageBox.Show(err);
-                } else {
+                }
+                else
+                {
+                    labelKey_Selected.Text = node.Text;
+
                     oKey key = node.Tag as oKey;
                     lblKeySelected_Path.Text = key.getPath();
                     lblKeySelected_Time.Text = "";
 
                     var keys = key.findKeys(m_keys);
-                    if (keys.Length == 1) {
+                    if (keys.Length == 1)
+                    {
                         m_key_selected = keys[0];
                         m_key_ids = m_key_selected.keys_last.Reverse().ToArray();
                         listKeys.Items.AddRange(m_key_ids);
+                        lblKeyID_Counter.Text = "(" + m_key_ids.Length.ToString() + ")";
                     }
                 }
             }
         }
 
-        void f_key_ids_selected(int index) {
-            if (index >= 0 && m_key_ids.Length > 0 && m_key_selected != null)
+        void f_key_ids_selected(string id)
+        {
+            lblKeySelected_Time.Text = "";
+            lblKeyID_Selected.Text = "";
+            txtEditor.Text = "";
+
+            if (id != null && m_key_ids.Length > 0 && m_key_selected != null)
             {
-                string id = m_key_ids[index];
+                //string id = m_key_ids[index];
                 lblKeySelected_Time.Text = id;
+                lblKeyID_Selected.Text = id;
+
                 string data = "";
                 try
                 {
@@ -317,15 +407,61 @@ namespace studio_redis
                     string json = JsonConvert.SerializeObject(o, Formatting.Indented);
                     txtEditor.Text = json;
                 }
-                catch (Exception e) { 
-                    txtEditor.Text = data;                
+                catch (Exception e)
+                {
+                    txtEditor.Text = data;
                 }
+            }
+        }
+
+        void f_key_del()
+        {
+            if (m_key_selected != null)
+            {
+                m_redis.SendCommand(RedisCommand.DEL, m_key_selected.key_full);
+                f_key_selected(null);
+                f_load();
+            }
+        }
+
+        void f_key_item_del()
+        {
+            if (m_key_selected != null && lblKeyID_Selected.Text.Length > 0)
+            {
+                m_redis.SendCommand(RedisCommand.HDEL, m_key_selected.key_full, lblKeyID_Selected.Text);
+                f_key_ids_selected(null);
+                f_search();
+            }
+            else
+            {
+                f_search();
             }
         }
 
         void f_search()
         {
+            txtEditor.Text = "";
+            //listKeys.Items.Clear();
+            //m_key_selected = null;
+            //m_key_ids = new string[] { };
+            listKeys.Items.Clear();
+            lblKeyID_Selected.Text = "";
+            lblKeyID_Counter.Text = "";
 
+            //lblKeySelected_Path.Text = key.getPath();
+            lblKeySelected_Time.Text = "";
+
+            f_load(true);
+
+            if (m_key_ids.Length > 0)
+            {
+                listKeys.Items.Clear();
+
+                string kw = txtSearch.Text.ToLower().Trim();
+                var a = m_key_ids.Where(x => x.Contains(kw)).ToArray();
+                listKeys.Items.AddRange(a);
+                lblKeyID_Counter.Text = "[ " + a.Length.ToString() + " | " + m_key_ids.Length.ToString() + " ]";
+            }
         }
 
         void f_clean_all()

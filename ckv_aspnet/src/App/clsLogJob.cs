@@ -9,27 +9,49 @@ using System.Web;
 
 namespace ckv_aspnet
 {
-    public interface ILogJob {
-        void write(string group, string key, int index, params object[] paras);
+    public interface ILogJob
+    {
+        void write(string group, string key, string text);
     }
 
     public class clsLogJob : ILogJob
     {
         static long ID_INCREMENT = 0;
         static RedisClient _redis;
-        static bool _inited = false;
-        void _init() {
-            if (_inited == false) {
-                _inited = true;
-                _redis = new RedisClient("127.0.0.1", 11111);
+        static bool _connected = false;
+
+        public clsLogJob(int port = 11111) => _init(port);
+
+        void _init(int port)
+        {
+            try
+            {
+                if (_connected == false)
+                {
+                    _redis = new RedisClient("localhost", port);
+                    _connected = true;
+                }
+            }
+            catch { 
             }
         }
 
-        public void write(string group, string key, int index, params object[] paras)
+        public void write(string scope_name, string key, string text)
         {
-            if (paras == null) return;
+            if (_connected == false) return;
+            if (text == null) text = string.Empty;
 
-            _init();
+            try
+            {
+                _redis.HSet(scope_name, key, text);
+            }
+            catch
+            {
+            }
+        }
+
+        public void write1(string scope_name, string key, params object[] paras)
+        {
             Interlocked.Increment(ref ID_INCREMENT);
             if (ID_INCREMENT == int.MaxValue) ID_INCREMENT = 0;
 
@@ -78,7 +100,7 @@ namespace ckv_aspnet
 
             try
             {
-                _redis.HSet(group, id, bi.ToString());
+                _redis.HSet(scope_name, id, bi.ToString());
             }
             catch { }
         }

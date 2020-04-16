@@ -42,7 +42,11 @@
             this.panelLeft = new System.Windows.Forms.Panel();
             this.panelList = new System.Windows.Forms.Panel();
             this.listKeys = new System.Windows.Forms.CheckedListBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.lblKeyID_Counter = new System.Windows.Forms.Label();
+            this.lblKeyID_Selected = new System.Windows.Forms.Label();
             this.panelListHeader = new System.Windows.Forms.Panel();
+            this.btnKeyDEL = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnSearch = new System.Windows.Forms.Button();
             this.splitter2 = new System.Windows.Forms.Splitter();
@@ -59,13 +63,20 @@
             this.btnLogItemSaveFile = new System.Windows.Forms.Button();
             this.lblKeySelected_Time = new System.Windows.Forms.Label();
             this.lblKeySelected_Path = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.panelTreeView = new System.Windows.Forms.Panel();
+            this.labelKey_Selected = new System.Windows.Forms.Label();
+            this.btnLogItem_DEL = new System.Windows.Forms.Button();
             this.panelHeader.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelList.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.panelListHeader.SuspendLayout();
             this.panelMain.SuspendLayout();
             this.panelEditor.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panelTreeView.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelHeader
@@ -189,21 +200,22 @@
             this.panelLeft.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.panelLeft.Controls.Add(this.panelList);
             this.panelLeft.Controls.Add(this.splitter2);
-            this.panelLeft.Controls.Add(this.treeKeys);
+            this.panelLeft.Controls.Add(this.panelTreeView);
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelLeft.Location = new System.Drawing.Point(0, 38);
             this.panelLeft.Name = "panelLeft";
-            this.panelLeft.Size = new System.Drawing.Size(200, 552);
+            this.panelLeft.Size = new System.Drawing.Size(243, 552);
             this.panelLeft.TabIndex = 1;
             // 
             // panelList
             // 
             this.panelList.Controls.Add(this.listKeys);
+            this.panelList.Controls.Add(this.panel2);
             this.panelList.Controls.Add(this.panelListHeader);
             this.panelList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelList.Location = new System.Drawing.Point(0, 276);
+            this.panelList.Location = new System.Drawing.Point(0, 197);
             this.panelList.Name = "panelList";
-            this.panelList.Size = new System.Drawing.Size(200, 276);
+            this.panelList.Size = new System.Drawing.Size(243, 355);
             this.panelList.TabIndex = 2;
             // 
             // listKeys
@@ -212,20 +224,67 @@
             this.listKeys.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listKeys.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listKeys.FormattingEnabled = true;
-            this.listKeys.Location = new System.Drawing.Point(0, 29);
+            this.listKeys.Location = new System.Drawing.Point(0, 51);
             this.listKeys.Name = "listKeys";
-            this.listKeys.Size = new System.Drawing.Size(200, 247);
+            this.listKeys.Size = new System.Drawing.Size(243, 304);
             this.listKeys.TabIndex = 1;
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel2.Controls.Add(this.lblKeyID_Counter);
+            this.panel2.Controls.Add(this.lblKeyID_Selected);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 24);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(243, 27);
+            this.panel2.TabIndex = 2;
+            // 
+            // lblKeyID_Counter
+            // 
+            this.lblKeyID_Counter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKeyID_Counter.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblKeyID_Counter.ForeColor = System.Drawing.Color.Crimson;
+            this.lblKeyID_Counter.Location = new System.Drawing.Point(116, -1);
+            this.lblKeyID_Counter.Name = "lblKeyID_Counter";
+            this.lblKeyID_Counter.Size = new System.Drawing.Size(125, 12);
+            this.lblKeyID_Counter.TabIndex = 1;
+            this.lblKeyID_Counter.Text = "(0)";
+            this.lblKeyID_Counter.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblKeyID_Selected
+            // 
+            this.lblKeyID_Selected.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKeyID_Selected.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblKeyID_Selected.ForeColor = System.Drawing.Color.MediumBlue;
+            this.lblKeyID_Selected.Location = new System.Drawing.Point(3, 10);
+            this.lblKeyID_Selected.Name = "lblKeyID_Selected";
+            this.lblKeyID_Selected.Size = new System.Drawing.Size(238, 15);
+            this.lblKeyID_Selected.TabIndex = 0;
+            this.lblKeyID_Selected.Text = "key_name";
             // 
             // panelListHeader
             // 
+            this.panelListHeader.Controls.Add(this.btnLogItem_DEL);
             this.panelListHeader.Controls.Add(this.txtSearch);
             this.panelListHeader.Controls.Add(this.btnSearch);
             this.panelListHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelListHeader.Location = new System.Drawing.Point(0, 0);
             this.panelListHeader.Name = "panelListHeader";
-            this.panelListHeader.Size = new System.Drawing.Size(200, 29);
+            this.panelListHeader.Size = new System.Drawing.Size(243, 24);
             this.panelListHeader.TabIndex = 0;
+            // 
+            // btnKeyDEL
+            // 
+            this.btnKeyDEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnKeyDEL.Location = new System.Drawing.Point(200, 0);
+            this.btnKeyDEL.Name = "btnKeyDEL";
+            this.btnKeyDEL.Size = new System.Drawing.Size(45, 21);
+            this.btnKeyDEL.TabIndex = 2;
+            this.btnKeyDEL.Text = "DEL";
+            this.btnKeyDEL.UseVisualStyleBackColor = true;
+            this.btnKeyDEL.Click += new System.EventHandler(this.btnKeyDEL_Click);
             // 
             // txtSearch
             // 
@@ -233,17 +292,17 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.Location = new System.Drawing.Point(3, 3);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(135, 20);
+            this.txtSearch.Size = new System.Drawing.Size(144, 20);
             this.txtSearch.TabIndex = 1;
             // 
             // btnSearch
             // 
             this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSearch.Location = new System.Drawing.Point(139, 2);
+            this.btnSearch.Location = new System.Drawing.Point(149, 2);
             this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(59, 23);
+            this.btnSearch.Size = new System.Drawing.Size(48, 21);
             this.btnSearch.TabIndex = 0;
-            this.btnSearch.Text = "Search";
+            this.btnSearch.Text = "search";
             this.btnSearch.UseVisualStyleBackColor = true;
             this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
             // 
@@ -251,9 +310,9 @@
             // 
             this.splitter2.BackColor = System.Drawing.SystemColors.HotTrack;
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter2.Location = new System.Drawing.Point(0, 271);
+            this.splitter2.Location = new System.Drawing.Point(0, 192);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(200, 5);
+            this.splitter2.Size = new System.Drawing.Size(243, 5);
             this.splitter2.TabIndex = 1;
             this.splitter2.TabStop = false;
             // 
@@ -261,16 +320,16 @@
             // 
             this.treeKeys.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.treeKeys.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.treeKeys.Dock = System.Windows.Forms.DockStyle.Top;
-            this.treeKeys.Location = new System.Drawing.Point(0, 0);
+            this.treeKeys.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeKeys.Location = new System.Drawing.Point(0, 16);
             this.treeKeys.Name = "treeKeys";
-            this.treeKeys.Size = new System.Drawing.Size(200, 271);
+            this.treeKeys.Size = new System.Drawing.Size(243, 176);
             this.treeKeys.TabIndex = 0;
             // 
             // splitter1
             // 
             this.splitter1.BackColor = System.Drawing.SystemColors.HotTrack;
-            this.splitter1.Location = new System.Drawing.Point(200, 38);
+            this.splitter1.Location = new System.Drawing.Point(243, 38);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(5, 552);
             this.splitter1.TabIndex = 2;
@@ -281,19 +340,19 @@
             this.panelMain.Controls.Add(this.panelEditor);
             this.panelMain.Controls.Add(this.panel1);
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelMain.Location = new System.Drawing.Point(205, 38);
+            this.panelMain.Location = new System.Drawing.Point(248, 38);
             this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(819, 552);
+            this.panelMain.Size = new System.Drawing.Size(776, 552);
             this.panelMain.TabIndex = 3;
             // 
             // panelEditor
             // 
             this.panelEditor.Controls.Add(this.txtEditor);
             this.panelEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelEditor.Location = new System.Drawing.Point(0, 23);
+            this.panelEditor.Location = new System.Drawing.Point(0, 37);
             this.panelEditor.Name = "panelEditor";
             this.panelEditor.Padding = new System.Windows.Forms.Padding(9, 9, 0, 0);
-            this.panelEditor.Size = new System.Drawing.Size(819, 529);
+            this.panelEditor.Size = new System.Drawing.Size(776, 515);
             this.panelEditor.TabIndex = 2;
             // 
             // txtEditor
@@ -305,13 +364,15 @@
             this.txtEditor.Location = new System.Drawing.Point(9, 9);
             this.txtEditor.Name = "txtEditor";
             this.txtEditor.ReadOnly = true;
-            this.txtEditor.Size = new System.Drawing.Size(810, 520);
+            this.txtEditor.Size = new System.Drawing.Size(767, 506);
             this.txtEditor.TabIndex = 1;
             this.txtEditor.Text = "";
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.btnEditorFontBigger);
             this.panel1.Controls.Add(this.btnEditorFontSmaller);
             this.panel1.Controls.Add(this.btnEditorSearch);
@@ -322,7 +383,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(819, 23);
+            this.panel1.Size = new System.Drawing.Size(776, 37);
             this.panel1.TabIndex = 0;
             // 
             // btnEditorFontBigger
@@ -330,7 +391,7 @@
             this.btnEditorFontBigger.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEditorFontBigger.BackColor = System.Drawing.SystemColors.Control;
             this.btnEditorFontBigger.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnEditorFontBigger.Location = new System.Drawing.Point(586, 1);
+            this.btnEditorFontBigger.Location = new System.Drawing.Point(495, 7);
             this.btnEditorFontBigger.Margin = new System.Windows.Forms.Padding(0);
             this.btnEditorFontBigger.Name = "btnEditorFontBigger";
             this.btnEditorFontBigger.Size = new System.Drawing.Size(21, 20);
@@ -345,7 +406,7 @@
             this.btnEditorFontSmaller.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEditorFontSmaller.BackColor = System.Drawing.SystemColors.Control;
             this.btnEditorFontSmaller.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnEditorFontSmaller.Location = new System.Drawing.Point(567, 1);
+            this.btnEditorFontSmaller.Location = new System.Drawing.Point(476, 7);
             this.btnEditorFontSmaller.Margin = new System.Windows.Forms.Padding(0);
             this.btnEditorFontSmaller.Name = "btnEditorFontSmaller";
             this.btnEditorFontSmaller.Size = new System.Drawing.Size(20, 20);
@@ -360,7 +421,7 @@
             this.btnEditorSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEditorSearch.BackColor = System.Drawing.SystemColors.Control;
             this.btnEditorSearch.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnEditorSearch.Location = new System.Drawing.Point(735, 1);
+            this.btnEditorSearch.Location = new System.Drawing.Point(644, 7);
             this.btnEditorSearch.Margin = new System.Windows.Forms.Padding(0);
             this.btnEditorSearch.Name = "btnEditorSearch";
             this.btnEditorSearch.Size = new System.Drawing.Size(42, 20);
@@ -373,7 +434,7 @@
             // txtEditorSearch
             // 
             this.txtEditorSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtEditorSearch.Location = new System.Drawing.Point(607, 1);
+            this.txtEditorSearch.Location = new System.Drawing.Point(516, 7);
             this.txtEditorSearch.Name = "txtEditorSearch";
             this.txtEditorSearch.Size = new System.Drawing.Size(128, 20);
             this.txtEditorSearch.TabIndex = 3;
@@ -383,7 +444,7 @@
             this.btnLogItemSaveFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLogItemSaveFile.BackColor = System.Drawing.SystemColors.Control;
             this.btnLogItemSaveFile.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btnLogItemSaveFile.Location = new System.Drawing.Point(777, 1);
+            this.btnLogItemSaveFile.Location = new System.Drawing.Point(686, 7);
             this.btnLogItemSaveFile.Margin = new System.Windows.Forms.Padding(0);
             this.btnLogItemSaveFile.Name = "btnLogItemSaveFile";
             this.btnLogItemSaveFile.Size = new System.Drawing.Size(41, 20);
@@ -395,16 +456,15 @@
             // 
             // lblKeySelected_Time
             // 
-            this.lblKeySelected_Time.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblKeySelected_Time.AutoSize = true;
-            this.lblKeySelected_Time.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblKeySelected_Time.ForeColor = System.Drawing.SystemColors.ActiveCaption;
-            this.lblKeySelected_Time.Location = new System.Drawing.Point(391, 5);
+            this.lblKeySelected_Time.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblKeySelected_Time.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.lblKeySelected_Time.Location = new System.Drawing.Point(15, 20);
             this.lblKeySelected_Time.Name = "lblKeySelected_Time";
-            this.lblKeySelected_Time.Size = new System.Drawing.Size(174, 13);
+            this.lblKeySelected_Time.Size = new System.Drawing.Size(145, 13);
             this.lblKeySelected_Time.TabIndex = 1;
             this.lblKeySelected_Time.Text = "19 - 03 - 2020 08:09:35 - 169";
-            this.lblKeySelected_Time.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblKeySelected_Time.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lblKeySelected_Path
             // 
@@ -416,6 +476,66 @@
             this.lblKeySelected_Path.Size = new System.Drawing.Size(270, 13);
             this.lblKeySelected_Path.TabIndex = 0;
             this.lblKeySelected_Path.Text = "/ MAIN / USER_ON_OFF / 200319131441132";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.label1.Location = new System.Drawing.Point(1, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(19, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "//";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label2
+            // 
+            this.label2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.label2.Location = new System.Drawing.Point(0, 36);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(776, 1);
+            this.label2.TabIndex = 8;
+            // 
+            // panelTreeView
+            // 
+            this.panelTreeView.Controls.Add(this.btnKeyDEL);
+            this.panelTreeView.Controls.Add(this.treeKeys);
+            this.panelTreeView.Controls.Add(this.labelKey_Selected);
+            this.panelTreeView.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTreeView.Location = new System.Drawing.Point(0, 0);
+            this.panelTreeView.Name = "panelTreeView";
+            this.panelTreeView.Size = new System.Drawing.Size(243, 192);
+            this.panelTreeView.TabIndex = 3;
+            // 
+            // labelKey_Selected
+            // 
+            this.labelKey_Selected.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.labelKey_Selected.Dock = System.Windows.Forms.DockStyle.Top;
+            this.labelKey_Selected.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelKey_Selected.ForeColor = System.Drawing.Color.Blue;
+            this.labelKey_Selected.Location = new System.Drawing.Point(0, 0);
+            this.labelKey_Selected.Name = "labelKey_Selected";
+            this.labelKey_Selected.Size = new System.Drawing.Size(243, 16);
+            this.labelKey_Selected.TabIndex = 1;
+            this.labelKey_Selected.Click += new System.EventHandler(this.labelKey_Selected_Click);
+            this.labelKey_Selected.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.labelKey_Selected_MouseDoubleClick);
+            // 
+            // btnLogItem_DEL
+            // 
+            this.btnLogItem_DEL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLogItem_DEL.BackColor = System.Drawing.SystemColors.Control;
+            this.btnLogItem_DEL.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnLogItem_DEL.Location = new System.Drawing.Point(197, 2);
+            this.btnLogItem_DEL.Margin = new System.Windows.Forms.Padding(0);
+            this.btnLogItem_DEL.Name = "btnLogItem_DEL";
+            this.btnLogItem_DEL.Size = new System.Drawing.Size(41, 20);
+            this.btnLogItem_DEL.TabIndex = 9;
+            this.btnLogItem_DEL.Text = "DEL";
+            this.btnLogItem_DEL.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnLogItem_DEL.UseVisualStyleBackColor = false;
+            this.btnLogItem_DEL.Click += new System.EventHandler(this.btnLogItem_DEL_Click);
             // 
             // fMainUI
             // 
@@ -436,12 +556,14 @@
             this.panelHeader.PerformLayout();
             this.panelLeft.ResumeLayout(false);
             this.panelList.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.panelListHeader.ResumeLayout(false);
             this.panelListHeader.PerformLayout();
             this.panelMain.ResumeLayout(false);
             this.panelEditor.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panelTreeView.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -478,5 +600,14 @@
         private System.Windows.Forms.Button btnEditorFontSmaller;
         private System.Windows.Forms.Button btnEditorSearch;
         private System.Windows.Forms.TextBox txtEditorSearch;
+        private System.Windows.Forms.Button btnKeyDEL;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label lblKeyID_Counter;
+        private System.Windows.Forms.Label lblKeyID_Selected;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Panel panelTreeView;
+        private System.Windows.Forms.Label labelKey_Selected;
+        private System.Windows.Forms.Button btnLogItem_DEL;
     }
 }

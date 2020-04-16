@@ -26,3 +26,4 @@
 /ckv_aspnet/aspnet_client
 /ckv_aspnet/obj
 /ckv_aspnet/bin/*.pdb
+/ckv_aspnet/src/Tools/*.pdb

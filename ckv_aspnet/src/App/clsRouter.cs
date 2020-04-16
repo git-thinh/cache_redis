@@ -28,10 +28,11 @@ namespace ckv_aspnet
             _add("api/chakra/test-1", clsChakra.js_chakra_run);
             _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
 
-            _add("api/job/test-1", clsJobTest.test_create_job_1);
-            _add("api/job/test-2", clsJobTest.test_create_job_2);
-            _add("api/job/test-3", clsJobTest.test_create_job_3);
-            _add("api/job/test-4", clsJobTest.test_create_job_4);
+            //_add("api/job/test-1", clsJobTest.test_create_job_1);
+            //_add("api/job/test-2", clsJobTest.test_create_job_2);
+            //_add("api/job/test-3", clsJobTest.test_create_job_3);
+            //_add("api/job/test-4", clsJobTest.test_create_job_4);
+            _add("api/job/create", (p) => { if (p != null) clsJob.create_schedule(p.ToString()); });
         }
 
         public static bool execute_api(HttpRequest Request, HttpResponse Response)
@@ -66,11 +67,19 @@ namespace ckv_aspnet
             return false;
         }
 
-        #region [ _add | _exe ]
+        #region [ _add ]
 
         static ConcurrentDictionary<string, object> m_functions = new ConcurrentDictionary<string, object>();
 
         static void _add(string name, Action func)
+        {
+            if (func != null)
+            {
+                m_functions.TryAdd(name, func);
+            }
+        }
+
+        static void _add(string name, Action<object> func)
         {
             if (func != null)
             {
@@ -101,6 +110,8 @@ namespace ckv_aspnet
                 }));
             }
         }
+
+        #endregion
 
         static oRouterResult _exe(HttpRequest Request)
         {
@@ -135,6 +146,9 @@ namespace ckv_aspnet
                         case "Action":
                             ((Action)fn)();
                             break;
+                        case "Action`1":
+                            ((Action<object>)fn)(para);
+                            break;
                         case "Func`1":
                             val = ((Func<object>)fn)();
                             break;
@@ -162,7 +176,6 @@ namespace ckv_aspnet
             }
         }
 
-        #endregion
     }
 
 }

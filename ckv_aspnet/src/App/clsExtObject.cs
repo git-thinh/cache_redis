@@ -3,14 +3,47 @@ using Quartz;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+using System.Text;
 
 namespace ckv_aspnet
 {
     public static class clsExtObject
     {
+        public static T getValue<T>(this Dictionary<string, object> dic, string key)
+        {
+            try
+            {
+                if (dic != null && dic.ContainsKey(key))
+                {
+                    var p = (T)dic[key];
+                    return p;
+                }
+            }
+            catch { }
+
+            T v = default(T);
+            return v;
+        }
+
+        public static Dictionary<string, object> getParaInput(this IJobExecutionContext context)
+        {
+            try
+            {
+                if (context != null)
+                {
+                    JobDataMap dataMap = context.JobDetail.JobDataMap;
+                    if (dataMap.ContainsKey("PARA___"))
+                    {
+                        var p = (Dictionary<string, object>)dataMap["PARA___"];
+                        return p;
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
         public static void log(this IJobExecutionContext context, string key, params object[] paras)
         {
             try
@@ -20,22 +53,25 @@ namespace ckv_aspnet
                     if (context.Scheduler.Context.ContainsKey("ILOG___"))
                     {
                         string server_name = string.Empty,
-                            date_time = string.Empty,
-                            group_name = string.Empty,
-                            job_name = string.Empty,
+                            id = string.Empty,
+                            schedule = string.Empty,
+                            scope_name = string.Empty,
+                            current_id = string.Empty,
                             para_text = string.Empty;
 
                         int counter = 0;
 
                         ILogJob log = (ILogJob)context.Scheduler.Context.Get("ILOG___");
-                        if(context.Scheduler.Context.ContainsKey("SERVER_NAME___"))
-                            server_name = context.Scheduler.Context.Get("SERVER_NAME___").ToString();
+
+                        if (context.Scheduler.Context.ContainsKey("SCOPE_NAME___"))
+                            scope_name = context.Scheduler.Context.GetString("SCOPE_NAME___");
 
                         JobDataMap dataMap = context.JobDetail.JobDataMap;
 
-                        if (dataMap.ContainsKey("DATE_TIME___")) date_time = dataMap.Get("DATE_TIME___").ToString();
-                        if (dataMap.ContainsKey("GROUP_NAME___")) group_name = dataMap.Get("GROUP_NAME___").ToString();
-                        if (dataMap.ContainsKey("JOB_NAME___")) job_name = dataMap.Get("JOB_NAME___").ToString();
+                        // id = [group_name].[date_time_create = yyMMddHHmmss].[guid_id...]
+                        if (dataMap.ContainsKey("ID___")) id = dataMap.Get("ID___").ToString();
+                        if (dataMap.ContainsKey("CURRENT_ID___")) current_id = dataMap.Get("CURRENT_ID___").ToString();
+                        if (dataMap.ContainsKey("SCHEDULE___")) schedule = dataMap.Get("SCHEDULE___").ToString();
 
                         if (dataMap.ContainsKey("PARA___"))
                         {
@@ -67,17 +103,70 @@ namespace ckv_aspnet
                                 }
                             }
                         }
+                        if (!string.IsNullOrWhiteSpace(para_text))
+                            para_text += Environment.NewLine + "----------------------------" + Environment.NewLine;
 
                         if (dataMap.ContainsKey("COUNTER___"))
                         {
-                            IList<DateTimeOffset> state = (IList<DateTimeOffset>)dataMap["COUNTER___"];
+                            var state = (ConcurrentDictionary<long, bool>)dataMap["COUNTER___"];
                             counter = state.Count;
-                            //state.Add(DateTimeOffset.UtcNow);
                         }
-                         
 
+                        StringBuilder bi = new StringBuilder();
+                        bi.Append(Environment.NewLine);
+                        try
+                        {
+                            for (var i = 0; i < paras.Length; i++)
+                            {
+                                string type = paras[i].GetType().Name;
+                                switch (type)
+                                {
+                                    case "Boolean":
+                                    case "Byte":
+                                    case "SByte":
+                                    case "Char":
+                                    case "Decimal":
+                                    case "Double":
+                                    case "Single":
+                                    case "Int32":
+                                    case "UInt32":
+                                    case "Int64":
+                                    case "UInt64":
+                                    case "Int16":
+                                    case "UInt16":
+                                    case "String":
+                                        bi.Append(paras[i].ToString());
+                                        break;
+                                    default:
+                                        string s = JsonConvert.SerializeObject(paras[i], Formatting.Indented);
+                                        bi.Append(s);
+                                        bi.Append(Environment.NewLine);
+                                        break;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            string s = JsonConvert.SerializeObject(paras, Formatting.Indented);
+                            bi.Append(s);
+                            bi.Append(Environment.NewLine);
+                            bi.Append("ERROR_LOG: " + ex.Message);
+                        }
 
+                        string 
+                            l_scope = scope_name + "." + id,
+                            l_key = DateTime.Now.ToString("yyMMdd-HHmmss-fff") + "." + key;
 
+                        string text =
+                            "LOG_ID: " + l_key + Environment.NewLine +
+                            "JOB_ID: " + id + Environment.NewLine +
+                            "CURRENT_ID: " + current_id + Environment.NewLine +
+                            "SCHEDULE: " + schedule + Environment.NewLine +
+                            "COUNT: " + counter.ToString() + Environment.NewLine +
+                            "----------------------------" + Environment.NewLine +
+                            para_text + bi.ToString();
+
+                        log.write(l_scope, l_key, text);
                     }
                 }
             }

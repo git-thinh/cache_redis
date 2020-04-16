@@ -12,7 +12,7 @@
                 PATH_ROOT = path;
                 clsApi._init(path);
                 clsRouter._init();
-                //clsJobTest._init();
+                clsJob._init();
             }
         }
     }
