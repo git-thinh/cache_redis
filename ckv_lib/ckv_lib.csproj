@@ -124,6 +124,17 @@
     <Compile Include="Redis\Sider\src\StringExtensions.cs" />
     <Compile Include="Redis\Sider\src\ThreadwisePool.cs" />
     <Compile Include="Redis\Sider\src\TrackedThreadwisePool.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Curl.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Easy.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Enums.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\External.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Multi.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\MultiInfo.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\MultiPartForm.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Share.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\Slist.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\SSLContext.cs" />
+    <Compile Include="SeasideResearch.LibCurlNet\VersionInfoData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
