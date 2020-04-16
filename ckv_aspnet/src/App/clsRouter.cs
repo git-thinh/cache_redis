@@ -28,10 +28,10 @@ namespace ckv_aspnet
             _add("api/chakra/test-1", clsChakra.js_chakra_run);
             _add("api/chakra/test-2", clsChakra.js_chakra_run_2);
 
-            _add("api/job/test-1", clsJob.test_create_job_1);
-            _add("api/job/test-2", clsJob.test_create_job_2);
-            _add("api/job/test-3", clsJob.test_create_job_3);
-            _add("api/job/test-4", clsJob.test_create_job_4);
+            _add("api/job/test-1", clsJobTest.test_create_job_1);
+            _add("api/job/test-2", clsJobTest.test_create_job_2);
+            _add("api/job/test-3", clsJobTest.test_create_job_3);
+            _add("api/job/test-4", clsJobTest.test_create_job_4);
         }
 
         public static bool execute_api(HttpRequest Request, HttpResponse Response)
