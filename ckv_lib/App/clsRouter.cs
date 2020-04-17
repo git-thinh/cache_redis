@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsRouter
     {

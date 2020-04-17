@@ -1,12 +1,13 @@
 ﻿using SeasideResearch.LibCurlNet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsCURL
     {
@@ -78,7 +79,12 @@ namespace ckv_aspnet
 
                 easy.SetOpt(CURLoption.CURLOPT_URL, url);
                 //easy.SetOpt(CURLoption.CURLOPT_CAINFO, "ca-bundle.crt");
-                easy.SetOpt(CURLoption.CURLOPT_CAINFO, @"D:\cache_redis\ckv_aspnet\bin\ca-bundle.crt");
+                string file_crt = Path.Combine(_CONFIG.PATH_ROOT, @"bin\ca-bundle.crt");
+                if (File.Exists(file_crt) == false) {
+                    rs.error = "Cannot found file: " + file_crt;
+                    return rs;
+                }
+                easy.SetOpt(CURLoption.CURLOPT_CAINFO, file_crt);
 
                 easy.Perform();
                 easy.Dispose();
@@ -215,7 +221,7 @@ namespace ckv_aspnet
 
                 easy.SetOpt(CURLoption.CURLOPT_URL, url);
                 //easy.SetOpt(CURLoption.CURLOPT_CAINFO, "ca-bundle.crt");
-                easy.SetOpt(CURLoption.CURLOPT_CAINFO, @"D:\cache_redis\ckv_aspnet\bin\ca-bundle.crt");
+                easy.SetOpt(CURLoption.CURLOPT_CAINFO, @"D:\cache_redis\ckv_lib\bin\ca-bundle.crt");
 
                 easy.Perform();
                 easy.Dispose();

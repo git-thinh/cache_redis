@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsGlobal : System.Web.HttpApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            clsApp._init(Server.MapPath("~/"));
+            if (_CONFIG.PATH_ROOT.Length == 0) _CONFIG.PATH_ROOT = Server.MapPath("~/");
+            clsApp._init();
         }
 
         protected void Session_Start(object sender, EventArgs e)
@@ -21,7 +17,7 @@ namespace ckv_aspnet
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
-            clsApp._init(Server.MapPath("~/"));
+            clsApp._init();
             clsRouter.execute_api(Request, Response);
         }
 

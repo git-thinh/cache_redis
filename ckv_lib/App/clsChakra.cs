@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsChakra
     {

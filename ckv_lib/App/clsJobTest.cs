@@ -93,7 +93,7 @@ scheduler.ListenerManager.RemoveSchedulerListener(mySchedListener);
 
 */
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsJobTest
     {

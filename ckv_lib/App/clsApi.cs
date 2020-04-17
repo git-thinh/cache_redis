@@ -7,11 +7,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsApi
     {
-        static string PATH_ROOT = string.Empty;
         static long ID_INCREMENT = 0;
         const int SIZE_INDEX = 0;
         static string ERROR_MESSAGE = string.Empty;
@@ -1121,7 +1120,7 @@ namespace ckv_aspnet
 
         public static void api_reload()
         {
-            string dir = Path.Combine(PATH_ROOT, "src\\Api");
+            string dir = Path.Combine(_CONFIG.PATH_ROOT, "_api");
             if (Directory.Exists(dir))
             {
                 m_apis.Clear();
@@ -1140,7 +1139,7 @@ namespace ckv_aspnet
 
         public static void api_global_reload()
         {
-            string dir_ = Path.Combine(PATH_ROOT, "src\\Api\\_");
+            string dir_ = Path.Combine(_CONFIG.PATH_ROOT, "_api\\_");
             if (Directory.Exists(dir_))
             {
                 m_api_global.Clear();
@@ -1166,9 +1165,8 @@ namespace ckv_aspnet
 
         #endregion
 
-        public static void _init(string path_root)
+        public static void _init()
         {
-            PATH_ROOT = path_root;
             api_reload();
             api_global_reload();
         }

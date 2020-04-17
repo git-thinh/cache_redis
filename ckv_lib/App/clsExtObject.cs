@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public static class clsExtObject
     {

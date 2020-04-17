@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public enum DATA_TYPE {
         TEXT_PLAIN = 0,

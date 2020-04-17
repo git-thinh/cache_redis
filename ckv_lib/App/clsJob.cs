@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ckv_aspnet
+namespace ckv_lib
 {
     public class clsJob
     {

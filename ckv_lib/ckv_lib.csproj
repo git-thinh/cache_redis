@@ -36,8 +36,17 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz, Version=3.0.7.0, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Quartz.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,101 +55,117 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chakra\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptBeforeCollectCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptContext.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptEngineException.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptErrorCode.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptException.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptFatalException.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptMemoryAllocationCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptMemoryEventType.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptNativeFunction.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptObjectFinalizeCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptPromiseContinuationCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptPropertyId.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptPropertyIdType.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptRuntime.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptRuntimeAttributes.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptRuntimeVersion.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptScriptException.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptSourceContext.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptThreadServiceCallback.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptTypedArrayType.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptUsageException.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptValue.cs" />
-    <Compile Include="Chakra\Hosting\JavaScriptValueType.cs" />
-    <Compile Include="Chakra\Hosting\Native.cs" />
+    <Compile Include="App\clsApi.cs" />
+    <Compile Include="App\clsApp.cs" />
+    <Compile Include="App\clsChakra.cs" />
+    <Compile Include="App\clsCURL.cs" />
+    <Compile Include="App\clsExtObject.cs" />
+    <Compile Include="App\clsGlobal.cs" />
+    <Compile Include="App\clsJob.cs" />
+    <Compile Include="App\clsJobTest.cs" />
+    <Compile Include="App\clsLogJob.cs" />
+    <Compile Include="App\clsRouter.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptBackgroundWorkItemCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptBeforeCollectCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptContext.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptEngineException.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptErrorCode.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptException.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptFatalException.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptMemoryAllocationCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptMemoryEventType.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptNativeFunction.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptObjectBeforeCollectCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptObjectFinalizeCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptPromiseContinuationCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptPropertyId.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptPropertyIdType.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptRuntime.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptRuntimeAttributes.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptRuntimeVersion.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptScriptException.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptSerializedScriptLoadSourceCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptSerializedScriptUnloadCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptSourceContext.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptThreadServiceCallback.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptTypedArrayType.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptUsageException.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptValue.cs" />
+    <Compile Include="Libs\Chakra\Hosting\JavaScriptValueType.cs" />
+    <Compile Include="Libs\Chakra\Hosting\Native.cs" />
+    <Compile Include="Model\oApi.cs" />
+    <Compile Include="Model\oApiAddnew.cs" />
+    <Compile Include="Model\oResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Redis\Sider\src\Aggregate.cs" />
-    <Compile Include="Redis\Sider\src\AutoActivatingPool.cs" />
-    <Compile Include="Redis\Sider\src\Exceptions.cs" />
-    <Compile Include="Redis\Sider\src\Executors\ExecutorBase.cs" />
-    <Compile Include="Redis\Sider\src\Executors\IExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\ImmediateExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\IocpExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\MonitorExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\PipelinedExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\PubSubExecutor.cs" />
-    <Compile Include="Redis\Sider\src\Executors\TransactedExecutor.cs" />
-    <Compile Include="Redis\Sider\src\IClientsPool.cs" />
-    <Compile Include="Redis\Sider\src\Invocation.cs" />
-    <Compile Include="Redis\Sider\src\IRedisClient.cs" />
-    <Compile Include="Redis\Sider\src\LimitingStream.cs" />
-    <Compile Include="Redis\Sider\src\Message.cs" />
-    <Compile Include="Redis\Sider\src\MessageType.cs" />
-    <Compile Include="Redis\Sider\src\Mode.cs" />
-    <Compile Include="Redis\Sider\src\Observable.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolEncoder.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolReader.cs" />
-    <Compile Include="Redis\Sider\src\ProtocolWriter.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.API.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.cs" />
-    <Compile Include="Redis\Sider\src\RedisClient.IO.core.cs" />
-    <Compile Include="Redis\Sider\src\RedisClientBase.cs" />
-    <Compile Include="Redis\Sider\src\RedisClientPipeliningExtensions.cs">
+    <Compile Include="Libs\Redis\Sider\src\Aggregate.cs" />
+    <Compile Include="Libs\Redis\Sider\src\AutoActivatingPool.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Exceptions.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\ExecutorBase.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\IExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\ImmediateExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\IocpExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\MonitorExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\PipelinedExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\PubSubExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Executors\TransactedExecutor.cs" />
+    <Compile Include="Libs\Redis\Sider\src\IClientsPool.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Invocation.cs" />
+    <Compile Include="Libs\Redis\Sider\src\IRedisClient.cs" />
+    <Compile Include="Libs\Redis\Sider\src\LimitingStream.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Message.cs" />
+    <Compile Include="Libs\Redis\Sider\src\MessageType.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Mode.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Observable.cs" />
+    <Compile Include="Libs\Redis\Sider\src\ProtocolEncoder.cs" />
+    <Compile Include="Libs\Redis\Sider\src\ProtocolReader.cs" />
+    <Compile Include="Libs\Redis\Sider\src\ProtocolWriter.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisClient.API.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisClient.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisClient.IO.core.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisClientBase.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisClientPipeliningExtensions.cs">
       <DependentUpon>RedisClientPipeliningExtensions.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Redis\Sider\src\RedisReader.cs" />
-    <Compile Include="Redis\Sider\src\RedisSettings.cs" />
-    <Compile Include="Redis\Sider\src\RedisType.cs" />
-    <Compile Include="Redis\Sider\src\RedisVersionAttribute.cs" />
-    <Compile Include="Redis\Sider\src\RedisWriter.cs" />
-    <Compile Include="Redis\Sider\src\ResponseType.cs" />
-    <Compile Include="Redis\Sider\src\RoundRobinPool.cs" />
-    <Compile Include="Redis\Sider\src\SAssert.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\BufferSerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\ISerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\ObjectSerializer.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\SerializerBase.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\Serializers.cs" />
-    <Compile Include="Redis\Sider\src\Serialization\StringSerializer.cs" />
-    <Compile Include="Redis\Sider\src\SettingsWrapper.cs" />
-    <Compile Include="Redis\Sider\src\StringExtensions.cs" />
-    <Compile Include="Redis\Sider\src\ThreadwisePool.cs" />
-    <Compile Include="Redis\Sider\src\TrackedThreadwisePool.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Curl.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Easy.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Enums.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\External.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Multi.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\MultiInfo.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\MultiPartForm.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Share.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\Slist.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\SSLContext.cs" />
-    <Compile Include="SeasideResearch.LibCurlNet\VersionInfoData.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisReader.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisSettings.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisType.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisVersionAttribute.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RedisWriter.cs" />
+    <Compile Include="Libs\Redis\Sider\src\ResponseType.cs" />
+    <Compile Include="Libs\Redis\Sider\src\RoundRobinPool.cs" />
+    <Compile Include="Libs\Redis\Sider\src\SAssert.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\BufferSerializer.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\ISerializer.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\ObjectSerializer.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\SerializerBase.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\Serializers.cs" />
+    <Compile Include="Libs\Redis\Sider\src\Serialization\StringSerializer.cs" />
+    <Compile Include="Libs\Redis\Sider\src\SettingsWrapper.cs" />
+    <Compile Include="Libs\Redis\Sider\src\StringExtensions.cs" />
+    <Compile Include="Libs\Redis\Sider\src\ThreadwisePool.cs" />
+    <Compile Include="Libs\Redis\Sider\src\TrackedThreadwisePool.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Curl.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Easy.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Enums.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\External.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Multi.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\MultiInfo.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\MultiPartForm.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Share.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\Slist.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\SSLContext.cs" />
+    <Compile Include="Libs\SeasideResearch.LibCurlNet\VersionInfoData.cs" />
+    <Compile Include="_CONFIG.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Redis\Sider\src\RedisClientPipeliningExtensions.tt">
+    <Content Include="DLL\Newtonsoft.Json.dll" />
+    <Content Include="DLL\Quartz.dll" />
+    <Content Include="Libs\Redis\Sider\src\RedisClientPipeliningExtensions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>RedisClientPipeliningExtensions.cs</LastGenOutput>
     </Content>

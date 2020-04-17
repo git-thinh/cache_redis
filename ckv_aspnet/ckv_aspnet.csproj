@@ -45,14 +45,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>src\DLL\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Quartz, Version=3.0.7.0, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>src\DLL\Quartz.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -71,25 +63,22 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="_api\cms_data\addnew.sql" />
+    <Content Include="_api\cms_data\cache.sql" />
+    <Content Include="_api\cms_data\export_article_from_html.js" />
+    <Content Include="_api\cms_data\get_domain.js" />
+    <Content Include="_api\test\cache-search-1.js" />
+    <Content Include="_api\test\cache-update-1.js" />
+    <Content Include="_api\test\db-1.js" />
+    <Content Include="_api\test\file-write-1.js" />
+    <Content Include="_api\test\job-create-1.js" />
+    <Content Include="_api\test\log-1.js" />
+    <Content Include="_api\_\build_url_from_text.js" />
+    <Content Include="_api\_\job_sync_user_shop_group.js" />
     <Content Include="client.html" />
     <Content Include="Global.asax" />
     <Content Include="home.html" />
     <Content Include="index.html" />
-    <Content Include="src\Api\cms_data\get_domain.js" />
-    <Content Include="src\Api\cms_data\export_article_from_html.js" />
-    <Content Include="src\Api\test\cache-update-1.js" />
-    <Content Include="src\Api\test\cache-search-1.js" />
-    <Content Include="src\Api\test\job-create-1.js" />
-    <Content Include="src\Api\test\file-write-1.js" />
-    <Content Include="src\Api\test\db-1.js" />
-    <Content Include="src\Api\test\log-1.js" />
-    <Content Include="src\Api\_\build_url_from_text.js" />
-    <Content Include="src\Api\cms_data\addnew.sql" />
-    <Content Include="src\Api\cms_data\cache.sql" />
-    <Content Include="src\Api\_\job_sync_user_shop_group.js" />
-    <Content Include="src\DLL\Newtonsoft.Json.dll" />
-    <Content Include="src\DLL\Quartz.dll" />
-    <Content Include="src\ReadMe.txt" />
     <Content Include="test\assets\images\avatar\nan.jpg" />
     <Content Include="test\assets\images\avatar\tom.jpg" />
     <Content Include="test\assets\images\bg.jpg" />
@@ -330,29 +319,15 @@
     <Content Include="_view\_debug\test.js" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\App\clsApi.cs" />
-    <Compile Include="src\App\clsApp.cs" />
-    <Compile Include="src\App\clsChakra.cs" />
-    <Compile Include="src\App\clsExtObject.cs" />
-    <Compile Include="src\App\clsGlobal.cs" />
-    <Compile Include="src\App\clsJob.cs" />
-    <Compile Include="src\App\clsJobTest.cs" />
-    <Compile Include="src\App\clsLogJob.cs" />
-    <Compile Include="src\App\clsRouter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\App\clsCURL.cs" />
-    <Compile Include="src\Model\oApiAddnew.cs" />
-    <Compile Include="src\Model\oApi.cs" />
-    <Compile Include="src\Model\oResult.cs" />
-    <Compile Include="src\_CONFIG.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="_api\cms_data\addnew.json" />
+    <Content Include="_api\cms_data\addnew.valid" />
+    <Content Include="_api\cms_data\config.json" />
+    <Content Include="_api\test\config.json" />
     <None Include="packages.config" />
-    <Content Include="src\Api\cms_data\addnew.json" />
-    <Content Include="src\Api\cms_data\addnew.valid" />
-    <Content Include="src\Api\cms_data\config.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
-    <Content Include="src\Api\test\config.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -384,7 +359,6 @@
     <Content Include="_view\config.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\Websocket\" />
     <Folder Include="_view\sidebar\" />
   </ItemGroup>
   <ItemGroup>
