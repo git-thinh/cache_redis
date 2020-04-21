@@ -20,7 +20,7 @@ namespace ckv_lib
         static RedisClient _redis;
         static bool _connected = false;
 
-        public clsLogJob(int port = _CONFIG.LOG_PORT_REDIS) => _init(port);
+        public clsLogJob(int port = 0) => _init(port == 0 ? _CONFIG.LOG_PORT_REDIS : port);
 
         void _init(int port)
         {

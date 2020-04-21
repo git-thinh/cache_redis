@@ -11,6 +11,21 @@ namespace ckv_lib
 {
     public class clsCURL
     {
+        public static bool m_ready = false;
+        public static string ERROR_MESSAGE = string.Empty;        
+        public static void _init() {
+            try
+            {
+                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
+            }
+            catch (Exception ex) {
+                ERROR_MESSAGE = ex.Message;
+                m_ready = true;
+            }
+        }
+
+        #region [ TEST ]
+
         public static oResult test_http(Dictionary<string, object> request = null)
         {
             oResult rs = new oResult() { ok = false, request = request };
@@ -119,7 +134,6 @@ namespace ckv_lib
             return rs;
         }
         
-
         public static string get_raw_http(object p)
         {
             if (p == null)
@@ -251,8 +265,10 @@ namespace ckv_lib
                 return "ERR: " + ex.Message;
             }
         }
+        
+        #endregion
 
-        static void stop()
+        public static void stop()
         {
             Curl.GlobalCleanup();
         }

@@ -14,6 +14,11 @@ namespace ckv_lib
 {
     public class clsChakra
     {
+        public static bool m_ready = false;
+        public static string ERROR_MESSAGE = string.Empty;
+
+        #region [ BASE ]
+
         static List<string> m_apis = new List<string>();
         public static string[] js_apis() => m_apis.ToArray();
         static JavaScriptSourceContext CURRENT_SOURCE_CONTEXT = JavaScriptSourceContext.FromIntPtr(IntPtr.Zero);
@@ -36,6 +41,8 @@ namespace ckv_lib
             }
             return context;
         }
+
+        #endregion
 
         #region [ test | log ]
 
@@ -289,9 +296,16 @@ namespace ckv_lib
         static JavaScriptContext js_context;
         public static void _init()
         {
-            m_log = new clsLogJS();
-            js_runtime = JavaScriptRuntime.Create();
-            js_context = _create_context(js_runtime);
+            try
+            {
+                m_log = new clsLogJS();
+                js_runtime = JavaScriptRuntime.Create();
+                js_context = _create_context(js_runtime);
+                m_ready = true;
+            }
+            catch (Exception ex) {
+                ERROR_MESSAGE = ex.Message;
+            }
         }
 
         #region [ test_1; test_2 ]
@@ -443,7 +457,6 @@ namespace ckv_lib
         }
     }
 
-
     public interface ILogJS
     {
         void write(string scope_name, string key, string text);
@@ -455,7 +468,7 @@ namespace ckv_lib
         static RedisClient _redis;
         static bool _connected = false;
 
-        public clsLogJS(int port = _CONFIG.LOG_PORT_REDIS) => _init(port);
+        public clsLogJS(int port = 0) => _init(port == 0 ? _CONFIG.LOG_PORT_REDIS : port);
 
         void _init(int port)
         {

@@ -8,10 +8,14 @@
             if (_inited == false)
             {
                 _inited = true;
+                _CONFIG._init();
+                
+                clsChakra._init();
+                clsCURL._init();
+
                 clsApi._init();
                 clsRouter._init();
                 clsJob._init();
-                clsChakra._init();
             }
         }
     }
