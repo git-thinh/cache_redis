@@ -6,7 +6,6 @@ namespace ckv_lib
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            if (_CONFIG.PATH_ROOT.Length == 0) _CONFIG.PATH_ROOT = Server.MapPath("~/");
             clsApp._init();
         }
 

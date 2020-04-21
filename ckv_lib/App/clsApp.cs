@@ -7,7 +7,6 @@
         {
             if (_inited == false)
             {
-                _inited = true;
                 _CONFIG._init();
                 
                 clsChakra._init();
@@ -16,6 +15,8 @@
                 clsApi._init();
                 clsRouter._init();
                 clsJob._init();
+
+                _inited = true;
             }
         }
     }

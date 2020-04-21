@@ -17,10 +17,12 @@ namespace ckv_lib
         public static string PATH_DATA_FILE = string.Empty;
 
         public static void _init() {
+            PATH_ROOT = AppDomain.CurrentDomain.BaseDirectory;
+
             PATH_DATA_FILE = WebConfigurationManager.AppSettings["PATH_DATA_FILE"];
             if (string.IsNullOrWhiteSpace(PATH_DATA_FILE)) {
-                PATH_DATA_FILE = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "_data");
-                if (Directory.Exists(PATH_DATA_FILE)) Directory.CreateDirectory(PATH_DATA_FILE);
+                PATH_DATA_FILE = Path.Combine(PATH_ROOT, "_data");
+                if (!Directory.Exists(PATH_DATA_FILE)) Directory.CreateDirectory(PATH_DATA_FILE);
             }
 
             string portLogRedis = WebConfigurationManager.AppSettings["LOG_PORT_REDIS"];

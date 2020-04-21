@@ -110,8 +110,10 @@ namespace ckv_lib
 
         private static readonly JavaScriptNativeFunction delegate_notify_user = fun_notify_user;
         private static readonly JavaScriptNativeFunction delegate_notify_broadcast = fun_notify_broadcast;
-        static JavaScriptValue fun_notify_user(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_notify_broadcast(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_notify_user(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("notify_user", arguments);
+        static JavaScriptValue fun_notify_broadcast(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("notify_broadcast", arguments);
 
         #endregion
 
@@ -119,8 +121,10 @@ namespace ckv_lib
 
         private static readonly JavaScriptNativeFunction delegate_ajax_call = fun_ajax_call;
         private static readonly JavaScriptNativeFunction delegate_curl_call = fun_curl_call;
-        static JavaScriptValue fun_ajax_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_curl_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_ajax_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("ajax_call", arguments);
+        static JavaScriptValue fun_curl_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("curl_call", arguments);
 
         #endregion
 
@@ -131,11 +135,16 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_api_reload = fun_api_reload;
         private static readonly JavaScriptNativeFunction delegate_api_reload_all = fun_api_reload_all;
         private static readonly JavaScriptNativeFunction delegate_api_exist = fun_api_exist;
-        static JavaScriptValue fun_api_list(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_api_get(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_api_reload(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_api_reload_all(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_api_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_api_list(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("api_list", arguments);
+        static JavaScriptValue fun_api_get(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("api_get", arguments);
+        static JavaScriptValue fun_api_reload(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("api_reload", arguments);
+        static JavaScriptValue fun_api_reload_all(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("api_reload_all", arguments);
+        static JavaScriptValue fun_api_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("api_exist", arguments);
 
         #endregion
 
@@ -151,15 +160,24 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_dir_create = fun_dir_create;
         private static readonly JavaScriptNativeFunction delegate_dir_delete = fun_dir_delete;
 
-        static JavaScriptValue fun_file_read_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_file_write_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_file_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_file_delete(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_file_append_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_dir_get_files(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_dir_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_dir_create(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_dir_delete(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_file_read_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("file_read_text", arguments);
+        static JavaScriptValue fun_file_write_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("file_write_text", arguments);
+        static JavaScriptValue fun_file_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("file_append_text", arguments);
+        static JavaScriptValue fun_file_delete(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("file_exist", arguments);
+        static JavaScriptValue fun_file_append_text(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("file_delete", arguments);
+        static JavaScriptValue fun_dir_get_files(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("dir_get_files", arguments);
+        static JavaScriptValue fun_dir_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("dir_exist", arguments);
+        static JavaScriptValue fun_dir_create(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("dir_create", arguments);
+        static JavaScriptValue fun_dir_delete(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("dir_delete", arguments);
 
         #endregion
 
@@ -171,24 +189,16 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_cache_clear_all = fun_cache_clear_all;
 
         static JavaScriptValue fun_cache_addnew(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-        {
-            return JavaScriptValue.Invalid;
-        }
+            => _call_function("cache_addnew", arguments);
 
         static JavaScriptValue fun_cache_update(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-        {
-            return JavaScriptValue.Invalid;
-        }
+            => _call_function("cache_update", arguments);
 
         static JavaScriptValue fun_cache_remove(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-        {
-            return JavaScriptValue.Invalid;
-        }
+            => _call_function("cache_remove", arguments);
 
         static JavaScriptValue fun_cache_clear_all(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-        {
-            return JavaScriptValue.Invalid;
-        }
+            => _call_function("cache_clear_all", arguments);
 
         #endregion
 
@@ -198,10 +208,14 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_cache_runtime_set = fun_cache_runtime_set;
         private static readonly JavaScriptNativeFunction delegate_cache_runtime_get = fun_cache_runtime_get;
         private static readonly JavaScriptNativeFunction delegate_cache_runtime_remove = fun_cache_runtime_remove;
-        static JavaScriptValue fun_cache_runtime_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_cache_runtime_set(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_cache_runtime_get(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_cache_runtime_remove(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_cache_runtime_exist(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_runtime_exist", arguments);
+        static JavaScriptValue fun_cache_runtime_set(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_runtime_set", arguments);
+        static JavaScriptValue fun_cache_runtime_get(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_runtime_get", arguments);
+        static JavaScriptValue fun_cache_runtime_remove(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_runtime_remove", arguments);
 
         #endregion
 
@@ -210,9 +224,12 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_cache_search = fun_cache_search;
         private static readonly JavaScriptNativeFunction delegate_cache_get_item_by_id = fun_cache_get_item_by_id;
         private static readonly JavaScriptNativeFunction delegate_cache_get_items_by_ids = fun_cache_get_items_by_ids;
-        static JavaScriptValue fun_cache_search(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_cache_get_item_by_id(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_cache_get_items_by_ids(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_cache_search(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_search", arguments);
+        static JavaScriptValue fun_cache_get_item_by_id(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_get_item_by_id", arguments);
+        static JavaScriptValue fun_cache_get_items_by_ids(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("cache_get_items_by_ids", arguments);
 
         #endregion
 
@@ -220,9 +237,7 @@ namespace ckv_lib
 
         private static readonly JavaScriptNativeFunction delegate_db_execute = fun_db_execute;
         static JavaScriptValue fun_db_execute(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-        {
-            return JavaScriptValue.Invalid;
-        }
+            => _call_function("db_execute", arguments);
 
         #endregion
 
@@ -233,11 +248,16 @@ namespace ckv_lib
         private static readonly JavaScriptNativeFunction delegate_job_stop = fun_job_stop;
         private static readonly JavaScriptNativeFunction delegate_job_start = fun_job_start;
         private static readonly JavaScriptNativeFunction delegate_job_remove = fun_job_remove;
-        static JavaScriptValue fun_job_list(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_job_create(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_job_stop(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_job_start(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
-        static JavaScriptValue fun_job_remove(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData) => JavaScriptValue.Invalid;
+        static JavaScriptValue fun_job_list(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("job_list", arguments);
+        static JavaScriptValue fun_job_create(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("job_create", arguments);
+        static JavaScriptValue fun_job_stop(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("job_stop", arguments);
+        static JavaScriptValue fun_job_start(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("job_start", arguments);
+        static JavaScriptValue fun_job_remove(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("job_remove", arguments);
 
         #endregion
 
@@ -275,7 +295,7 @@ namespace ckv_lib
             _define(hostObject, "dir_create", delegate_dir_create);
             _define(hostObject, "dir_delete", delegate_dir_delete);
 
-            _define(hostObject, "job_list", fun_job_list);
+            _define(hostObject, "job_list", delegate_job_list);
             _define(hostObject, "job_create", delegate_job_create);
             _define(hostObject, "job_stop", delegate_job_stop);
             _define(hostObject, "job_start", delegate_job_start);
@@ -291,6 +311,191 @@ namespace ckv_lib
             _define(hostObject, "api_exist", delegate_api_exist);
         }
 
+        static JavaScriptValue _call_function(string function, JavaScriptValue[] arguments)
+        {
+            var para = arguments.getDictionary();
+            switch (function)
+            {
+                case "notify_user":
+                    #region [ notify_user ]
+
+                    #endregion
+                    break;
+                case "notify_broadcast":
+                    #region [ notify_broadcast ]
+
+                    #endregion
+                    break;
+                case "ajax_call":
+                    #region [ ajax_call ]
+
+                    #endregion
+                    break;
+                case "curl_call":
+                    #region [ curl_call ]
+
+                    #endregion
+                    break;
+                case "api_list":
+                    #region [ api_list ]
+
+                    #endregion
+                    break;
+                case "api_get":
+                    #region [ api_get ]
+
+                    #endregion
+                    break;
+                case "api_reload":
+                    #region [ api_reload ]
+
+                    #endregion
+                    break;
+                case "api_reload_all":
+                    #region [ api_reload_all ]
+
+                    #endregion
+                    break;
+                case "api_exist":
+                    #region [ api_exist ]
+
+                    #endregion
+                    break;
+                case "file_read_text":
+                    #region [ file_read_text ]
+
+                    #endregion
+                    break;
+                case "file_write_text":
+                    #region [ file_write_text ]
+
+                    #endregion
+                    break;
+                case "file_append_text":
+                    #region [ file_append_text ]
+
+                    #endregion
+                    break;
+                case "file_exist":
+                    #region [ file_exist ]
+
+                    #endregion
+                    break;
+                case "file_delete":
+                    #region [ file_delete ]
+
+                    #endregion
+                    break;
+                case "dir_get_files":
+                    #region [ dir_get_files ]
+
+                    #endregion
+                    break;
+                case "dir_exist":
+                    #region [ dir_exist ]
+
+                    #endregion
+                    break;
+                case "dir_create":
+                    #region [ dir_create ]
+
+                    #endregion
+                    break;
+                case "dir_delete":
+                    #region [ dir_delete ]
+
+                    #endregion
+                    break;
+                case "cache_addnew":
+                    #region [ cache_addnew ]
+
+                    #endregion
+                    break;
+                case "cache_update":
+                    #region [ cache_update ]
+
+                    #endregion
+                    break;
+                case "cache_remove":
+                    #region [ cache_remove ]
+
+                    #endregion
+                    break;
+                case "cache_clear_all":
+                    #region [ cache_clear_all ]
+
+                    #endregion
+                    break;
+                case "cache_runtime_exist":
+                    #region [ cache_runtime_exist ]
+
+                    #endregion
+                    break;
+                case "cache_runtime_set":
+                    #region [ cache_runtime_set ]
+
+                    #endregion
+                    break;
+                case "cache_runtime_get":
+                    #region [ cache_runtime_get ]
+
+                    #endregion
+                    break;
+                case "cache_runtime_remove":
+                    #region [ cache_runtime_remove ]
+
+                    #endregion
+                    break;
+                case "cache_search":
+                    #region [ cache_search ]
+
+                    #endregion
+                    break;
+                case "cache_get_item_by_id":
+                    #region [ cache_get_item_by_id ]
+
+                    #endregion
+                    break;
+                case "cache_get_items_by_ids":
+                    #region [ cache_get_items_by_ids ]
+
+                    #endregion
+                    break;
+                case "db_execute":
+                    #region [ db_execute ]
+
+                    #endregion
+                    break;
+                case "job_list":
+                    #region [ job_list ]
+
+                    #endregion
+                    break;
+                case "job_create":
+                    #region [ job_create ]
+
+                    #endregion
+                    break;
+                case "job_stop":
+                    #region [ job_stop ]
+
+                    #endregion
+                    break;
+                case "job_start":
+                    #region [ job_start ]
+
+                    #endregion
+                    break;
+                case "job_remove":
+                    #region [ job_remove ]
+
+                    #endregion
+                    break;
+            }
+
+            return JavaScriptValue.Invalid;
+        }
+
         static ILogJS m_log;
         static JavaScriptRuntime js_runtime;
         static JavaScriptContext js_context;
@@ -303,7 +508,8 @@ namespace ckv_lib
                 js_context = _create_context(js_runtime);
                 m_ready = true;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ERROR_MESSAGE = ex.Message;
             }
         }
@@ -373,6 +579,11 @@ namespace ckv_lib
         public static oResult run_api(Dictionary<string, object> request = null)
         {
             oResult rs = new oResult() { ok = false, request = request };
+            if (request == null || request.Count == 0)
+            {
+                rs.error = "Cannot found data of request";
+                return rs;
+            }
 
             string scope = request.getValueByKey("___scope");
             if (string.IsNullOrEmpty(scope))
@@ -387,46 +598,66 @@ namespace ckv_lib
                 return rs;
             }
 
-            string sapi = request.getValueByKey("___api");
-            if (string.IsNullOrEmpty(sapi))
+            if (string.IsNullOrEmpty(request.getValueByKey("___api")) 
+                || string.IsNullOrEmpty(request.getValueByKey("___fun")))
             {
-                rs.error = "[___api] is null or empty";
+                rs.error = "[___api] or [___fun] is null or empty";
                 return rs;
             }
 
-            oApi o = clsApi.Get(scope);
-            if (o.apis.Length == 0)
+            string js = string.Empty, api_name = string.Empty;
+
+            #region [ JS: api or function ]
+
+            if (string.IsNullOrEmpty(request.getValueByKey("___api")) == false)
             {
-                rs.error = "folder " + scope + " missing files api: " + sapi.Replace("|", ".js; ") + ".js";
-                return rs;
+                string sapi = request.getValueByKey("___api");
+                oApi o = clsApi.Get(scope);
+                if (o.apis.Length == 0)
+                {
+                    rs.error = "folder " + scope + " missing files api: " + sapi.Replace("|", ".js; ") + ".js";
+                    return rs;
+                }
+                sapi = sapi.ToLower().Trim();
+                string[] a = sapi.Split('|');
+                for (var i = 0; i < a.Length; i++)
+                {
+                    if (o.apis_data.ContainsKey(a[i]) == false)
+                    {
+                        rs.error = "folder " + scope + " missing files api: " + a[i] + ".js";
+                        return rs;
+                    }
+                    js += o.apis_data[a[i]] + Environment.NewLine + Environment.NewLine;
+                }
+                api_name = string.Join(",", a);
+            }
+            else if (string.IsNullOrEmpty(request.getValueByKey("___fun")) == false) {
+                api_name = request.getValueByKey("___fun");
+                js = "api." + api_name + "(JSON.stringify(___para));" + Environment.NewLine + Environment.NewLine;
             }
 
-            sapi = sapi.ToLower().Trim();
-            string[] a = sapi.Split('|');
+            #endregion
+
             StringBuilder bi = new StringBuilder();
 
             bi.Append("(()=>{ ");
             bi.Append(Environment.NewLine);
-            bi.Append("var ___scope = 'API-JS." + scope + "." + sapi + "'; ");
+            bi.Append("var ___scope = 'API-JS." + scope + "." + api_name + "'; ");
+            bi.Append(Environment.NewLine);
+            bi.Append("var ___config = " + JsonConvert.SerializeObject(new
+            {
+                PATH_ROOT = _CONFIG.PATH_ROOT,
+                LOG_PORT_REDIS = _CONFIG.LOG_PORT_REDIS,
+                PATH_DATA_FILE = _CONFIG.PATH_DATA_FILE
+            }) + ";");
             bi.Append(Environment.NewLine);
             bi.Append("var ___log = function(key,text){ ___api.log(___scope, key, text); }; ");
             bi.Append(Environment.NewLine);
-            bi.Append("var ___para = ");
-            bi.Append(JsonConvert.SerializeObject(request));
+            bi.Append("var ___para = " + JsonConvert.SerializeObject(request));
             bi.Append(Environment.NewLine);
             bi.Append(Environment.NewLine);
 
-            for (var i = 0; i < a.Length; i++)
-            {
-                if (o.apis_data.ContainsKey(a[i]) == false)
-                {
-                    rs.error = "folder " + scope + " missing files api: " + a[i] + ".js";
-                    return rs;
-                }
-                bi.Append(o.apis_data[a[i]]);
-                bi.Append(Environment.NewLine);
-                bi.Append(Environment.NewLine);
-            }
+            bi.Append(js);
 
             bi.Append(Environment.NewLine);
             bi.Append(" })()");

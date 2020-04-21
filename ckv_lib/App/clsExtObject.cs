@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ChakraHost.Hosting;
+using Newtonsoft.Json;
 using Quartz;
 using System;
 using System.Collections.Concurrent;
@@ -9,21 +10,83 @@ namespace ckv_lib
 {
     public static class clsExtObject
     {
-        public static T getValue<T>(this Dictionary<string, object> dic, string key)
+        #region [ JavaScriptValue ]
+
+        public static string[] getParamenters(this JavaScriptValue[] arguments)
         {
             try
             {
-                if (dic != null && dic.ContainsKey(key))
+                if (arguments != null && arguments.Length > 1)
                 {
-                    var p = (T)dic[key];
-                    return p;
+                    int argumentCount = arguments.Length;
+                    string[] vals = new string[] { };
+                        vals = new string[argumentCount - 1];
+                    for (uint i = 1; i < argumentCount; i++)
+                        vals[i - 1] = arguments[i].ConvertToString().ToString();
                 }
             }
             catch { }
+            return new string[] { };
+        }
 
-            T v = default(T);
+        public static string getParamenterFirstOrDefault(this JavaScriptValue[] arguments)
+        {
+            var a = arguments.getParamenters();
+            if (a.Length > 0) return a[0];
+            return string.Empty;
+        }
+
+        public static T getParamenterFirstOrDefault<T>(this JavaScriptValue[] arguments, T value_default = default(T))
+        {
+            T v = value_default;
+            var a = arguments.getParamenters();
+            if (a.Length > 0) {
+                string type = value_default.GetType().Name;
+                switch (type)
+                {
+                    case "Boolean":
+                    case "Byte":
+                    case "SByte":
+                    case "Char":
+                    case "Decimal":
+                    case "Double":
+                    case "Single":
+                    case "Int32":
+                    case "UInt32":
+                    case "Int64":
+                    case "UInt64":
+                    case "Int16":
+                    case "UInt16":
+                    case "String":
+                        v = (T)Convert.ChangeType(a[0], typeof(T));
+                        break;
+                    default:
+                        return value_default;
+                }
+            }
             return v;
         }
+
+        public static Dictionary<string,object> getDictionary(this JavaScriptValue[] arguments)
+        {
+            var a = arguments.getParamenters();
+            if (a.Length > 0)
+            {
+                string json = a[0].Trim();
+                if (!string.IsNullOrEmpty(json) && json[0] == '{' && json[json.Length - 1] == '}') {
+                    try
+                    {
+                        var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                    }
+                    catch { }
+                }
+            }
+            return new Dictionary<string, object>() { };
+        }
+
+        #endregion
+
+        #region [ Quartz ]
 
         public static Dictionary<string, object> getParaInput(this IJobExecutionContext context)
         {
@@ -153,7 +216,7 @@ namespace ckv_lib
                             bi.Append("ERROR_LOG: " + ex.Message);
                         }
 
-                        string 
+                        string
                             l_scope = scope_name + "." + id,
                             l_key = DateTime.Now.ToString("yyMMdd-HHmmss-fff") + "." + key;
 
@@ -171,6 +234,24 @@ namespace ckv_lib
                 }
             }
             catch { }
+        }
+
+        #endregion
+
+        public static T getValue<T>(this Dictionary<string, object> dic, string key)
+        {
+            try
+            {
+                if (dic != null && dic.ContainsKey(key))
+                {
+                    var p = (T)dic[key];
+                    return p;
+                }
+            }
+            catch { }
+
+            T v = default(T);
+            return v;
         }
 
         public static T getValueByKey<T>(this ConcurrentDictionary<string, object> dic, string key)
