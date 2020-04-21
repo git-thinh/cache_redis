@@ -14,7 +14,7 @@
     <RootNamespace>ckv_aspnet</RootNamespace>
     <AssemblyName>ckv_aspnet</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -72,7 +72,9 @@
     <Content Include="_api\test\db-1.js" />
     <Content Include="_api\test\file-write-1.js" />
     <Content Include="_api\test\job-create-1.js" />
+    <Content Include="_api\function\request_async.js" />
     <Content Include="_api\test\log-1.js" />
+    <Content Include="_api\test\crawler.js" />
     <Content Include="_api\_\build_url_from_text.js" />
     <Content Include="_api\_\job_sync_user_shop_group.js" />
     <Content Include="client.html" />
@@ -357,6 +359,7 @@
     <Content Include="_lib\fomantic-ui\themes\material\assets\fonts\icons.woff" />
     <Content Include="_lib\fomantic-ui\themes\material\assets\fonts\icons.woff2" />
     <Content Include="_view\config.json" />
+    <Content Include="_api\function\config.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="_view\sidebar\" />
@@ -385,7 +388,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50257</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:50257/</IISUrl>
+          <IISUrl>http://localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

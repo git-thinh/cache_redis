@@ -1,12 +1,16 @@
 ﻿using ChakraHost.Hosting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sider;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 
@@ -117,14 +121,43 @@ namespace ckv_lib
 
         #endregion
 
-        #region [ ajax_call | curl_call ( get|post|put... ) ]
+        #region [ request_async | curl_call ( get|post|put... ) ]
 
-        private static readonly JavaScriptNativeFunction delegate_ajax_call = fun_ajax_call;
+        private static readonly JavaScriptNativeFunction delegate_request_async = fun_request_async;
         private static readonly JavaScriptNativeFunction delegate_curl_call = fun_curl_call;
-        static JavaScriptValue fun_ajax_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
-            => _call_function("ajax_call", arguments);
+        static JavaScriptValue fun_request_async(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("request_async", arguments);
         static JavaScriptValue fun_curl_call(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
             => _call_function("curl_call", arguments);
+
+        #endregion
+
+        #region [ html_export_links | html_export_images | html_to_text_01 | html_clean_01 | html_remove_comment | html_remove_tag_simple | html_remove_tag_content | html_remove_tag_keep_content ]
+
+        private static readonly JavaScriptNativeFunction delegate_html_export_links = fun_html_export_links;
+        private static readonly JavaScriptNativeFunction delegate_html_export_images = fun_html_export_images;
+        private static readonly JavaScriptNativeFunction delegate_html_to_text_01 = fun_html_to_text_01;
+        private static readonly JavaScriptNativeFunction delegate_html_clean_01 = fun_html_clean_01;
+        private static readonly JavaScriptNativeFunction delegate_html_remove_comment = fun_html_remove_comment;
+        private static readonly JavaScriptNativeFunction delegate_html_remove_tag_simple = fun_html_remove_tag_simple;
+        private static readonly JavaScriptNativeFunction delegate_html_remove_tag_content = fun_html_remove_tag_content;
+        private static readonly JavaScriptNativeFunction delegate_html_remove_tag_keep_content = fun_html_remove_tag_keep_content;
+        static JavaScriptValue fun_html_export_links(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_export_links", arguments);
+        static JavaScriptValue fun_html_export_images(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_export_images", arguments);
+        static JavaScriptValue fun_html_to_text_01(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_to_text_01", arguments);
+        static JavaScriptValue fun_html_clean_01(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_clean_01", arguments);
+        static JavaScriptValue fun_html_remove_comment(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_remove_comment", arguments);
+        static JavaScriptValue fun_html_remove_tag_simple(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_remove_tag_simple", arguments);
+        static JavaScriptValue fun_html_remove_tag_content(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_remove_tag_content", arguments);
+        static JavaScriptValue fun_html_remove_tag_keep_content(JavaScriptValue callee, bool isConstructCall, JavaScriptValue[] arguments, ushort argumentCount, IntPtr callbackData)
+            => _call_function("html_remove_tag_keep_content", arguments);
 
         #endregion
 
@@ -267,7 +300,16 @@ namespace ckv_lib
             _define(hostObject, "log", delegate_log);
 
             _define(hostObject, "curl_call", delegate_curl_call);
-            _define(hostObject, "ajax_call", delegate_ajax_call);
+            _define(hostObject, "request_async", delegate_request_async);
+            
+            _define(hostObject, "html_export_links", delegate_html_export_links);
+            _define(hostObject, "html_export_images", delegate_html_export_images);
+            _define(hostObject, "html_to_text_01", delegate_html_to_text_01);
+            _define(hostObject, "html_clean_01", delegate_html_clean_01);
+            _define(hostObject, "html_remove_comment", delegate_html_remove_comment);
+            _define(hostObject, "html_remove_tag_simple", delegate_html_remove_tag_simple);
+            _define(hostObject, "html_remove_tag_content", delegate_html_remove_tag_content);
+            _define(hostObject, "html_remove_tag_keep_content", delegate_html_remove_tag_keep_content);
 
             _define(hostObject, "cache_update", delegate_cache_update);
             _define(hostObject, "cache_addnew", delegate_cache_addnew);
@@ -311,11 +353,342 @@ namespace ckv_lib
             _define(hostObject, "api_exist", delegate_api_exist);
         }
 
+        static ILogJS m_log;
+        static JavaScriptRuntime js_runtime;
+        static JavaScriptContext js_context;
+        public static void _init()
+        {
+            try
+            {
+                m_log = new clsLogJS();
+                js_runtime = JavaScriptRuntime.Create();
+                js_context = _create_context(js_runtime);
+                m_ready = true;
+            }
+            catch (Exception ex)
+            {
+                ERROR_MESSAGE = "ERROR_INIT: " + ex.Message;
+            }
+        }
+
+        #region [ test_1; test_2 ]
+
+        public static oResult test_1(Dictionary<string, object> request = null)
+        {
+            oResult rs = new oResult() { ok = false, request = request };
+
+            using (JavaScriptRuntime runtime = JavaScriptRuntime.Create())
+            {
+                JavaScriptContext context = _create_context(runtime);
+
+                using (new JavaScriptContext.Scope(context))
+                {
+                    string script = "(()=>{ var val = ___api.test('TEST_1: Hello world'); ___api.log('api-js.test-1', 'key-1', 'TEST_1: This log called by JS...'); return val; })()";
+
+                    try
+                    {
+                        JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
+                        rs.data = result.ConvertToString().ToString();
+                        rs.ok = true;
+                    }
+                    catch (JavaScriptScriptException e)
+                    {
+                        var messageName = JavaScriptPropertyId.FromString("message");
+                        rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
+                    }
+                    catch (Exception e)
+                    {
+                        rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
+                    }
+                }
+            }
+            return rs;
+        }
+
+        public static oResult test_2(Dictionary<string, object> request = null)
+        {
+            oResult rs = new oResult() { ok = false, request = request };
+            using (new JavaScriptContext.Scope(js_context))
+            {
+                string script = "(()=>{ var val = ___api.test('TEST_2: Hello world'); ___api.log('api-js.test-2', 'key-2', 'TEST_2: This log called by JS...'); return val; })()";
+
+                try
+                {
+                    JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
+                    rs.data = result.ConvertToString().ToString();
+                    rs.ok = true;
+                }
+                catch (JavaScriptScriptException e)
+                {
+                    var messageName = JavaScriptPropertyId.FromString("message");
+                    rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
+                }
+                catch (Exception e)
+                {
+                    rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
+                }
+            }
+            return rs;
+        }
+
+        #endregion
+
         static JavaScriptValue _call_function(string function, JavaScriptValue[] arguments)
         {
             var para = arguments.getDictionary();
+            oResult result = new oResult() { ok = false, request = para }; 
+
+            if (m_ready==false)
+            {
+                result.error = ERROR_MESSAGE;
+                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+            }
+
+            if (para.Count == 0)
+            {
+                result.error = "Arguments is null or empty. Not If Arguments must be string text json, may be JSON.stringify({...})";
+                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+            }
+
             switch (function)
             {
+                case "":
+                    #region [  ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
+
+                    #endregion
+                    break;
+                case "html_export_links":
+                    #region [ html_export_links ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
+
+                    #endregion
+                    break;
+                case "html_export_images":
+                    #region [ html_export_images ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
+
+                    #endregion
+                    break;
+                case "html_to_text_01":
+                    #region [ html_to_text_01 ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("html") == false || para["html"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        if (s.Length > 0)
+                        {
+                            var mtit = Regex.Match(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                            string title = string.Empty;
+                            if (mtit.Success)
+                            {
+                                title = "[TITLE] " + mtit.Groups["Title"].Value.Trim() + Environment.NewLine;
+                                s = Regex.Replace(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", string.Empty, RegexOptions.Singleline);
+                            }
+
+                            //### Remove any tags but not there content "<p>bob<span> johnson</span></p>" -> "bob johnson"
+                            // Regex.Replace(input, @"<(.|\n)*?>", string.Empty);
+                            s = Regex.Replace(s, @"</?\w+((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>", string.Empty, RegexOptions.Singleline);
+                            s = title + s.Trim();
+                        }
+                        result.data = s;
+                        result.ok = true;
+                    }
+
+                    #endregion
+                    break;
+                case "html_clean_01":
+                    #region [ html_clean_01 ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("html") == false || para["html"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        if (s.Length > 0)
+                        {
+                            s = new Regex(@"<script[^>]*>[\s\S]*?</script>").Replace(s, string.Empty);
+                            s = new Regex(@"<style[^>]*>[\s\S]*?</style>").Replace(s, string.Empty);
+                            s = new Regex(@"<noscript[^>]*>[\s\S]*?</noscript>").Replace(s, string.Empty);
+                            s = Regex.Replace(s, @"<meta(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            s = Regex.Replace(s, @"<link(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            s = Regex.Replace(s, @"<use(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            s = Regex.Replace(s, @"<figure(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            s = Regex.Replace(s, @"<!DOCTYPE(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            s = Regex.Replace(s, @"<!--(.|\n)*?-->", string.Empty, RegexOptions.Singleline);
+
+                            s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
+
+                            if (para.ContainsKey("remove_first") && para["remove_first"] != null)
+                            {
+                                string remove_first = para.getValueByKey("remove_first").Trim();
+                                if (!string.IsNullOrWhiteSpace(remove_first))
+                                {
+                                    int pos = s.IndexOf(remove_first);
+                                    if (pos != -1) s = s.Substring(pos + remove_first.Length, s.Length - pos - remove_first.Length).Trim();
+                                }
+                            }
+
+                            if (para.ContainsKey("remove_end") && para["remove_end"] != null)
+                            {
+                                string remove_end = para.getValueByKey("remove_end").Trim();
+                                if (!string.IsNullOrWhiteSpace(remove_end))
+                                {
+                                    int pos = s.IndexOf(remove_end);
+                                    if (pos != -1) s = s.Substring(0, pos).Trim();
+                                }
+                            }
+                        }
+                        result.data = s;
+                        result.ok = true;
+                    }
+
+                    #endregion
+                    break;
+                case "html_remove_comment":
+                    #region [ html_remove_comment ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
+
+                    #endregion
+                    break;
+                case "html_remove_tag_simple":
+                    #region [ html_remove_tag_simple ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("html") == false || para["html"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                        if (para.ContainsKey("tags") == false || para["tags"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [tags] is not null or empty and it has format { tags: '!DOCTYPE,use,figure,meta,link,...' }";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        string[] tags = para.getValueByKey("tags").Trim().Split(',').Select(x => x.Trim().ToLower()).ToArray();
+                        if (s.Length > 0 && tags.Length > 0)
+                        {
+                            for (int i = 0; i < tags.Length; i++)
+                                s = new Regex(@"<" + tags[i] + @"(.|\n)*?>").Replace(s, string.Empty);
+                            s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
+
+                            //s = Regex.Replace(s, @"<meta(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            //s = Regex.Replace(s, @"<link(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            //s = Regex.Replace(s, @"<use(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            //s = Regex.Replace(s, @"<figure(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                            //s = Regex.Replace(s, @"<!DOCTYPE(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+
+                        }
+                        result.data = s;
+                        result.ok = true;
+                    }
+
+                    #endregion
+                    break;
+                case "html_remove_tag_content":
+                    #region [ html_remove_tag_content ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("html") == false || para["html"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                        if (para.ContainsKey("tags") == false || para["tags"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [tags] is not null or empty and it has format { tags: 'script,style,h1,a,p,...' }";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        string[] tags = para.getValueByKey("tags").Trim().Split(',').Select(x => x.Trim().ToLower()).ToArray();
+                        if (s.Length > 0 && tags.Length > 0)
+                        {
+                            for (int i = 0; i < tags.Length; i++)
+                                s = new Regex(@"<" + tags[i] + @"[^>]*>[\s\S]*?</" + tags[i] + @">").Replace(s, string.Empty);
+
+                            //s = new Regex(@"<script[^>]*>[\s\S]*?</script>").Replace(s, string.Empty);
+                            //s = new Regex(@"<style[^>]*>[\s\S]*?</style>").Replace(s, string.Empty);
+                            //s = new Regex(@"<noscript[^>]*>[\s\S]*?</noscript>").Replace(s, string.Empty);
+
+                            s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
+                        }
+                        result.data = s;
+                        result.ok = true;
+                    }
+
+                    #endregion
+                    break;
+                case "html_remove_tag_keep_content":
+                    #region [ html_remove_tag_keep_content ]
+
+                    if (para.Count > 0)
+                    {
+                        if (para.ContainsKey("html") == false || para["html"] == null)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        if (s.Length > 0)
+                        {
+                            //### Remove any tags but not there content "<p>bob<span> johnson</span></p>" -> "bob johnson"
+                            // Regex.Replace(input, @"<(.|\n)*?>", string.Empty);
+                            s = Regex.Replace(s, @"</?\w+((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>", string.Empty, RegexOptions.Singleline);
+                        }
+                        result.data = s;
+                        result.ok = true;
+                    }
+
+                    #endregion
+                    break;
                 case "notify_user":
                     #region [ notify_user ]
 
@@ -326,8 +699,104 @@ namespace ckv_lib
 
                     #endregion
                     break;
-                case "ajax_call":
-                    #region [ ajax_call ]
+                case "request_async":
+                    #region [ request_async ]
+
+                    if (para.Count > 0 && para.ContainsKey("headers"))
+                    {
+                        Dictionary<string, object> headers = null;
+
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        if (para.ContainsKey("headers"))
+                        {
+                            try
+                            {
+                                headers = ((JObject)para["headers"]).ToObject<Dictionary<string, object>>(); 
+                            }
+                            catch (Exception e)
+                            {
+                                result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be format JSON. " + e.Message;
+                                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                            }
+                        }
+
+                        if (headers.Count == 0
+                            || headers.ContainsKey("url") == false || headers["url"] == null || string.IsNullOrEmpty(headers["url"].ToString())
+                            || headers.ContainsKey("method") == false || headers["method"] == null || string.IsNullOrEmpty(headers["method"].ToString()))
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be { url:..., method:... } and Value is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        try
+                        {
+                            string httpMethod = "GET", url = string.Empty;
+
+                            using (var httpClient = new HttpClient())
+                            {
+                                foreach (var header in headers)
+                                {
+                                    if (header.Key.StartsWith("Content") || header.Key == "data") continue;
+                                    
+                                    if (header.Key == "url")
+                                    {
+                                        url = header.Value.ToString();
+                                        continue;
+                                    }
+                                    
+                                    if (header.Key == "method")
+                                    {
+                                        httpMethod = header.Value.ToString();
+                                        continue;
+                                    }
+
+                                    if (header.Value != null)
+                                        httpClient.DefaultRequestHeaders.Add(header.Key, header.Value.ToString());
+                                }
+
+                                HttpResponseMessage responseMessage = null;
+
+                                switch (httpMethod)
+                                {
+                                    case "DELETE":
+                                        responseMessage = httpClient.DeleteAsync(url).Result;
+                                        break;
+                                    case "PATCH":
+                                    case "POST":
+                                        string data = string.Empty;
+                                        if (para.ContainsKey("data") && para[data] != null) data = para["data"].ToString();
+                                        responseMessage = httpClient.PostAsync(url, new StringContent(data)).Result;
+                                        break;
+                                    case "GET":
+                                        responseMessage = httpClient.GetAsync(url).Result;
+                                        break;
+                                }
+
+                                if (responseMessage != null)
+                                {
+                                    using (responseMessage)
+                                    {
+                                        using (var content = responseMessage.Content)
+                                        {
+                                            string responseText = content.ReadAsStringAsync().Result;
+                                            result.ok = true;
+                                            result.data = responseText;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            result.error = "ERROR_THROW_" + function.ToUpper() + ": " + e.Message;
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
 
                     #endregion
                     break;
@@ -493,88 +962,9 @@ namespace ckv_lib
                     break;
             }
 
-            return JavaScriptValue.Invalid;
+            //return JavaScriptValue.Invalid;
+            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
         }
-
-        static ILogJS m_log;
-        static JavaScriptRuntime js_runtime;
-        static JavaScriptContext js_context;
-        public static void _init()
-        {
-            try
-            {
-                m_log = new clsLogJS();
-                js_runtime = JavaScriptRuntime.Create();
-                js_context = _create_context(js_runtime);
-                m_ready = true;
-            }
-            catch (Exception ex)
-            {
-                ERROR_MESSAGE = ex.Message;
-            }
-        }
-
-        #region [ test_1; test_2 ]
-
-        public static oResult test_1(Dictionary<string, object> request = null)
-        {
-            oResult rs = new oResult() { ok = false, request = request };
-
-            using (JavaScriptRuntime runtime = JavaScriptRuntime.Create())
-            {
-                JavaScriptContext context = _create_context(runtime);
-
-                using (new JavaScriptContext.Scope(context))
-                {
-                    string script = "(()=>{ var val = ___api.test('TEST_1: Hello world'); ___api.log('api-js.test-1', 'key-1', 'TEST_1: This log called by JS...'); return val; })()";
-
-                    try
-                    {
-                        JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
-                        rs.data = result.ConvertToString().ToString();
-                        rs.ok = true;
-                    }
-                    catch (JavaScriptScriptException e)
-                    {
-                        var messageName = JavaScriptPropertyId.FromString("message");
-                        rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
-                    }
-                    catch (Exception e)
-                    {
-                        rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
-                    }
-                }
-            }
-            return rs;
-        }
-
-        public static oResult test_2(Dictionary<string, object> request = null)
-        {
-            oResult rs = new oResult() { ok = false, request = request };
-            using (new JavaScriptContext.Scope(js_context))
-            {
-                string script = "(()=>{ var val = ___api.test('TEST_2: Hello world'); ___api.log('api-js.test-2', 'key-2', 'TEST_2: This log called by JS...'); return val; })()";
-
-                try
-                {
-                    JavaScriptValue result = JavaScriptContext.RunScript(script, CURRENT_SOURCE_CONTEXT++, string.Empty);
-                    rs.data = result.ConvertToString().ToString();
-                    rs.ok = true;
-                }
-                catch (JavaScriptScriptException e)
-                {
-                    var messageName = JavaScriptPropertyId.FromString("message");
-                    rs.error = "ERROR_JS_EXCEPTION: " + e.Error.GetProperty(messageName).ConvertToString().ToString();
-                }
-                catch (Exception e)
-                {
-                    rs.error = "ERROR_CHAKRA: failed to run script: " + e.Message;
-                }
-            }
-            return rs;
-        }
-
-        #endregion
 
         public static oResult run_api(Dictionary<string, object> request = null)
         {
@@ -585,32 +975,35 @@ namespace ckv_lib
                 return rs;
             }
 
-            string scope = request.getValueByKey("___scope");
-            if (string.IsNullOrEmpty(scope))
-            {
-                rs.error = "[___scope] is null or empty";
-                return rs;
-            }
+            string scope = string.Empty;
 
-            if (!clsApi.Exist(scope))
-            {
-                rs.error = "[___scope] = " + scope + " is not exist";
-                return rs;
-            }
-
-            if (string.IsNullOrEmpty(request.getValueByKey("___api")) 
-                || string.IsNullOrEmpty(request.getValueByKey("___fun")))
+            if (string.IsNullOrEmpty(request.getValueByKey("___api"))
+                && string.IsNullOrEmpty(request.getValueByKey("___fun")))
             {
                 rs.error = "[___api] or [___fun] is null or empty";
                 return rs;
             }
 
-            string js = string.Empty, api_name = string.Empty;
+            string js = string.Empty, 
+                api_name = string.Empty;
 
             #region [ JS: api or function ]
 
             if (string.IsNullOrEmpty(request.getValueByKey("___api")) == false)
             {
+                scope = request.getValueByKey("___scope");
+                if (string.IsNullOrEmpty(scope))
+                {
+                    rs.error = "[___scope] is null or empty";
+                    return rs;
+                }
+
+                if (!clsApi.Exist(scope))
+                {
+                    rs.error = "[___scope] = " + scope + " is not exist";
+                    return rs;
+                }
+
                 string sapi = request.getValueByKey("___api");
                 oApi o = clsApi.Get(scope);
                 if (o.apis.Length == 0)
@@ -631,9 +1024,11 @@ namespace ckv_lib
                 }
                 api_name = string.Join(",", a);
             }
-            else if (string.IsNullOrEmpty(request.getValueByKey("___fun")) == false) {
+            else if (string.IsNullOrEmpty(request.getValueByKey("___fun")) == false)
+            {
                 api_name = request.getValueByKey("___fun");
-                js = "api." + api_name + "(JSON.stringify(___para));" + Environment.NewLine + Environment.NewLine;
+                js = "var rs_ = ___api." + api_name + "(JSON.stringify(___para));" + Environment.NewLine;
+                js += "return rs_;" + Environment.NewLine + Environment.NewLine;
             }
 
             #endregion
@@ -652,6 +1047,8 @@ namespace ckv_lib
             }) + ";");
             bi.Append(Environment.NewLine);
             bi.Append("var ___log = function(key,text){ ___api.log(___scope, key, text); }; ");
+            bi.Append(Environment.NewLine);
+            bi.Append("var ___api_call = function(func, obj){ var p = JSON.stringify(obj); var v = ___api[func](p); var rs = JSON.parse(v); return rs; }; ");
             bi.Append(Environment.NewLine);
             bi.Append("var ___para = " + JsonConvert.SerializeObject(request));
             bi.Append(Environment.NewLine);
@@ -672,6 +1069,8 @@ namespace ckv_lib
                     string v = result.ConvertToString().ToString();
                     if (v == "undefined") rs.data = null;
                     else rs.data = v;
+
+                    rs.type = DATA_TYPE.JSON_RESPONSE;
                     rs.ok = true;
                 }
                 catch (JavaScriptScriptException e)

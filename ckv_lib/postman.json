@@ -50,6 +50,23 @@
 					"response": []
 				},
 				{
+					"name": "api_js",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api_js",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api_js"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "api/all",
 					"request": {
 						"method": "GET",
@@ -117,6 +134,35 @@
 								"api",
 								"global",
 								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test log-1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/js/test?___scope=test&___api=log-1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"js",
+								"test"
+							],
+							"query": [
+								{
+									"key": "___scope",
+									"value": "test"
+								},
+								{
+									"key": "___api",
+									"value": "log-1"
+								}
 							]
 						}
 					},
@@ -634,6 +680,31 @@
 					"response": []
 				},
 				{
+					"name": "create?g_test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/job/create?g_test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"job",
+								"create"
+							],
+							"query": [
+								{
+									"key": "g_test",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "test-2",
 					"request": {
 						"method": "GET",
@@ -685,6 +756,96 @@
 								"api",
 								"job",
 								"test-4"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "functions",
+			"item": [
+				{
+					"name": "request_async ___api",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"___scope\": \"function\",\n\t\"___api\": \"request_async\",\n\t\"headers\": {\n\t\t\"url\": \"https://vnexpress.net/\",\n\t\t\"method\": \"GET\"\n\t},\n\t\"data\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/js/test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"js",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crawler",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"___scope\": \"test\",\n\t\"___api\": \"crawler\",\n\t\"headers\": {\n\t\t\"url\": \"https://vnexpress.net/chu-tich-vcci-noi-long-phong-toa-la-goi-kich-thich-kinh-te-lon-nhat-4087759.html\",\n\t\t\"method\": \"GET\"\n\t},\n    \"remove_first\": \"<h1 class=\\\"title-detail\\\">\",\n    \"remove_end\": \"</article\",\n\t\"data\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/js/test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"js",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "request_async ___fun",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"___fun\": \"request_async\",\n\t\"headers\": {\n\t\t\"url\": \"https://vnexpress.net/\",\n\t\t\"method\": \"GET\"\n\t},\n\t\"data\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/js/test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"js",
+								"test"
 							]
 						}
 					},

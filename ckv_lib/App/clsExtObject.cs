@@ -23,6 +23,7 @@ namespace ckv_lib
                         vals = new string[argumentCount - 1];
                     for (uint i = 1; i < argumentCount; i++)
                         vals[i - 1] = arguments[i].ConvertToString().ToString();
+                    return vals;
                 }
             }
             catch { }
@@ -77,6 +78,7 @@ namespace ckv_lib
                     try
                     {
                         var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                        return dic;
                     }
                     catch { }
                 }
