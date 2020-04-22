@@ -1,4 +1,5 @@
 ﻿using ChakraHost.Hosting;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sider;
@@ -301,7 +302,7 @@ namespace ckv_lib
 
             _define(hostObject, "curl_call", delegate_curl_call);
             _define(hostObject, "request_async", delegate_request_async);
-            
+
             _define(hostObject, "html_export_links", delegate_html_export_links);
             _define(hostObject, "html_export_images", delegate_html_export_images);
             _define(hostObject, "html_to_text_01", delegate_html_to_text_01);
@@ -436,9 +437,9 @@ namespace ckv_lib
         static JavaScriptValue _call_function(string function, JavaScriptValue[] arguments)
         {
             var para = arguments.getDictionary();
-            oResult result = new oResult() { ok = false, request = para }; 
+            oResult result = new oResult() { ok = false, request = para };
 
-            if (m_ready==false)
+            if (m_ready == false)
             {
                 result.error = ERROR_MESSAGE;
                 return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
@@ -471,10 +472,40 @@ namespace ckv_lib
 
                     if (para.Count > 0)
                     {
-                        if (para.ContainsKey("headers") == false)
+                        if (para.ContainsKey("html") == false || para["html"] == null)
                         {
-                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
                             return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        if (s.Length > 0)
+                        {
+                            List<oLinkItem> list = new List<oLinkItem>();
+
+                            // 1. Find all matches in file.
+                            MatchCollection m1 = Regex.Matches(s, @"(<a.*?>.*?</a>)", RegexOptions.Singleline);
+
+                            // 2. Loop over each match.
+                            foreach (Match m in m1)
+                            {
+                                string value = m.Groups[1].Value;
+                                oLinkItem i = new oLinkItem() { html = m.ToString() };
+
+                                // 3. Get href attribute.
+                                Match m2 = Regex.Match(value, @"href=\""(.*?)\""", RegexOptions.Singleline);
+                                if (m2.Success)
+                                    i.href = m2.Groups[1].Value;
+
+                                // 4. Remove inner tags from text.
+                                string t = Regex.Replace(value, @"\s*<.*?>\s*", "", RegexOptions.Singleline);
+                                i.text = t;
+
+                                list.Add(i);
+                            }
+
+                            result.data = list;
+                            result.ok = true;
                         }
                     }
 
@@ -485,10 +516,31 @@ namespace ckv_lib
 
                     if (para.Count > 0)
                     {
-                        if (para.ContainsKey("headers") == false)
+                        if (para.ContainsKey("html") == false || para["html"] == null)
                         {
-                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
                             return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        string s = para.getValueByKey("html").Trim();
+                        if (s.Length > 0)
+                        {
+                            List<oImageItem> list = new List<oImageItem>();
+
+                            HtmlDocument doc = new HtmlDocument();
+                            doc.LoadHtml(s); // or doc.Load(htmlFileStream)
+                            //var nodes = doc.DocumentNode.SelectNodes(@"//img[@src]");
+                            var nodes = doc.DocumentNode.SelectNodes(@"//img");
+                            foreach (var img in nodes)
+                            {
+                                var dic = new Dictionary<string, string>();
+                                foreach (var attr in img.Attributes)
+                                    dic.Add(attr.Name, attr.Value);
+                                list.Add(new oImageItem() { html = img.OuterHtml, attrs = dic });
+                            }
+
+                            result.data = list;
+                            result.ok = true;
                         }
                     }
 
@@ -496,6 +548,21 @@ namespace ckv_lib
                     break;
                 case "html_to_text_01":
                     #region [ html_to_text_01 ]
+
+                    /*
+                     * POST /api/js/test
+                        {
+	                        "___scope": "test",
+	                        "___api": "crawler",
+	                        "headers": {
+		                        "url": "https://vnexpress.net/chu-tich-vcci-noi-long-phong-toa-la-goi-kich-thich-kinh-te-lon-nhat-4087759.html",
+		                        "method": "GET"
+	                        },
+                            "remove_first": "<h1 class=\"title-detail\">|</h1>",
+                            "remove_end": "</article",
+	                        "data": ""
+                        }
+                     */
 
                     if (para.Count > 0)
                     {
@@ -530,6 +597,21 @@ namespace ckv_lib
                 case "html_clean_01":
                     #region [ html_clean_01 ]
 
+                    /*
+                     * POST /api/js/test
+                        {
+	                        "___scope": "test",
+	                        "___api": "crawler",
+	                        "headers": {
+		                        "url": "https://vnexpress.net/chu-tich-vcci-noi-long-phong-toa-la-goi-kich-thich-kinh-te-lon-nhat-4087759.html",
+		                        "method": "GET"
+	                        },
+                            "remove_first": "<h1 class=\"title-detail\">|</h1>",
+                            "remove_end": "</article",
+	                        "data": ""
+                        }
+                     */
+
                     if (para.Count > 0)
                     {
                         if (para.ContainsKey("html") == false || para["html"] == null)
@@ -558,8 +640,21 @@ namespace ckv_lib
                                 string remove_first = para.getValueByKey("remove_first").Trim();
                                 if (!string.IsNullOrWhiteSpace(remove_first))
                                 {
-                                    int pos = s.IndexOf(remove_first);
-                                    if (pos != -1) s = s.Substring(pos + remove_first.Length, s.Length - pos - remove_first.Length).Trim();
+                                    var mtit = Regex.Match(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                                    string title = string.Empty;
+                                    if (mtit.Success) title = "[TITLE] " + mtit.Groups["Title"].Value.Trim() + Environment.NewLine;
+
+                                    int pos = -1;
+                                    string split_text;
+                                    string[] a = remove_first.Split('|');
+                                    for (int i = 0; i < a.Length; i++)
+                                    {
+                                        split_text = a[i];
+                                        pos = s.IndexOf(split_text);
+                                        if (pos != -1) s = s.Substring(pos + split_text.Length, s.Length - pos - split_text.Length).Trim();
+                                    }
+
+                                    s = title + s;
                                 }
                             }
 
@@ -568,8 +663,15 @@ namespace ckv_lib
                                 string remove_end = para.getValueByKey("remove_end").Trim();
                                 if (!string.IsNullOrWhiteSpace(remove_end))
                                 {
-                                    int pos = s.IndexOf(remove_end);
-                                    if (pos != -1) s = s.Substring(0, pos).Trim();
+                                    int pos = -1;
+                                    string split_text;
+                                    string[] a = remove_end.Split('|');
+                                    for (int i = 0; i < a.Length; i++)
+                                    {
+                                        split_text = a[i];
+                                        pos = s.IndexOf(split_text);
+                                        if (pos != -1) s = s.Substring(0, pos).Trim();
+                                    }
                                 }
                             }
                         }
@@ -716,7 +818,7 @@ namespace ckv_lib
                         {
                             try
                             {
-                                headers = ((JObject)para["headers"]).ToObject<Dictionary<string, object>>(); 
+                                headers = ((JObject)para["headers"]).ToObject<Dictionary<string, object>>();
                             }
                             catch (Exception e)
                             {
@@ -742,13 +844,13 @@ namespace ckv_lib
                                 foreach (var header in headers)
                                 {
                                     if (header.Key.StartsWith("Content") || header.Key == "data") continue;
-                                    
+
                                     if (header.Key == "url")
                                     {
                                         url = header.Value.ToString();
                                         continue;
                                     }
-                                    
+
                                     if (header.Key == "method")
                                     {
                                         httpMethod = header.Value.ToString();
@@ -984,7 +1086,7 @@ namespace ckv_lib
                 return rs;
             }
 
-            string js = string.Empty, 
+            string js = string.Empty,
                 api_name = string.Empty;
 
             #region [ JS: api or function ]
