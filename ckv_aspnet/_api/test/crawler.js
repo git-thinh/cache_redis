@@ -38,9 +38,10 @@ if (o_html.ok) {
                 for (var i = 0; i < imgs.length; i++) {
                     var id = new Date().getTime();
                     var tag_img = imgs[i].html;
-                    var a = htm.split(tag_img)
+                    htm = htm.split(tag_img).join('\r\n [' + id + '] \r\n ');
                 }
             }
+            rs.data.images = imgs;
         }
 
         rs.data.html = htm;
