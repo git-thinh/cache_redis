@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 
 namespace ckv_lib
@@ -133,7 +134,68 @@ namespace ckv_lib
 
             return rs;
         }
-        
+
+        public static string ___https(string url) {
+
+            try
+            {
+                Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
+
+                Easy easy = new Easy();
+
+                StringBuilder bi = new StringBuilder();
+                Easy.WriteFunction wf = new Easy.WriteFunction((buf, size, nmemb, extraData) =>
+                {
+                    string si = Encoding.UTF8.GetString(buf);
+                    bi.Append(si);
+                    return size * nmemb;
+                });
+                easy.SetOpt(CURLoption.CURLOPT_WRITEFUNCTION, wf);
+
+                Easy.SSLContextFunction sf = new Easy.SSLContextFunction((ctx, extraData) => CURLcode.CURLE_OK);
+                easy.SetOpt(CURLoption.CURLOPT_SSL_CTX_FUNCTION, sf);
+
+                easy.SetOpt(CURLoption.CURLOPT_URL, url);
+                //easy.SetOpt(CURLoption.CURLOPT_CAINFO, "ca-bundle.crt");
+                string file_crt = Path.Combine(_CONFIG.PATH_ROOT, @"bin\ca-bundle.crt");
+                if (File.Exists(file_crt) == false)
+                    return "ERR: Cannot found file: " + file_crt;
+
+                easy.SetOpt(CURLoption.CURLOPT_CAINFO, file_crt);
+
+                easy.Perform();
+
+                Thread.Sleep(3000);
+
+                easy.Dispose();
+
+                Curl.GlobalCleanup();
+
+                string s = bi.ToString();
+
+                //string title = Regex.Match(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
+
+                //s = new Regex(@"<script[^>]*>[\s\S]*?</script>").Replace(s, string.Empty);
+                //s = new Regex(@"<style[^>]*>[\s\S]*?</style>").Replace(s, string.Empty);
+                //s = new Regex(@"<noscript[^>]*>[\s\S]*?</noscript>").Replace(s, string.Empty);
+                //s = Regex.Replace(s, @"<meta(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                //s = Regex.Replace(s, @"<link(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                //s = Regex.Replace(s, @"<use(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                //s = Regex.Replace(s, @"<figure(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                //s = Regex.Replace(s, @"<!DOCTYPE(.|\n)*?>", string.Empty, RegexOptions.Singleline);
+                //s = Regex.Replace(s, @"<!--(.|\n)*?-->", string.Empty, RegexOptions.Singleline);
+
+                //s = Regex.Replace(s, @"(?:\r\n|\r(?!\n)|(?<!\r)\n){2,}", "\r\n");
+
+                return s;
+            }
+            catch (Exception ex)
+            {
+                return "ERR: " + ex.Message;
+            }
+        }
+
+
         public static string get_raw_http(object p)
         {
             if (p == null)

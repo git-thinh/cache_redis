@@ -23,9 +23,10 @@ if (o_html.ok) {
     var o_html_2 = ___api_call('html_clean_01', {
         html: o_html.data,
         remove_first: ___para['remove_first'],
-        remove_end: ___para['remove_end'],
+        remove_end: ___para['remove_end']
     });
     if (o_html_2.ok) {
+        rs.ok = true;
         var htm = o_html_2.data;
 
         var o_link = ___api_call('html_export_links', { html: htm });
@@ -36,9 +37,15 @@ if (o_html.ok) {
             var imgs = o_img.data;
             if (imgs && imgs.length > 0) {
                 for (var i = 0; i < imgs.length; i++) {
-                    var id = new Date().getTime();
-                    var tag_img = imgs[i].html;
-                    htm = htm.split(tag_img).join('\r\n [' + id + '] \r\n ');
+                    var id = new Date().getTime().toString();
+                    var tag_img = imgs[i].html,
+                        attr_img = imgs[i].attrs;
+                    if (attr_img && attr_img['data-src']) {
+                        //htm = htm.split(tag_img).join('\r\n [' + id + '] \r\n ');
+                        htm = htm.split(tag_img).join('<br> [IMG] ' + attr_img['data-src'] + ' <br>');
+                    }
+                    //___log('img', tag_img);
+                    //___log('img', htm);
                 }
             }
             rs.data.images = imgs;
@@ -46,9 +53,14 @@ if (o_html.ok) {
 
         rs.data.html = htm;
 
-        var o_text = ___api_call('html_to_text_01', { html: htm });
+        var o_text = ___api_call('html_to_text_01', {
+            html: htm,
+            remove_first: ___para['text_remove_first'],
+            remove_end: ___para['text_remove_end']
+        });
         if (o_text.ok) {
             rs.data.text = o_text.data;
+            ___log('text', o_text.data);
         } else rs.error = o_text.error;
 
     } else rs.error = o_html_2.error;

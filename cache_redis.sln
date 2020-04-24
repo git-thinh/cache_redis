@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv_aspnet", "ckv_aspnet\ck
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ckv_lib", "ckv_lib\ckv_lib.csproj", "{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xhr", "xhr\xhr.csproj", "{7052DF2F-6BED-4959-A9DC-D39109EA870F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,14 @@ Global
 		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|x64.ActiveCfg = Release|Any CPU
 		{0C5F8D48-0C51-42D8-BBB2-EBFC43EB6350}.Release|x64.Build.0 = Release|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7052DF2F-6BED-4959-A9DC-D39109EA870F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

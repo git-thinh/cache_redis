@@ -1,15 +1,20 @@
 ﻿using ChakraHost.Hosting;
 using HtmlAgilityPack;
+using Microsoft.ClearScript.V8;
+//using Microsoft.ClearScript.V8;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sider;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -467,6 +472,159 @@ namespace ckv_lib
 
                     #endregion
                     break;
+                case "request_async":
+                    #region [ request_async ]
+
+                    if (para.Count > 0 && para.ContainsKey("headers"))
+                    {
+                        #region
+
+                        Dictionary<string, object> headers = null;
+
+                        if (para.ContainsKey("headers") == false)
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        if (para.ContainsKey("headers"))
+                        {
+                            try
+                            {
+                                headers = ((JObject)para["headers"]).ToObject<Dictionary<string, object>>();
+                            }
+                            catch (Exception e)
+                            {
+                                result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be format JSON. " + e.Message;
+                                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                            }
+                        }
+
+                        if (headers.Count == 0
+                            || headers.ContainsKey("url") == false || headers["url"] == null || string.IsNullOrEmpty(headers["url"].ToString())
+                            || headers.ContainsKey("method") == false || headers["method"] == null || string.IsNullOrEmpty(headers["method"].ToString()))
+                        {
+                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be { url:..., method:... } and Value is not null or empty";
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+
+                        #endregion
+
+                        try
+                        {
+                            string httpMethod = "GET";
+                            string type = "v8";
+                            string url = string.Empty;
+                            string htm = string.Empty;
+
+                            foreach (var header in headers)
+                            {
+                                if (header.Key.StartsWith("Content") || header.Key == "data") continue;
+
+                                if (header.Key == "url")
+                                {
+                                    url = header.Value.ToString();
+                                    continue;
+                                }
+
+                                if (header.Key == "method")
+                                {
+                                    httpMethod = header.Value.ToString();
+                                    continue;
+                                }
+
+                                if (header.Key == "type")
+                                {
+                                    type = header.Value.ToString();
+                                    continue;
+                                }
+                            }
+                            switch (type)
+                            {
+                                case "curl":
+                                    htm = clsCURL.___https(url);
+                                    result.ok = true;
+                                    result.data = htm;
+                                    break;
+                                case "v8":
+                                    try
+                                    {
+                                        V8ScriptEngine engine = new V8ScriptEngine(V8ScriptEngineFlags.DisableGlobalMembers);
+                                        engine.AddCOMType("XMLHttpRequest", "MSXML2.XMLHTTP");
+                                        engine.Execute(@" function get(url) { var xhr = new XMLHttpRequest(); xhr.open('GET', url, false); xhr.send(); if (xhr.status == 200) return xhr.responseText; else return ''; }");
+                                        htm = engine.Script.get(url);
+                                        engine.Dispose();
+
+                                        result.ok = true;
+                                        result.data = htm;
+                                    }
+                                    catch (Exception e1)
+                                    {
+                                        //htm = e1.Message;
+                                        result.error = "ERROR_XHR_" + function.ToUpper() + ": " + e1.Message;
+                                        return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                                    }
+                                    break;
+                                default:
+                                    using (var httpClient = new HttpClient())
+                                    {
+                                        foreach (var header in headers)
+                                        {
+                                            if (header.Key.StartsWith("Content") || header.Key == "type" || header.Key == "data" || header.Key == "url" || header.Key == "method") continue;
+                                            if (header.Value != null) httpClient.DefaultRequestHeaders.Add(header.Key, header.Value.ToString());
+                                        }
+
+                                        //============================================================
+                                        //ServicePointManager.CertificatePolicy = new MyPolicy();
+                                        //ServicePointManager.Expect100Continue = true;
+                                        //ServicePointManager.DefaultConnectionLimit = 9999;
+                                        //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12;
+
+                                        //============================================================
+                                        HttpResponseMessage responseMessage = null;
+                                        switch (httpMethod)
+                                        {
+                                            case "DELETE":
+                                                responseMessage = httpClient.DeleteAsync(url).Result;
+                                                break;
+                                            case "PATCH":
+                                            case "POST":
+                                                string data = string.Empty;
+                                                if (para.ContainsKey("data") && para[data] != null) data = para["data"].ToString();
+                                                responseMessage = httpClient.PostAsync(url, new StringContent(data)).Result;
+                                                break;
+                                            case "GET":
+                                                responseMessage = httpClient.GetAsync(url).Result;
+                                                break;
+                                        }
+
+                                        if (responseMessage != null)
+                                            using (responseMessage)
+                                            using (var content = responseMessage.Content)
+                                                htm = content.ReadAsStringAsync().Result.Trim();
+                                        if (htm.Length > 0)
+                                        {
+                                            result.ok = true;
+                                            result.data = htm;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            result.error = "ERROR_THROW_" + function.ToUpper() + ": " + e.Message;
+                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                        }
+                    }
+
+                    #endregion
+                    break;
+                case "curl_call":
+                    #region [ curl_call ]
+
+                    #endregion
+                    break;
                 case "html_export_links":
                     #region [ html_export_links ]
 
@@ -526,21 +684,30 @@ namespace ckv_lib
                         if (s.Length > 0)
                         {
                             List<oImageItem> list = new List<oImageItem>();
-
-                            HtmlDocument doc = new HtmlDocument();
-                            doc.LoadHtml(s); // or doc.Load(htmlFileStream)
-                            //var nodes = doc.DocumentNode.SelectNodes(@"//img[@src]");
-                            var nodes = doc.DocumentNode.SelectNodes(@"//img");
-                            foreach (var img in nodes)
+                            try
                             {
-                                var dic = new Dictionary<string, string>();
-                                foreach (var attr in img.Attributes)
-                                    dic.Add(attr.Name, attr.Value);
-                                list.Add(new oImageItem() { html = img.OuterHtml, attrs = dic });
+                                HtmlDocument doc = new HtmlDocument();
+                                doc.LoadHtml(s); // or doc.Load(htmlFileStream)
+                                                 //var nodes = doc.DocumentNode.SelectNodes(@"//img[@src]");
+                                var nodes = doc.DocumentNode.SelectNodes(@"//img");
+                                if (nodes != null)
+                                {
+                                    foreach (var img in nodes)
+                                    {
+                                        var dic = new Dictionary<string, string>();
+                                        foreach (var attr in img.Attributes)
+                                            dic.Add(attr.Name, attr.Value);
+                                        list.Add(new oImageItem() { html = img.OuterHtml, attrs = dic });
+                                    }
+                                }
+                                result.data = list;
+                                result.ok = true;
                             }
-
-                            result.data = list;
-                            result.ok = true;
+                            catch (Exception e)
+                            {
+                                result.error = "ERROR_" + function.ToUpper() + ": The paramenter [html] is not null or empty";
+                                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
+                            }
                         }
                     }
 
@@ -583,10 +750,135 @@ namespace ckv_lib
                                 s = Regex.Replace(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", string.Empty, RegexOptions.Singleline);
                             }
 
+                            List<oLinkItem> list = new List<oLinkItem>();
+                            #region [ LINK ]
+
+                            // 1. Find all matches in file.
+                            MatchCollection m1 = Regex.Matches(s, @"(<a.*?>.*?</a>)", RegexOptions.Singleline);
+
+                            // 2. Loop over each match.
+                            foreach (Match m in m1)
+                            {
+                                string value = m.Groups[1].Value;
+                                oLinkItem i = new oLinkItem() { html = m.ToString() };
+
+                                // 3. Get href attribute.
+                                Match m2 = Regex.Match(value, @"href=\""(.*?)\""", RegexOptions.Singleline);
+                                if (m2.Success)
+                                    i.href = m2.Groups[1].Value;
+
+                                // 4. Remove inner tags from text.
+                                string t = Regex.Replace(value, @"\s*<.*?>\s*", "", RegexOptions.Singleline);
+                                i.text = t;
+
+                                list.Add(i);
+                                s = s.Replace(m.ToString(), " " + i.id + " ");
+                            }
+
+                            #endregion
+
+                            #region [ IMG ]
+
+                            //List<oImageItem> list_img = new List<oImageItem>();
+                            //HtmlDocument doc = new HtmlDocument();
+                            //string htm = s;
+                            //if (htm.Contains("<html") == false) htm = "<html>" + htm;
+                            //doc.LoadHtml(htm); // or doc.Load(htmlFileStream)
+                            ////var nodes = doc.DocumentNode.SelectNodes(@"//img[@src]");
+                            //var nodes = doc.DocumentNode.SelectNodes(@"//img");
+                            //if (nodes != null)
+                            //{
+                            //    foreach (var img in nodes)
+                            //    {
+                            //        var dic = new Dictionary<string, string>();
+                            //        foreach (var attr in img.Attributes)
+                            //            dic.Add(attr.Name, attr.Value);
+                            //        var i = new oImageItem() { html = img.OuterHtml, attrs = dic };
+                            //        list_img.Add(i);
+                            //        s = s.Replace(i.html, " " + i.id + " ");
+                            //    }
+                            //}
+
+                            #endregion
+
+                            s = s
+                                //.Replace("<a", " [A] <a").Replace("</a", " [/A]</a")
+                                //.Replace("<img", " [IMG] <img")
+
+                                .Replace("<article", "^[ARTICLE] <article").Replace("</article", "^[/ARTICLE]</article")
+
+                                .Replace("<div", "^<div")
+                                .Replace("<p", "^<p")
+
+                                .Replace("<table", "^[TABLE] <table").Replace("</table", "^[/TABLE]</table")
+                                .Replace("<tr", "^[TR] <tr").Replace("</tr", "^[/TR]</tr")
+                                //.Replace("<td", " || <td")
+
+                                .Replace("<ul", "^[UL] <ul").Replace("</ul", "^[/UL]</ul")
+                                .Replace("<li", "^[LI] <li")
+                                .Replace("<h1", "^[H1] <h1")
+                                .Replace("<h2", "^[H2] <h2")
+                                .Replace("<h3", "^[H3] <h3")
+                                .Replace("<h4", "^[H4] <h4")
+                                .Replace("<h5", "^[H5] <h5")
+                                .Replace("<h6", "^[H6] <h6")
+
+                                .Replace("<br", "^<br");
+
+                            foreach (var a in list) s = s.Replace(a.id, a.ToString());
+
                             //### Remove any tags but not there content "<p>bob<span> johnson</span></p>" -> "bob johnson"
                             // Regex.Replace(input, @"<(.|\n)*?>", string.Empty);
                             s = Regex.Replace(s, @"</?\w+((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>", string.Empty, RegexOptions.Singleline);
+
+                            s = s.Replace("^", Environment.NewLine);
+                            s = Regex.Replace(s, @"[\r\n]{2,}", "\r\n");
+                            s = string.Join(Environment.NewLine + Environment.NewLine,
+                                s.Split(new char[] { '\r', '\n' }).Select(x => x.Trim()).Where(x => x.Length > 0));
+
+                            if (para.ContainsKey("remove_first") && para["remove_first"] != null)
+                            {
+                                string remove_first = para.getValueByKey("remove_first").Trim();
+                                if (!string.IsNullOrWhiteSpace(remove_first))
+                                {
+                                    //var mtit = Regex.Match(s, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                                    //string title = string.Empty;
+                                    //if (mtit.Success) title = "[TITLE] " + mtit.Groups["Title"].Value.Trim() + Environment.NewLine;
+
+                                    int pos = -1;
+                                    string split_text;
+                                    string[] a = remove_first.Split('|');
+                                    for (int i = 0; i < a.Length; i++)
+                                    {
+                                        split_text = a[i];
+                                        pos = s.IndexOf(split_text);
+                                        if (pos != -1) s = s.Substring(pos + split_text.Length, s.Length - pos - split_text.Length).Trim();
+                                    }
+
+                                    //s = title + s;
+                                }
+                            }
+
+                            if (para.ContainsKey("remove_end") && para["remove_end"] != null)
+                            {
+                                string remove_end = para.getValueByKey("remove_end").Trim();
+                                if (!string.IsNullOrWhiteSpace(remove_end))
+                                {
+                                    int pos = -1;
+                                    string split_text;
+                                    string[] a = remove_end.Split('|');
+                                    for (int i = 0; i < a.Length; i++)
+                                    {
+                                        split_text = a[i];
+                                        pos = s.IndexOf(split_text);
+                                        if (pos != -1) s = s.Substring(0, pos).Trim();
+                                    }
+                                }
+                            }
+
                             s = title + s.Trim();
+
+                            //if (list_img.Count > 0) s = Environment.NewLine + "<==IMG==>" + Environment.NewLine + JsonConvert.SerializeObject(list_img);
                         }
                         result.data = s;
                         result.ok = true;
@@ -798,112 +1090,6 @@ namespace ckv_lib
                     break;
                 case "notify_broadcast":
                     #region [ notify_broadcast ]
-
-                    #endregion
-                    break;
-                case "request_async":
-                    #region [ request_async ]
-
-                    if (para.Count > 0 && para.ContainsKey("headers"))
-                    {
-                        Dictionary<string, object> headers = null;
-
-                        if (para.ContainsKey("headers") == false)
-                        {
-                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] not exist";
-                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
-                        }
-
-                        if (para.ContainsKey("headers"))
-                        {
-                            try
-                            {
-                                headers = ((JObject)para["headers"]).ToObject<Dictionary<string, object>>();
-                            }
-                            catch (Exception e)
-                            {
-                                result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be format JSON. " + e.Message;
-                                return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
-                            }
-                        }
-
-                        if (headers.Count == 0
-                            || headers.ContainsKey("url") == false || headers["url"] == null || string.IsNullOrEmpty(headers["url"].ToString())
-                            || headers.ContainsKey("method") == false || headers["method"] == null || string.IsNullOrEmpty(headers["method"].ToString()))
-                        {
-                            result.error = "ERROR_" + function.ToUpper() + ": The paramenter [headers] must be { url:..., method:... } and Value is not null or empty";
-                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
-                        }
-
-                        try
-                        {
-                            string httpMethod = "GET", url = string.Empty;
-
-                            using (var httpClient = new HttpClient())
-                            {
-                                foreach (var header in headers)
-                                {
-                                    if (header.Key.StartsWith("Content") || header.Key == "data") continue;
-
-                                    if (header.Key == "url")
-                                    {
-                                        url = header.Value.ToString();
-                                        continue;
-                                    }
-
-                                    if (header.Key == "method")
-                                    {
-                                        httpMethod = header.Value.ToString();
-                                        continue;
-                                    }
-
-                                    if (header.Value != null)
-                                        httpClient.DefaultRequestHeaders.Add(header.Key, header.Value.ToString());
-                                }
-
-                                HttpResponseMessage responseMessage = null;
-
-                                switch (httpMethod)
-                                {
-                                    case "DELETE":
-                                        responseMessage = httpClient.DeleteAsync(url).Result;
-                                        break;
-                                    case "PATCH":
-                                    case "POST":
-                                        string data = string.Empty;
-                                        if (para.ContainsKey("data") && para[data] != null) data = para["data"].ToString();
-                                        responseMessage = httpClient.PostAsync(url, new StringContent(data)).Result;
-                                        break;
-                                    case "GET":
-                                        responseMessage = httpClient.GetAsync(url).Result;
-                                        break;
-                                }
-
-                                if (responseMessage != null)
-                                {
-                                    using (responseMessage)
-                                    {
-                                        using (var content = responseMessage.Content)
-                                        {
-                                            string responseText = content.ReadAsStringAsync().Result;
-                                            result.ok = true;
-                                            result.data = responseText;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            result.error = "ERROR_THROW_" + function.ToUpper() + ": " + e.Message;
-                            return JavaScriptValue.FromString(JsonConvert.SerializeObject(result));
-                        }
-                    }
-
-                    #endregion
-                    break;
-                case "curl_call":
-                    #region [ curl_call ]
 
                     #endregion
                     break;
@@ -1186,6 +1372,16 @@ namespace ckv_lib
                 }
             }
             return rs;
+        }
+    }
+    public class MyPolicy : ICertificatePolicy
+    {
+        public bool CheckValidationResult(ServicePoint srvPoint,
+          X509Certificate certificate, WebRequest request,
+          int certificateProblem)
+        {
+            //Return True to force the certificate to be accepted.
+            return true;
         }
     }
 

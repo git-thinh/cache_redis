@@ -8,11 +8,13 @@ namespace ckv_lib
 {
     public class oLinkItem
     {
+        public string id { set; get; }
         public string href { set; get; }
         public string text { set; get; }
         public string html { set; get; }
 
         public oLinkItem() {
+            this.id = Guid.NewGuid().ToString();
             this.href = string.Empty;
             this.text = string.Empty;
             this.html = string.Empty;
@@ -20,7 +22,7 @@ namespace ckv_lib
 
         public override string ToString()
         {
-            return href + "\n\t" + text;
+            return " [A] " + text + " || " + href  + " [/A] ";
         }
     }
 }

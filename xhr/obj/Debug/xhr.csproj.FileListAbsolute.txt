@@ -1,0 +1,16 @@
+D:\cache_redis\ckv_aspnet\bin\xhr\ClearScriptV8-32.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\ClearScriptV8-64.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-zlib-ia32.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-base-ia32.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-ia32.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-zlib-x64.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-base-x64.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\v8-x64.dll
+D:\cache_redis\ckv_aspnet\bin\xhr\xhr.exe.config
+D:\cache_redis\ckv_aspnet\bin\xhr\xhr.exe
+D:\cache_redis\ckv_aspnet\bin\xhr\xhr.pdb
+D:\cache_redis\xhr\obj\Debug\xhr.csproj.CoreCompileInputs.cache
+D:\cache_redis\xhr\obj\Debug\xhr.csproj.CopyComplete
+D:\cache_redis\xhr\obj\Debug\xhr.exe
+D:\cache_redis\xhr\obj\Debug\xhr.pdb
+D:\cache_redis\xhr\obj\Debug\xhr.csprojAssemblyReference.cache
