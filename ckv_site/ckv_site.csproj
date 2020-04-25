@@ -14,7 +14,7 @@
     <RootNamespace>ckv_site</RootNamespace>
     <AssemblyName>ckv_site</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -87,6 +87,19 @@
     <Content Include="client.html" />
     <Content Include="Global.asax" />
     <Content Include="admin.html" />
+    <Content Include="_site\iot.vn\asset\img\banner-1.png" />
+    <Content Include="_site\iot.vn\asset\img\comment.JPG" />
+    <Content Include="_site\iot.vn\asset\img\facebook.png" />
+    <Content Include="_site\iot.vn\asset\img\h-logo.png" />
+    <Content Include="_site\iot.vn\asset\img\logodba.png" />
+    <Content Include="_site\iot.vn\asset\img\phone.png" />
+    <Content Include="_site\iot.vn\asset\img\special-1.png" />
+    <Content Include="_site\iot.vn\asset\img\special-2.png" />
+    <Content Include="_site\iot.vn\asset\img\viec-lam-bao-ve.jpg" />
+    <Content Include="_site\iot.vn\asset\img\xem-tiep.jpg" />
+    <Content Include="_site\iot.vn\asset\img\youtube.png" />
+    <Content Include="_site\iot.vn\asset\style.css" />
+    <Content Include="_site\iot.vn\index.htm" />
     <Content Include="_site\iot.vn\index.html" />
     <Content Include="test\assets\images\avatar\nan.jpg" />
     <Content Include="test\assets\images\avatar\tom.jpg" />
@@ -318,7 +331,44 @@
     <Content Include="_lib\lodash.min.js" />
     <Content Include="_lib\vue\vue-router.min.js" />
     <Content Include="_lib\vue\vue.min.js" />
+    <Content Include="_site\iot.vn\kh\bao-ve-nha-hang-khach-san-he-thong-Coffe-High-Land.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-nha-hang-khach-san-Sofitel-MeTropole-ha-noi.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-sieu-thi-Pico-Plaza.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-su-kien-dai-le-phat-dan-lien-hop-quoc-vesak-2014.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-su-kien-gia-dinh-bien-dao-mua-xuan.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-toa-nha-chung-cu-250.JPG" />
+    <Content Include="_site\iot.vn\kh\bao-ve-toa-nha-chung-cu-C14-bo-cong-an.JPG" />
+    <Content Include="_site\iot.vn\kh\bao-ve-toa-nha-chung-cu-Diamond-Blue-250.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-toa-nha-chung-cu-Diamond-Blue.jpg" />
+    <Content Include="_site\iot.vn\kh\bao-ve-toa-nha-chung-cu-Platinum-Residences.jpg" />
+    <Content Include="_site\iot.vn\kh\dich-vu-bao-ve-di-dong-250.jpg" />
+    <Content Include="_site\iot.vn\kh\dich-vu-bao-ve-vip-250.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-nha-hang-khach-san-he-thong-Coffe-High-Land-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-nha-hang-khach-san-Sofitel-MeTropole-ha-noi-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-sieu-thi-Pico-Plaza-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-su-kien-dai-le-phat-dan-lien-hop-quoc-vesak-2014-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-su-kien-gia-dinh-bien-dao-mua-xuan-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-toa-nha-chung-cu-C14-bo-cong-an-small.JPG" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-toa-nha-chung-cu-Diamond-Blue-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-toa-nha-chung-cu-Platinum-Residences-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-chu-tich-quoc-hoi-nguyen-thi-kim-ngan-250.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-chu-tich-quoc-hoi-nguyen-thi-kim-ngan-mini.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-chu-tich-quoc-hoi-nguyen-thi-kim-ngan-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-chu-tich-quoc-hoi-nguyen-thi-kim-ngan.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-dang-hong-phuc-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-dang-hong-phuc.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-thu-tuong-nguyen-xuan-phuc-250.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-thu-tuong-nguyen-xuan-phuc-mini.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-thu-tuong-nguyen-xuan-phuc-small.jpg" />
+    <Content Include="_site\iot.vn\kh\viec-lam-bao-ve-vip-thu-tuong-nguyen-xuan-phuc.jpg" />
+    <Content Include="_site\iot.vn\news-detail.htm" />
+    <Content Include="_site\iot.vn\news-detail.html" />
+    <Content Include="_site\iot.vn\news.htm" />
+    <Content Include="_site\iot.vn\news.html" />
+    <Content Include="_site\iot.vn\not-find.htm" />
     <Content Include="_site\iot.vn\test.html" />
+    <Content Include="_site\iot.vn\_footer.htm" />
+    <Content Include="_site\iot.vn\_header.htm" />
     <Content Include="_view\dialog\test.css" />
     <Content Include="_view\dialog\test.htm" />
     <Content Include="_view\form\form01.htm" />
@@ -384,6 +434,7 @@
     <Content Include="_lib\fomantic-ui\themes\material\assets\fonts\icons.woff" />
     <Content Include="_lib\fomantic-ui\themes\material\assets\fonts\icons.woff2" />
     <Content Include="_view\config.json" />
+    <Content Include="_site\iot.vn\not-find.spark" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="_cache\" />
@@ -404,7 +455,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>58511</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:58599/</IISUrl>
+          <IISUrl>http://localhost</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

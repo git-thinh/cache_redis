@@ -15,7 +15,7 @@ namespace ckv_site
         {
             _CONFIG._init();
             m_cache = new clsCache();
-            m_api = new clsApi(m_cache); 
+            m_api = new clsApi(m_cache);
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
@@ -23,25 +23,20 @@ namespace ckv_site
             Uri uri = Request.Url;
 
             string path = uri.AbsolutePath.Substring(1);
-            if (path == "favicon.ico") { response_end(); return; }
+            if (path == "favicon.ico") { Response.End(); return; }
             string[] a = path.Split('/');
 
             string domain = uri.Host;
             if (domain == "localhost" || domain == "127.0.0.1") domain = _CONFIG.DOMAIN_LOCALHOST;
-            string file = string.Empty;
 
-            if (path.Length == 0) path = "index.html";
-            if (path.EndsWith(".html")) path = "_site\\" + domain + "\\" + path;
-            if (path == "admin") path = "admin.html";
-
-            //[2] api/{cache_name}/{do_action}/{id}
+            //[1] api/{cache_name}/{do_action}/{id}
             if (a[0] == "api" && a.Length > 2)
             {
                 Response.ContentType = "application/json";
                 if (m_api.cache_exist(a[1]))
                 {
                     Response.Write(JsonConvert.SerializeObject(oResult.Error("Cannot found cache name: " + a[1])));
-                    response_end();
+                    Response.End();
                     return;
                 }
 
@@ -53,24 +48,31 @@ namespace ckv_site
                     rv = rp;
 
                 Response.Write(JsonConvert.SerializeObject(rv));
-                response_end();
+                Response.End();
                 return;
             }
+
+            //[2] Files
+            string file = string.Empty;
+            if (path.Length == 0) path = "index.html";
+            if (path.EndsWith(".html")) path = "_site\\" + domain + "\\" + path;
+            if (path == "admin") path = "admin.html";
+
+            string contentType = MimeMapping.GetMimeMapping(path);
+            if (path[0] != '_' // break dirs: _lib, _view,..
+                && contentType != "text/html" // break files *.html
+                && Request.UrlReferrer != null) // Ref from other request as request on page html
+                path = "_site\\" + domain + "\\" + path;
 
             file = Path.Combine(_CONFIG.PATH_ROOT, path).Replace("/", "\\");
 
             if (File.Exists(file))
             {
-                string contentType = MimeMapping.GetMimeMapping(file);
                 Response.ContentType = contentType;
                 Response.TransmitFile(file);
             }
             else Response.StatusCode = 404;
 
-            response_end();
-        }
-
-        void response_end() {
             Response.End();
         }
 
