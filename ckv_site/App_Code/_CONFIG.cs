@@ -15,9 +15,12 @@ namespace ckv_site
         public static string PATH_ROOT = string.Empty;
         public static int LOG_PORT_REDIS = LOG_PORT_REDIS_DEFAULT;
         public static string PATH_DATA_FILE = string.Empty;
+        public static string DOMAIN_LOCALHOST = string.Empty;
 
         public static void _init() {
             PATH_ROOT = AppDomain.CurrentDomain.BaseDirectory;
+
+            DOMAIN_LOCALHOST = WebConfigurationManager.AppSettings["DOMAIN_LOCALHOST"];
 
             PATH_DATA_FILE = WebConfigurationManager.AppSettings["PATH_DATA_FILE"];
             if (string.IsNullOrWhiteSpace(PATH_DATA_FILE)) {

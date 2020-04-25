@@ -89,7 +89,7 @@ var view___init = (callback) => {
         for (var vn in cf_) {
             if (cf_[vn] && cf_[vn].views) {
                 cf_[vn].views.forEach((vi) => {
-                    fets.push(fetch(('_view/' + vn + '/' + vi.name + '.html').toLowerCase()));
+                    fets.push(fetch(('_view/' + vn + '/' + vi.name + '.htm').toLowerCase()));
                     fets.push(fetch(('_view/' + vn + '/' + vi.name + '.js').toLowerCase()));
                     fets.push(fetch(('_view/' + vn + '/' + vi.name + '.css').toLowerCase()));
                 });
@@ -128,7 +128,7 @@ var view___init = (callback) => {
                 } else if (r.ok) {
                     text = await r.text();
                     switch (type) {
-                        case 'ml': // html
+                        case 'tm': // htm
                             ___HTML[key] = text;
                             break;
                         case 'ss': // css

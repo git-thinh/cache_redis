@@ -75,12 +75,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Code\clsCache.cs" />
+    <Content Include="App_Code\Model\oApi.cs" />
+    <Content Include="App_Code\Model\oApiAddnew.cs" />
+    <Content Include="App_Code\Model\oImageItem.cs" />
+    <Content Include="App_Code\Model\oLinkItem.cs" />
+    <Content Include="App_Code\Model\oResult.cs" />
+    <Content Include="App_Code\_CONFIG.cs" />
     <Content Include="HelloworldAutodetect.html" />
     <Content Include="HelloWorldWebSocket.html" />
     <Content Include="client.html" />
     <Content Include="Global.asax" />
-    <Content Include="home.html" />
-    <Content Include="index.html" />
+    <Content Include="admin.html" />
+    <Content Include="_site\iot.vn\index.html" />
     <Content Include="test\assets\images\avatar\nan.jpg" />
     <Content Include="test\assets\images\avatar\tom.jpg" />
     <Content Include="test\assets\images\bg.jpg" />
@@ -311,55 +318,34 @@
     <Content Include="_lib\lodash.min.js" />
     <Content Include="_lib\vue\vue-router.min.js" />
     <Content Include="_lib\vue\vue.min.js" />
+    <Content Include="_site\iot.vn\test.html" />
     <Content Include="_view\dialog\test.css" />
-    <Content Include="_view\dialog\test.html" />
-    <Content Include="_view\form\form01.html" />
+    <Content Include="_view\dialog\test.htm" />
+    <Content Include="_view\form\form01.htm" />
     <Content Include="_view\form\form01.js" />
     <Content Include="_view\header\search_test.css" />
-    <Content Include="_view\header\search_test.html" />
+    <Content Include="_view\header\search_test.htm" />
     <Content Include="_view\header\search_test.js" />
-    <Content Include="_view\header\top.html" />
+    <Content Include="_view\header\top.htm" />
     <Content Include="_view\header\top.js" />
-    <Content Include="_view\loading\loading.html" />
+    <Content Include="_view\loading\loading.htm" />
     <Content Include="_view\popup\test.css" />
-    <Content Include="_view\popup\test.html" />
+    <Content Include="_view\popup\test.htm" />
     <Content Include="_view\popup\test.js" />
-    <Content Include="_view\table\table_basic.html" />
+    <Content Include="_view\table\table_basic.htm" />
     <Content Include="_view\user\login.css" />
-    <Content Include="_view\user\login.html" />
+    <Content Include="_view\user\login.htm" />
     <Content Include="_view\user\login.js" />
-    <Content Include="_view\user\logout.html" />
+    <Content Include="_view\user\logout.htm" />
     <Content Include="_view\user\logout.js" />
     <Content Include="_view\_debug\test.css" />
-    <Content Include="_view\_debug\test.html" />
+    <Content Include="_view\_debug\test.htm" />
     <Content Include="_view\_debug\test.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\clsGlobal.cs" />
     <Content Include="App_Code\clsApi.cs" />
-    <Content Include="App_Code\SimpleOwinAspNetHost.cs" />
-    <Content Include="App_Code\Helloworld.cs" />
-    <Content Include="App_Code\MiddlewareApps.cs" />
-    <Content Include="App_Code\SimpleOwinApp.cs" />
-    <Content Include="App_Code\Model\oApi.cs" />
-    <Content Include="App_Code\Model\oApiAddnew.cs" />
-    <Content Include="App_Code\Model\oImageItem.cs" />
-    <Content Include="App_Code\Model\oLinkItem.cs" />
-    <Content Include="App_Code\Model\oResult.cs" />
-    <Content Include="App_Code\SimpleOwinExtensions.cs" />
-    <Content Include="App_Code\_CONFIG.cs" />
-    <Content Include="App_Code\Middlewares\H5bp.cs" />
-    <Content Include="App_Code\Middlewares\Helpers\HttpEncoder.cs" />
-    <Content Include="App_Code\Middlewares\Helpers\HttpUtility.cs" />
-    <Content Include="App_Code\Middlewares\IRouter.cs" />
-    <Content Include="App_Code\Middlewares\JsonBodyParser.cs" />
-    <Content Include="App_Code\Middlewares\MethodOverride.cs" />
-    <Content Include="App_Code\Middlewares\NotFound.cs" />
-    <Content Include="App_Code\Middlewares\QueryParser.cs" />
-    <Content Include="App_Code\Middlewares\RegexRouter.cs" />
-    <Content Include="App_Code\Middlewares\SimpleJson.cs" />
-    <Content Include="App_Code\Middlewares\UrlEncoded.cs" />
-    <Content Include="App_Code\Middlewares\_boilerplate.cs" />
+    <Content Include="App_Code\clsJS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -400,7 +386,7 @@
     <Content Include="_view\config.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Code\WebSockets\" />
+    <Folder Include="_cache\" />
     <Folder Include="_view\sidebar\" />
   </ItemGroup>
   <PropertyGroup>
@@ -418,7 +404,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>58511</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:58511/</IISUrl>
+          <IISUrl>http://localhost:58599/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
