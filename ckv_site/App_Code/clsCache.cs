@@ -7,13 +7,14 @@ using System.Linq;
 
 namespace ckv_site
 {
-    public interface ICache {
+    public interface ICache
+    {
         void Reload();
         bool Exist(string cache_name);
         oResult ExecuteAPI(string cache_name, string do_action, string id = "", Dictionary<string, object> parameters = null);
     }
 
-    public class clsCache: ICache
+    public class clsCache : ICache
     {
         static long ID_INCREMENT = 0;
         const int SIZE_INDEX = 0;
@@ -1336,21 +1337,35 @@ namespace ckv_site
             m_engine.AddHostObject("console", m_console);
         }
 
-        public void Reload() {
+        public void Reload()
+        {
             string dir = Path.Combine(_CONFIG.PATH_ROOT, "_cache");
         }
 
         public bool Exist(string cache_name) { return m___check(cache_name); }
 
-        public oResult ExecuteAPI(string cache_name, string do_action, string id = "",  Dictionary<string, object> parameters = null)
+        public oResult ExecuteAPI(string cache_name, string do_action, string id = "", Dictionary<string, object> parameters = null)
         {
             oResult r = new oResult() { ok = false };
+            string file = Path.Combine(_CONFIG.PATH_ROOT, "_api\\" + cache_name + "___" + do_action + ".js");
+            
+            if (File.Exists(file) == false) {
+                r.error = "ERROR[clsCache.ExecuteAPI] Cannot found file: " + file;
+                return r;
+            }
+
             try
             {
                 string script = "";
-                r = (oResult)m_engine.Evaluate(script);
+                object v = m_engine.Evaluate(script);
+                if (v is Microsoft.ClearScript.Undefined)
+                {
+                    r.error = "ERROR[clsCache.ExecuteAPI] The script _api/" + cache_name + "___" + do_action + ".js return is Undefined";
+                }
+                else r = (oResult)v;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 r.error = "ERROR[clsCache.ExecuteAPI] " + e.Message;
             }
             return r;

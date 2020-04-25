@@ -87,6 +87,7 @@
     <Content Include="client.html" />
     <Content Include="Global.asax" />
     <Content Include="admin.html" />
+    <Content Include="_api\site___all.js" />
     <Content Include="_site\iot.vn\asset\img\banner-1.png" />
     <Content Include="_site\iot.vn\asset\img\comment.JPG" />
     <Content Include="_site\iot.vn\asset\img\facebook.png" />
@@ -369,6 +370,7 @@
     <Content Include="_site\iot.vn\test.html" />
     <Content Include="_site\iot.vn\_footer.htm" />
     <Content Include="_site\iot.vn\_header.htm" />
+    <Content Include="_site\test.vn\index.html" />
     <Content Include="_view\dialog\test.css" />
     <Content Include="_view\dialog\test.htm" />
     <Content Include="_view\form\form01.htm" />

@@ -54,7 +54,8 @@ namespace ckv_site
 
             //[2] Files
             string file = string.Empty;
-            if (path.Length == 0) path = "index.html";
+            bool isHome = false;
+            if (path.Length == 0) { isHome = true; path = "index.html"; }
             if (path.EndsWith(".html")) path = "_site\\" + domain + "\\" + path;
             if (path == "admin") path = "admin.html";
 
@@ -71,7 +72,15 @@ namespace ckv_site
                 Response.ContentType = contentType;
                 Response.TransmitFile(file);
             }
-            else Response.StatusCode = 404;
+            else
+            {
+                if (isHome) {
+                    Response.ContentType = contentType;
+                    Response.Write("<h1>Cannot found page " + domain + "</h1>");
+                }
+                else
+                Response.StatusCode = 404;
+            }
 
             Response.End();
         }
