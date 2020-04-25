@@ -1,0 +1,5 @@
+{
+  "release": true,
+  "max_item": 3000000,
+  "connect_string": "server=THINHNUC\\MSSQL;database=phuquy;UId=sa; Password=dev@123;Connection Timeout=180"
+}

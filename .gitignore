@@ -31,3 +31,5 @@
 /ckv_lib/obj
 /ckv_aspnet/bin/ckv_aspnet.dll.config
 /ckv_aspnet/bin/ckv_lib.dll.config
+/ckv_site/bin/roslyn
+/ckv_site/obj

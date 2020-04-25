@@ -1,0 +1,130 @@
+{
+  "_debug": {
+    "title": "Debug",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Test module",
+        "name": "test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "sidebar_right",
+        "enable": true
+      }
+    ]
+  },
+  "loading": {
+    "title": "Loading",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Loading",
+        "name": "loading",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      }
+    ]
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Test module",
+        "name": "test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      }
+    ]
+  },
+  "user": {
+    "title": "User",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Login",
+        "name": "login",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      },
+      {
+        "type": "inline",
+        "title": "Logout",
+        "name": "logout",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "",
+        "enable": true
+      }
+    ]
+  },
+  "header": {
+    "title": "Header",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Header top",
+        "name": "top",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "header_top",
+        "requiresAuth": true,
+        "enable": true
+      },
+      {
+        "type": "inline",
+        "title": "Search",
+        "name": "search_test",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "header_filter",
+        "requiresAuth": true,
+        "enable": true
+      }
+    ]
+  },
+  "table": {
+    "title": "Table",
+    "views": [
+      {
+        "type": "inline",
+        "title": "Table basic",
+        "name": "table_basic",
+        "area_allow": [ "url", "menu" ],
+        "area_init": "main_body",
+        "requiresAuth": true,
+        "enable": true
+      }
+    ]
+  },
+  "form": {
+    "title": "Form",
+    "views": [
+      {
+        "type": "inline",
+        "name": "form01"
+      }
+    ]
+  },
+  "dialog": {
+    "title": "dialog",
+    "views": [
+      {
+        "type": "dialog",
+        "title": "test",
+        "name": "test",
+        "enable": true
+      }
+    ]
+  },
+  "popup": {
+    "title": "popup",
+    "views": [
+      {
+        "type": "popup",
+        "title": "test",
+        "name": "test",
+        "enable": true
+      }
+    ]
+  }
+}
